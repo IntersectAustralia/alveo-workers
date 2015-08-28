@@ -1,0 +1,10 @@
+
+
+exchange:
+  type: direct
+  
+
+queue:
+  name: solr.index
+  durable: true
+  auto_delete: false
