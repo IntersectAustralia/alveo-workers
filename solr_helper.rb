@@ -4,8 +4,8 @@ module SolrHelper
 
   end
 
-    ##
-  # :call-seq
+  ##
+  # call-seq:
   #   date_group('6 September 1986') => '1980 - 1989'
   #   date_group('6 September 1986', 20) => '1980 - 1999'
   #
@@ -26,22 +26,22 @@ module SolrHelper
   end
 
   ##
-  # :call-seq
+  # call-seq:
   #   extract_year('6 September 1986') => 1986
   #   extract_year('Phase I fall') => 'Unknown'
   #
-  # Extracts the year from a `dc:created` string. Returns
+  # Extracts the year from a dc:created string. Handles the following examples
   #
-  #   * "1913?"
-  #   * "30/10/93"
-  #   * "96/05/17"
-  #   * "7-11/11/94"
-  #   * "17&19/8/93"
-  #   * "2012-03-07"
-  #   * "August 2000"
-  #   * "6 September 1986"
-  #   * "4 Spring 1986"
-  #   * "Phase I fall"
+  # * "1913?"
+  # * "30/10/93"
+  # * "96/05/17"
+  # * "7-11/11/94"
+  # * "17&19/8/93"
+  # * "2012-03-07"
+  # * "August 2000"
+  # * "6 September 1986"
+  # * "4 Spring 1986"
+  # * "Phase I fall"
 
   def extract_year(dc_created_string)
     dc_created_string.chomp!('?')
