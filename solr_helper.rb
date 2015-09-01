@@ -10,17 +10,17 @@ module SolrHelper
   #   date_group('6 September 1986', 20) => '1980 - 1999'
   #
   # Takes the year from a `dc:created` string and returns the range
-  # that it falls within, as specified by the option resolution
+  # that it falls within, as specified by optional resolution parameter
 
   def date_group(dc_created_string, resolution=10)
+    result = 'Unknown'
     begin
       year = extract_year(dc_created_string)
       increment = year / resolution
       range_start = increment * resolution
-      range_end = start + resolution - 1
-      result "#{range_start} - #{range_end}"
+      range_end = range_start + resolution - 1
+      result = "#{range_start} - #{range_end}"
     rescue ArgumentError
-      result = 'Unknown'
     end
       result
   end
