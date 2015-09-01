@@ -6,6 +6,27 @@ describe SolrHelper do
 
   let(:module_class) { Class.new.include(SolrHelper).new }
 
+  describe '#date_group' do
+
+    it 'returns a default range of 10' do
+      test_date_group('1994', '1990 - 1999')
+    end
+
+    it 'returns an arbitrary range' do
+      test_date_group('1994', '1988 - 1994', 7)
+    end
+
+    it 'returns "Unknown" for bad input' do
+      test_date_group('wutang clan', 'Unknown')
+    end
+
+    def test_date_group(example, expected, resolution=10)
+      actual = module_class.date_group(example, resolution)
+      expect(actual).to eq(expected)
+    end
+
+  end
+
   describe '#extract_year' do
 
     it 'parses "YYYY?"' do
@@ -53,7 +74,7 @@ describe SolrHelper do
 
     def test_extract_year(example, expected)
       actual = module_class.extract_year(example)
-      expect(expected).to eq(actual)
+      expect(actual).to eq(expected)
     end
 
   end
