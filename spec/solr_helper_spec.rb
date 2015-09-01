@@ -1,5 +1,5 @@
 require 'rspec'
-require_relative '../solr_helper.rb'
+require_relative '../solr_helper'
 
 
 describe SolrHelper do
