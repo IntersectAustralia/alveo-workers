@@ -6,6 +6,7 @@ GEM
       amq-protocol (>= 1.9.2)
     coderay (1.1.0)
     diff-lcs (1.2.5)
+    json (1.8.1)
     method_source (0.8.2)
     pry (0.10.1)
       coderay (~> 1.1.0)
@@ -31,6 +32,7 @@ PLATFORMS
 
 DEPENDENCIES
   bunny (>= 2.0.1)
+  json
   pry
   rspec
 
