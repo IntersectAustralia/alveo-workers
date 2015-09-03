@@ -6,6 +6,7 @@ require_relative '../solr_helper'
 describe SolrHelper do
 
   let(:module_class) { Class.new.include(SolrHelper).new }
+  let(:solr_config) { YAML.load_file('./spec/files/solr_config.yml') }
 
   describe '#date_group' do
 
@@ -83,11 +84,10 @@ describe SolrHelper do
   describe '#map_facet_fields' do
 
 
-    describe '#set_facet_field_map' do
+    describe '#field_to_facet_map' do
 
       it 'initialises the @default_document' do
-        config = YAML.load_file('./spec/files/solr_facets.yml')
-        facet_field_map = config['solr']['mapped_facets']
+        rdf_relation_to_facet_map = solr_config['solr']['rdf_relation_to_facet_map']
         expected = {"AUSNC_audience_facet"=>"unspecified",
                     "AUSNC_communication_setting_facet"=>"unspecified",
                     "AUSNC_mode_facet"=>"unspecified",
@@ -100,8 +100,34 @@ describe SolrHelper do
                     "AUSNC_communication_context_facet"=>"unspecified",
                     "AUSNC_communication_medium_facet"=>"unspecified",
                     "OLAC_discourse_type_facet"=>"unspecified"}
-        module_class.set_facet_field_map(facet_field_map)
+        module_class.set_rdf_relation_to_facet_map(rdf_relation_to_facet_map)
         actual = module_class.instance_variable_get(:@default_document)
+        expect(actual).to eq(expected)
+      end
+
+    end
+
+    describe '#generate_item_fields' do
+
+      it 'generates a hash with _ssim and _tesim keys' do
+        rdf_ns_to_solr_prefix_map = solr_config['solr']['rdf_ns_to_solr_prefix_map']
+        module_class.set_rdf_ns_to_solr_prefix_map(rdf_ns_to_solr_prefix_map)
+        module_class.instance_variable_set(:@rdf_prefix_to_ns_map, {'dcterms': 'http://purl.org/dc/terms/'})
+        expected = { 'DC_contributor_ssim': 'Kanye West', 'DC_contributor_tesim': 'Kanye West' }
+        actual = module_class.generate_item_fields('dcterms:contributor', 'Kanye West')
+        expect(actual).to eq(expected)
+      end
+
+    end
+
+    describe '#map_rdf_predicate_to_solr_field' do
+
+      it 'maps RDF prefix to a solr prefix' do
+        rdf_ns_to_solr_prefix_map = solr_config['solr']['rdf_ns_to_solr_prefix_map']
+        module_class.set_rdf_ns_to_solr_prefix_map(rdf_ns_to_solr_prefix_map)
+        module_class.instance_variable_set(:@rdf_prefix_to_ns_map, {'dcterms': 'http://purl.org/dc/terms/'})
+        expected = 'DC_contributor'
+        actual = module_class.map_rdf_predicate_to_solr_field('dcterms:contributor')
         expect(actual).to eq(expected)
       end
 

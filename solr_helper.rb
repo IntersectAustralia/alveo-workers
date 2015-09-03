@@ -1,13 +1,12 @@
 module SolrHelper
 
-  @facet_field_map = {}
-
   def create_solr_document()
 
   end
 
   def map_facet_fields(json_ld_hash)
     result = {}
+     @rdf_prefix_to_ns_map = json_ld_hash['@context']
     json_ld_hash['@graph'].each { |graph_hash|
       if is_item? graph_hash
         map_item_fields graph_hash
@@ -20,15 +19,27 @@ module SolrHelper
 
   def map_item_fields(graph_hash)
     result = @default_document.clone
-
     graph_hash.each { |key, value|
       if @facet_field_map.has_key? key
         result[facet_field_map[key]] = value
       else
-
+        result.merge(generate_item_fields(key, value))
       end
     }
     result
+  end
+
+  def generate_item_fields(rdf_predicate, value)
+    solr_field = map_rdf_predicate_to_solr_field(rdf_predicate)
+    solr_value = extract_value(value)
+    { "#{solr_field}_ssim": value, "#{solr_field}_tesim": value }
+  end
+
+  def map_rdf_predicate_to_solr_field(rdf_predicate)
+    predicate_components = rdf_predicate.split(':')
+    rdf_prefix = predicate_components.first.to_sym
+    solr_prefix = @rdf_ns_to_solr_prefix_map[@rdf_prefix_to_ns_map[rdf_prefix]]
+    solr_prefix + predicate_components.last
   end
 
   def map_document_fields(graph_hash)
@@ -48,19 +59,26 @@ module SolrHelper
   end
 
   ##
-  # Sets facet_field_map, which should be a Hash of key-value
-  # pairs which map from the JSON-LD key to the Solr document
-  # value. e.g.
+  # Sets  the rdf_relation_to_facet_map, which should be a Hash of key-value
+  # pairs which map from the JSON-LD relation key to the Solr document
+  # facet value. e.g.
   #
   # 'dcterms:isPartOf': collection_name_facet
   #
 
-  def set_facet_field_map(facet_field_map)
-    @facet_field_map = facet_field_map
+  def set_rdf_relation_to_facet_map(rdf_relation_to_facet_map)
+    @rdf_relation_to_facet_map = rdf_relation_to_facet_map
     @default_document = {}
-    facet_field_map.each_value { |value|
+    rdf_relation_to_facet_map.each_value { |value|
       @default_document[value] = 'unspecified'
     }
+  end
+
+  ##
+  #
+
+  def set_rdf_ns_to_solr_prefix_map(rdf_ns_to_solr_prefix_map)
+    @rdf_ns_to_solr_prefix_map = rdf_ns_to_solr_prefix_map
   end
 
   ##
