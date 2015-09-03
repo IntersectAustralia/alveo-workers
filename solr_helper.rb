@@ -1,7 +1,66 @@
 module SolrHelper
 
+  @facet_field_map = {}
+
   def create_solr_document()
 
+  end
+
+  def map_facet_fields(json_ld_hash)
+    result = {}
+    json_ld_hash['@graph'].each { |graph_hash|
+      if is_item? graph_hash
+        map_item_fields graph_hash
+      elsif is_document? graph_hash
+        map_document_fields graph_hash
+      end
+    }
+    result
+  end
+
+  def map_item_fields(graph_hash)
+    result = @default_document.clone
+
+    graph_hash.each { |key, value|
+      if @facet_field_map.has_key? key
+        result[facet_field_map[key]] = value
+      else
+
+      end
+    }
+    result
+  end
+
+  def map_document_fields(graph_hash)
+
+  end
+
+  def extract_value(value)
+    if value.is_a? Hash
+      result = value[:@id]
+      if result !~ /^\w+?\:\/{2}/ # URI test
+        result = result.split(':').last
+      end
+    else
+      result = value
+    end
+    result
+  end
+
+  ##
+  # Sets facet_field_map, which should be a Hash of key-value
+  # pairs which map from the JSON-LD key to the Solr document
+  # value. e.g.
+  #
+  # 'dcterms:isPartOf': collection_name_facet
+  #
+
+  def set_facet_field_map(facet_field_map)
+    @facet_field_map = facet_field_map
+    @default_document = {}
+    facet_field_map.each_value { |value|
+      @default_document[value] = 'unspecified'
+    }
   end
 
   ##
@@ -58,6 +117,24 @@ module SolrHelper
     end
     year = year + 1900 if year < 100
     year
+  end
+
+  def graph_type(graph_hash)
+    result = 'Unknown'
+    if graph_hash['@type'] == 'ausnc:AusNCObject'
+      result = 'Item'
+    elsif graph_hash['@type'] == 'foaf:Document'
+      result = 'Document'
+    end
+    result
+  end
+
+  def is_document?(graph_hash)
+    graph_type(graph_hash) == 'Document'
+  end
+
+  def is_item?(graph_hash)
+    graph_type(graph_hash) == 'Item'
   end
 
 end
