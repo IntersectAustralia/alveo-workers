@@ -1,6 +1,7 @@
 require 'rspec'
+require 'json'
+require 'yaml'
 require_relative '../solr_helper'
-
 
 describe SolrHelper do
 
@@ -74,6 +75,60 @@ describe SolrHelper do
 
     def test_extract_year(example, expected)
       actual = module_class.extract_year(example)
+      expect(actual).to eq(expected)
+    end
+
+  end
+
+  describe '#map_facet_fields' do
+
+
+    describe '#set_facet_field_map' do
+
+      it 'initialises the @default_document' do
+        config = YAML.load_file('./spec/files/solr_facets.yml')
+        facet_field_map = config['solr']['mapped_facets']
+        expected = {"AUSNC_audience_facet"=>"unspecified",
+                    "AUSNC_communication_setting_facet"=>"unspecified",
+                    "AUSNC_mode_facet"=>"unspecified",
+                    "AUSNC_publication_status_facet"=>"unspecified",
+                    "AUSNC_written_mode_facet"=>"unspecified",
+                    "collection_name_facet"=>"unspecified",
+                    "OLAC_language_facet"=>"unspecified",
+                    "AUSNC_speech_style_facet"=>"unspecified",
+                    "AUSNC_interactivity_facet"=>"unspecified",
+                    "AUSNC_communication_context_facet"=>"unspecified",
+                    "AUSNC_communication_medium_facet"=>"unspecified",
+                    "OLAC_discourse_type_facet"=>"unspecified"}
+        module_class.set_facet_field_map(facet_field_map)
+        actual = module_class.instance_variable_get(:@default_document)
+        expect(actual).to eq(expected)
+      end
+
+    end
+
+    describe '#extract_value' do
+
+      it 'does not strip URIs' do
+        test_extract_value({'@id': 'file:///path/to/file.txt'}, 'file:///path/to/file.txt')
+        test_extract_value({'@id': 'http://www.test.org'}, 'http://www.test.org')
+        test_extract_value({'@id': 'ssh://root:pass@lol.hax.org'}, 'ssh://root:pass@lol.hax.org')
+      end
+
+      it 'strips RDF vocabulary' do
+        test_extract_value({'@id': 'ausnc:published'}, 'published')
+        test_extract_value({'@id': 'ausnc:print'}, 'print')
+        test_extract_value({'@id': 'corpus:ace'}, 'ace')
+      end
+
+      it 'does not modify non Hashes' do
+        test_extract_value('Skills, trades and hobbies', 'Skills, trades and hobbies')
+      end
+
+    end
+
+    def test_extract_value(example, expected)
+      actual = module_class.extract_value(example)
       expect(actual).to eq(expected)
     end
 
