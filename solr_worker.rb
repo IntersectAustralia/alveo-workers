@@ -1,4 +1,5 @@
 require 'bunny'
+require 'json'
 
 class SolrWorker
 
@@ -22,7 +23,15 @@ class SolrWorker
   end
 
   def on_message(payload)
+    message = JSON.parse(payload)
+    if message[:action] = 'index'
+      index_item()
+    end
+  end
+
+  def index_item()
 
   end
+
 
 end
