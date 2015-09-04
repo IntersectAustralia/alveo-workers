@@ -86,7 +86,7 @@ describe SolrHelper do
 
     describe '#set_rdf_relation_to_facet_map' do
 
-      it 'initialises the @default_document' do
+      it 'initialises the @default_item_fields' do
         rdf_relation_to_facet_map = solr_config['solr']['rdf_relation_to_facet_map']
         expected = {"AUSNC_audience_facet"=>"unspecified",
                     "AUSNC_communication_setting_facet"=>"unspecified",
@@ -102,6 +102,21 @@ describe SolrHelper do
                     "OLAC_discourse_type_facet"=>"unspecified"}
         module_class.set_rdf_relation_to_facet_map(rdf_relation_to_facet_map)
         actual = module_class.instance_variable_get(:@default_item_fields)
+        expect(actual).to eq(expected)
+      end
+
+    end
+
+    describe '#set_document_field_to_rdf_relationmap' do
+
+      it 'initialises the @default_document' do
+        # rdf_relation_to_document_field_map = solr_config['solr']['rdf_relation_to_document_field_map']
+        document_field_to_rdf_relation_map = {'DC_type_facet' => 'http://purl.org/dc/terms/type',
+                                              'DC_extent_sim' => 'http://purl.org/dc/terms/extent',
+                                              'DC_extent_tesim' => 'http://purl.org/dc/terms/extent'}
+        module_class.set_document_field_to_rdf_relation_map(document_field_to_rdf_relation_map)
+        expected = {'DC_type_facet' => [], 'DC_extent_sim' => [], 'DC_extent_tesim' => []}
+        actual = module_class.instance_variable_get(:@default_document_fields)
         expect(actual).to eq(expected)
       end
 
@@ -168,6 +183,24 @@ describe SolrHelper do
       (acutal_ns, actual_term) = module_class.get_qualified_term('http://ns.ausnc.org.au/schemas/ausnc_md_model/speech_style')
       expect(acutal_ns).to eq(expected_ns)
       expect(actual_term).to eq(expected_term)
+    end
+
+    describe '#map_document_fields' do
+
+      it 'maps and merges document metadata' do
+        document_field_to_rdf_relation_map = solr_config['solr']['document_field_to_rdf_relation_map']
+        module_class.set_document_field_to_rdf_relation_map(document_field_to_rdf_relation_map)
+        example = [{"http://purl.org/dc/terms/extent" => [{"@value" => 1234}],
+                    "http://purl.org/dc/terms/type" => [{"@value" => "Original"}]},
+                   {"http://purl.org/dc/terms/extent" => [{"@value" => 5678}],
+                    "http://purl.org/dc/terms/type" => [{"@value" => "Raw"}]}]
+        expected = {'DC_type_facet' => ['Original', 'Raw'],
+                    'DC_extent_sim' => [1234, 5678],
+                    'DC_extent_tesim' => [1234, 5678]}
+        actual = module_class.map_document_fields(example)
+        expect(actual).to eq(expected)
+      end
+
     end
 
   end
