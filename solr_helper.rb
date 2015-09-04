@@ -5,20 +5,33 @@ module SolrHelper
   end
 
   def map_facet_fields(json_ld_hash)
-    result = {}
-     @rdf_prefix_to_ns_map = json_ld_hash['@context']
+    @rdf_context_map = json_ld_hash['@context']
+    item_graph = nil
+    document_graphs = []
     json_ld_hash['@graph'].each { |graph_hash|
       if is_item? graph_hash
-        map_item_fields graph_hash
+        item_graph = graph_hash
       elsif is_document? graph_hash
-        map_document_fields graph_hash
+        document_graphs << graph_hash
       end
     }
+    map_item_fields item_graph
+    map_document_fields document_graphs
     result
   end
 
-  def map_item_fields(graph_hash)
-    result = @default_document.clone
+  def resolve_context(rdf_predicate)
+    result = rdf_predicate
+    if !~ /^@/
+      predicate_components = rdf_predicate.split(':')
+      rdf_prefix = predicate_components.first.to_sym
+      @rdf_context_map[rdf_prefix] + predicate_components.last
+    end
+    result
+  end
+
+  def map_item_fields(item_graph)
+    result = get_default_item_fields
     graph_hash.each { |key, value|
       if @facet_field_map.has_key? key
         result[facet_field_map[key]] = value
@@ -29,22 +42,30 @@ module SolrHelper
     result
   end
 
+  def map_document_fields(document_graphs)
+    result = get_default_document_fields
+    document_graphs.each { |document|
+      @rdf_relation_to_document_field_map.each { |rdf_relation|
+        
+      }
+    }
+    result
+  end
+
   def generate_item_fields(rdf_predicate, value)
     solr_field = map_rdf_predicate_to_solr_field(rdf_predicate)
     solr_value = extract_value(value)
     { "#{solr_field}_ssim": value, "#{solr_field}_tesim": value }
   end
 
+  # TODO rework this
   def map_rdf_predicate_to_solr_field(rdf_predicate)
     predicate_components = rdf_predicate.split(':')
     rdf_prefix = predicate_components.first.to_sym
-    solr_prefix = @rdf_ns_to_solr_prefix_map[@rdf_prefix_to_ns_map[rdf_prefix]]
+    solr_prefix = @rdf_ns_to_solr_prefix_map[@rdf_context_map[rdf_prefix]]
     solr_prefix + predicate_components.last
   end
 
-  def map_document_fields(graph_hash)
-
-  end
 
   def extract_value(value)
     if value.is_a? Hash
@@ -68,14 +89,19 @@ module SolrHelper
 
   def set_rdf_relation_to_facet_map(rdf_relation_to_facet_map)
     @rdf_relation_to_facet_map = rdf_relation_to_facet_map
-    @default_document = {}
+    @default_item_fields = {}
     rdf_relation_to_facet_map.each_value { |value|
-      @default_document[value] = 'unspecified'
+      @default_item_fields[value] = 'unspecified'
     }
   end
 
-  ##
-  #
+  def set_rdf_relation_to_document_field_map(rdf_relation_to_document_field_map)
+    @rdf_relation_to_document_field_map = rdf_relation_to_document_field_map
+    @default_document_fields = {}
+    rdf_relation_to_document_field_map.each_value { |value|
+      @default_document_fields[value] = []
+    }
+  end
 
   def set_rdf_ns_to_solr_prefix_map(rdf_ns_to_solr_prefix_map)
     @rdf_ns_to_solr_prefix_map = rdf_ns_to_solr_prefix_map
@@ -145,6 +171,14 @@ module SolrHelper
       result = 'Document'
     end
     result
+  end
+
+  def get_default_item_fields
+    @default_item_fields.clone
+  end
+
+  def get_default_document_fields
+    @default_document_fields.clone
   end
 
   def is_document?(graph_hash)
