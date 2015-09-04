@@ -30,7 +30,7 @@ solr:
     'http://www.loc.gov/loc.terms/relators/': LoC_
     'http://alveo.edu.au/vocabulary/': AUSTALK_
     'http://ns.austalk.edu.au/': Alveo_
-  rdf_relation_to_document_field_map:
-    'http://purl.org/dc/terms/type': DC_type_facet
-    'http://purl.org/dc/terms/extent': DC_extent_sim
-    'http://purl.org/dc/terms/extent': DC_extent_tesim
+  document_field_to_rdf_relation_map:
+    DC_type_facet: 'http://purl.org/dc/terms/type'
+    DC_extent_sim: 'http://purl.org/dc/terms/extent'
+    DC_extent_tesim: 'http://purl.org/dc/terms/extent'

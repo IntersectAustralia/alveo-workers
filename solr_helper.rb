@@ -21,7 +21,7 @@ module SolrHelper
       if @facet_field_map.has_key? key
         result[facet_field_map[key]] = value
       else
-        # result.merge(generate_item_fields(key, value))
+        result.merge(generate_item_fields(key, value))
       end
     }
     result
@@ -30,8 +30,8 @@ module SolrHelper
   def map_document_fields(document_graphs)
     result = get_default_document_fields
     document_graphs.each { |document|
-      @rdf_relation_to_document_field_map.each { |rdf_relation|
-
+      @document_field_to_rdf_relation_map.each { |key, value|
+        result[key] << extract_value(document[value])
       }
     }
     result
@@ -73,6 +73,16 @@ module SolrHelper
     @default_item_fields = {}
     rdf_relation_to_facet_map.each_value { |value|
       @default_item_fields[value] = 'unspecified'
+    }
+  end
+
+  def set_document_field_to_rdf_relation_map(document_field_to_rdf_relation_map)
+    # require 'pry'
+    # binding.pry
+    @document_field_to_rdf_relation_map = document_field_to_rdf_relation_map
+    @default_document_fields = {}
+    document_field_to_rdf_relation_map.each_key { |key|
+      @default_document_fields[key] = []
     }
   end
 
