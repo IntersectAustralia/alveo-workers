@@ -1,11 +1,6 @@
 module SolrHelper
 
-  def create_solr_document()
-
-  end
-
   def map_facet_fields(json_ld_hash)
-    @rdf_context_map = json_ld_hash['@context']
     item_graph = nil
     document_graphs = []
     json_ld_hash['@graph'].each { |graph_hash|
@@ -20,23 +15,13 @@ module SolrHelper
     result
   end
 
-  def resolve_context(rdf_predicate)
-    result = rdf_predicate
-    if !~ /^@/
-      predicate_components = rdf_predicate.split(':')
-      rdf_prefix = predicate_components.first.to_sym
-      @rdf_context_map[rdf_prefix] + predicate_components.last
-    end
-    result
-  end
-
   def map_item_fields(item_graph)
     result = get_default_item_fields
-    graph_hash.each { |key, value|
+    item_graph.each { |key, value|
       if @facet_field_map.has_key? key
         result[facet_field_map[key]] = value
       else
-        result.merge(generate_item_fields(key, value))
+        # result.merge(generate_item_fields(key, value))
       end
     }
     result
@@ -46,7 +31,7 @@ module SolrHelper
     result = get_default_document_fields
     document_graphs.each { |document|
       @rdf_relation_to_document_field_map.each { |rdf_relation|
-        
+
       }
     }
     result
@@ -55,28 +40,24 @@ module SolrHelper
   def generate_item_fields(rdf_predicate, value)
     solr_field = map_rdf_predicate_to_solr_field(rdf_predicate)
     solr_value = extract_value(value)
-    { "#{solr_field}_ssim": value, "#{solr_field}_tesim": value }
+    { "#{solr_field}_ssim" => value, "#{solr_field}_tesim" => value }
   end
 
-  # TODO rework this
-  def map_rdf_predicate_to_solr_field(rdf_predicate)
-    predicate_components = rdf_predicate.split(':')
-    rdf_prefix = predicate_components.first.to_sym
-    solr_prefix = @rdf_ns_to_solr_prefix_map[@rdf_context_map[rdf_prefix]]
-    solr_prefix + predicate_components.last
+  # TODO change predicate to 'term'
+  def map_rdf_predicate_to_solr_field(uri)
+    (namespace, term) = get_qualified_term(uri)
+    solr_prefix = @rdf_ns_to_solr_prefix_map[namespace]
+    solr_prefix + term
   end
 
 
   def extract_value(value)
-    if value.is_a? Hash
-      result = value[:@id]
-      if result !~ /^\w+?\:\/{2}/ # URI test
-        result = result.split(':').last
-      end
+    if value.is_a? Array
+      result = value.first.values.first
     else
       result = value
     end
-    result
+    result   
   end
 
   ##
@@ -92,14 +73,6 @@ module SolrHelper
     @default_item_fields = {}
     rdf_relation_to_facet_map.each_value { |value|
       @default_item_fields[value] = 'unspecified'
-    }
-  end
-
-  def set_rdf_relation_to_document_field_map(rdf_relation_to_document_field_map)
-    @rdf_relation_to_document_field_map = rdf_relation_to_document_field_map
-    @default_document_fields = {}
-    rdf_relation_to_document_field_map.each_value { |value|
-      @default_document_fields[value] = []
     }
   end
 
@@ -125,7 +98,7 @@ module SolrHelper
       result = "#{range_start} - #{range_end}"
     rescue ArgumentError
     end
-      result
+    result
   end
 
   ##
@@ -164,13 +137,17 @@ module SolrHelper
   end
 
   def graph_type(graph_hash)
-    result = 'Unknown'
-    if graph_hash['@type'] == 'ausnc:AusNCObject'
-      result = 'Item'
-    elsif graph_hash['@type'] == 'foaf:Document'
-      result = 'Document'
-    end
-    result
+    get_unqualified_term(graph_hash['@type'].first)
+  end
+
+  def get_qualified_term(uri)
+    term = get_unqualified_term(uri)
+    namespace = uri[0..-(term.length+1)]
+    [namespace, term]
+  end
+
+  def get_unqualified_term(uri)
+    uri.split('/').last
   end
 
   def get_default_item_fields
@@ -186,7 +163,7 @@ module SolrHelper
   end
 
   def is_item?(graph_hash)
-    graph_type(graph_hash) == 'Item'
+    graph_type(graph_hash) == 'AusNCObject'
   end
 
 end

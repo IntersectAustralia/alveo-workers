@@ -2,18 +2,18 @@
 
 solr:
   rdf_relation_to_facet_map:
-    'dcterms:isPartOf': collection_name_facet
-    'ausnc:mode': AUSNC_mode_facet
-    'ausnc:speech_style': AUSNC_speech_style_facet
-    'ausnc:publication_status': AUSNC_publication_status_facet
-    'ausnc:written_mode': AUSNC_written_mode_facet
-    'ausnc:interactivity': AUSNC_interactivity_facet
-    'ausnc:communication_context': AUSNC_communication_context_facet
-    'ausnc:communication_medium': AUSNC_communication_medium_facet
-    'ausnc:communication_setting': AUSNC_communication_setting_facet
-    'ausnc:audience': AUSNC_audience_facet
-    'olac:discourse_type': OLAC_discourse_type_facet
-    'olac:language': OLAC_language_facet
+    'http://purl.org/dc/terms/isPartOf': collection_name_facet
+    'http://ns.ausnc.org.au/schemas/ausnc_md_model/mode': AUSNC_mode_facet
+    'http://ns.ausnc.org.au/schemas/ausnc_md_model/speech_style': AUSNC_speech_style_facet
+    'http://ns.ausnc.org.au/schemas/ausnc_md_model/publication_status': AUSNC_publication_status_facet
+    'http://ns.ausnc.org.au/schemas/ausnc_md_model/written_mode': AUSNC_written_mode_facet
+    'http://ns.ausnc.org.au/schemas/ausnc_md_model/interactivity': AUSNC_interactivity_facet
+    'http://ns.ausnc.org.au/schemas/ausnc_md_model/communication_context': AUSNC_communication_context_facet
+    'http://ns.ausnc.org.au/schemas/ausnc_md_model/communication_medium': AUSNC_communication_medium_facet
+    'http://ns.ausnc.org.au/schemas/ausnc_md_model/communication_setting': AUSNC_communication_setting_facet
+    'http://ns.ausnc.org.au/schemas/ausnc_md_model/audience': AUSNC_audience_facet
+    'http://www.language-archives.org/OLAC/1.1/discourse_type': OLAC_discourse_type_facet
+    'http://www.language-archives.org/OLAC/1.1/language': OLAC_language_facet
   rdf_ns_to_solr_prefix_map:
     'http://ns.ausnc.org.au/schemas/ace/': ACE_
     'http://ns.ausnc.org.au/schemas/ausnc_md_model/': AUSNC_
@@ -27,7 +27,6 @@ solr:
     'http://purl.org/vocab/bio/0.1/':  PURL_VOCAB_
     'http://www.language-archives.org/OLAC/1.1/': OLAC_
     'http://xmlns.com/foaf/0.1/': FOAF_
-    'http://www.w3.org/1999/02/22-rdf-syntax-ns#': RDF_
     'http://www.loc.gov/loc.terms/relators/': LoC_
     'http://alveo.edu.au/vocabulary/': AUSTALK_
     'http://ns.austalk.edu.au/': Alveo_

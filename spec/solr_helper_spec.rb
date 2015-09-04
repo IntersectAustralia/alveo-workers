@@ -84,7 +84,7 @@ describe SolrHelper do
   describe '#map_facet_fields' do
 
 
-    describe '#field_to_facet_map' do
+    describe '#set_rdf_relation_to_facet_map' do
 
       it 'initialises the @default_document' do
         rdf_relation_to_facet_map = solr_config['solr']['rdf_relation_to_facet_map']
@@ -101,7 +101,7 @@ describe SolrHelper do
                     "AUSNC_communication_medium_facet"=>"unspecified",
                     "OLAC_discourse_type_facet"=>"unspecified"}
         module_class.set_rdf_relation_to_facet_map(rdf_relation_to_facet_map)
-        actual = module_class.instance_variable_get(:@default_document)
+        actual = module_class.instance_variable_get(:@default_item_fields)
         expect(actual).to eq(expected)
       end
 
@@ -112,9 +112,8 @@ describe SolrHelper do
       it 'generates a hash with _ssim and _tesim keys' do
         rdf_ns_to_solr_prefix_map = solr_config['solr']['rdf_ns_to_solr_prefix_map']
         module_class.set_rdf_ns_to_solr_prefix_map(rdf_ns_to_solr_prefix_map)
-        module_class.instance_variable_set(:@rdf_prefix_to_ns_map, {'dcterms': 'http://purl.org/dc/terms/'})
-        expected = { 'DC_contributor_ssim': 'Kanye West', 'DC_contributor_tesim': 'Kanye West' }
-        actual = module_class.generate_item_fields('dcterms:contributor', 'Kanye West')
+        expected = { 'DC_contributor_ssim' => 'Kanye West', 'DC_contributor_tesim' => 'Kanye West' }
+        actual = module_class.generate_item_fields('http://purl.org/dc/terms/contributor', 'Kanye West')
         expect(actual).to eq(expected)
       end
 
@@ -125,9 +124,8 @@ describe SolrHelper do
       it 'maps RDF prefix to a solr prefix' do
         rdf_ns_to_solr_prefix_map = solr_config['solr']['rdf_ns_to_solr_prefix_map']
         module_class.set_rdf_ns_to_solr_prefix_map(rdf_ns_to_solr_prefix_map)
-        module_class.instance_variable_set(:@rdf_prefix_to_ns_map, {'dcterms': 'http://purl.org/dc/terms/'})
         expected = 'DC_contributor'
-        actual = module_class.map_rdf_predicate_to_solr_field('dcterms:contributor')
+        actual = module_class.map_rdf_predicate_to_solr_field('http://purl.org/dc/terms/contributor')
         expect(actual).to eq(expected)
       end
 
@@ -135,16 +133,8 @@ describe SolrHelper do
 
     describe '#extract_value' do
 
-      it 'does not strip URIs' do
-        test_extract_value({'@id': 'file:///path/to/file.txt'}, 'file:///path/to/file.txt')
-        test_extract_value({'@id': 'http://www.test.org'}, 'http://www.test.org')
-        test_extract_value({'@id': 'ssh://root:pass@lol.hax.org'}, 'ssh://root:pass@lol.hax.org')
-      end
-
-      it 'strips RDF vocabulary' do
-        test_extract_value({'@id': 'ausnc:published'}, 'published')
-        test_extract_value({'@id': 'ausnc:print'}, 'print')
-        test_extract_value({'@id': 'corpus:ace'}, 'ace')
+      it 'extracts the first deeply nested hash value' do
+        test_extract_value([{"@value" => "Skills, trades and hobbies"}], 'Skills, trades and hobbies')
       end
 
       it 'does not modify non Hashes' do
@@ -156,6 +146,28 @@ describe SolrHelper do
     def test_extract_value(example, expected)
       actual = module_class.extract_value(example)
       expect(actual).to eq(expected)
+    end
+
+  end
+
+  describe '#graph_type' do
+
+    it 'returns the qualified type term when given a graph hash' do
+      expected = 'AusNCObject'
+      actual = module_class.graph_type({"@type" => ["http://ns.ausnc.org.au/schemas/ausnc_md_model/AusNCObject"]})
+      expect(actual).to eq(expected)
+    end
+    
+  end
+
+  describe '#get_qualified_term' do
+
+    it 'parses a fully qualified term into its namespace and term' do
+      expected_ns = 'http://ns.ausnc.org.au/schemas/ausnc_md_model/'
+      expected_term = 'speech_style'
+      (acutal_ns, actual_term) = module_class.get_qualified_term('http://ns.ausnc.org.au/schemas/ausnc_md_model/speech_style')
+      expect(acutal_ns).to eq(expected_ns)
+      expect(actual_term).to eq(expected_term)
     end
 
   end
