@@ -121,7 +121,7 @@ describe SolrHelper do
 
     describe '#generate_item_fields' do
 
-      it 'generates a hash with _ssim and _tesim keys' do
+      it 'generates a hash with _ssim and _tesim values to index' do
         rdf_ns_to_solr_prefix_map = solr_config['solr']['rdf_ns_to_solr_prefix_map']
         module_class.set_rdf_ns_to_solr_prefix_map(rdf_ns_to_solr_prefix_map)
         expected = { 'DC_contributor_ssim' => 'Kanye West', 'DC_contributor_tesim' => 'Kanye West' }
@@ -224,6 +224,25 @@ describe SolrHelper do
 
       def test_normalise_whitespace(example, expected)
         actual = module_class.normalise_whitespace(example)
+        expect(actual).to eq(expected)
+      end
+
+    end
+
+    describe '#generate_access_rights' do
+
+      it 'generates a hash with group and person access rights values to index' do
+        example_person = 'data_owner@intersect.org.au'
+        example_group = 'collection'
+        expected = {
+            discover_access_group_ssim: 'collection-discover',
+            read_access_group_ssim: 'collection-read',
+            edit_access_group_ssim: 'collection-edit',
+            discover_access_person_ssim: 'data_owner@intersect.org.au',
+            read_access_person_ssim: 'data_owner@intersect.org.au',
+            edit_access_person_ssim: 'data_owner@intersect.org.au'
+        }
+        actual = module_class.generate_access_rights(example_person, example_group)
         expect(actual).to eq(expected)
       end
 

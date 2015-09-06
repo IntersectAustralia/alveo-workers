@@ -43,6 +43,17 @@ module SolrHelper
     { "#{solr_field}_ssim" => value, "#{solr_field}_tesim" => value }
   end
 
+  def generate_access_rights(person, group)
+    {
+        discover_access_person_ssim: person,
+        read_access_person_ssim: person,
+        edit_access_person_ssim: person,
+        discover_access_group_ssim: "#{group}-discover",
+        read_access_group_ssim: "#{group}-read",
+        edit_access_group_ssim: "#{group}-edit",
+    }
+  end
+
   # TODO change predicate to 'term'
   def map_rdf_predicate_to_solr_field(uri)
     (namespace, term) = get_qualified_term(uri)
@@ -76,8 +87,6 @@ module SolrHelper
   end
 
   def set_document_field_to_rdf_relation_map(document_field_to_rdf_relation_map)
-    # require 'pry'
-    # binding.pry
     @document_field_to_rdf_relation_map = document_field_to_rdf_relation_map
     @default_document_fields = {}
     document_field_to_rdf_relation_map.each_key { |key|
