@@ -85,18 +85,18 @@ describe SolrHelper do
 
       it 'initialises the @default_item_fields' do
         rdf_relation_to_facet_map = solr_config['solr']['rdf_relation_to_facet_map']
-        expected = {"AUSNC_audience_facet"=>"unspecified",
-                    "AUSNC_communication_setting_facet"=>"unspecified",
-                    "AUSNC_mode_facet"=>"unspecified",
-                    "AUSNC_publication_status_facet"=>"unspecified",
-                    "AUSNC_written_mode_facet"=>"unspecified",
-                    "collection_name_facet"=>"unspecified",
-                    "OLAC_language_facet"=>"unspecified",
-                    "AUSNC_speech_style_facet"=>"unspecified",
-                    "AUSNC_interactivity_facet"=>"unspecified",
-                    "AUSNC_communication_context_facet"=>"unspecified",
-                    "AUSNC_communication_medium_facet"=>"unspecified",
-                    "OLAC_discourse_type_facet"=>"unspecified"}
+        expected = {'AUSNC_audience_facet' => 'unspecified',
+                    'AUSNC_communication_setting_facet' => 'unspecified',
+                    'AUSNC_mode_facet' => 'unspecified',
+                    'AUSNC_publication_status_facet' => 'unspecified',
+                    'AUSNC_written_mode_facet' => 'unspecified',
+                    'collection_name_facet' => 'unspecified',
+                    'OLAC_language_facet' => 'unspecified',
+                    'AUSNC_speech_style_facet' => 'unspecified',
+                    'AUSNC_interactivity_facet' => 'unspecified',
+                    'AUSNC_communication_context_facet' => 'unspecified',
+                    'AUSNC_communication_medium_facet' => 'unspecified',
+                    'OLAC_discourse_type_facet' => 'unspecified'}
         module_class.set_rdf_relation_to_facet_map(rdf_relation_to_facet_map)
         actual = module_class.instance_variable_get(:@default_item_fields)
         expect(actual).to eq(expected)
@@ -146,11 +146,15 @@ describe SolrHelper do
     describe '#extract_value' do
 
       it 'extracts the first deeply nested hash value' do
-        test_extract_value([{"@value" => "Skills, trades and hobbies"}], 'Skills, trades and hobbies')
+        test_extract_value([{'@value' => 'Skills, trades and hobbies'}], 'Skills, trades and hobbies')
       end
 
       it 'does not modify non Hashes' do
         test_extract_value('Skills, trades and hobbies', 'Skills, trades and hobbies')
+      end
+
+      it 'normailises whitespace in the extracted value' do
+        test_extract_value([{'@value' => "   Skills, trades\t\tand hobbies\n"}], 'Skills, trades and hobbies')
       end
 
     end
@@ -166,10 +170,10 @@ describe SolrHelper do
 
     it 'returns the qualified type term when given a graph hash' do
       expected = 'AusNCObject'
-      actual = module_class.graph_type({"@type" => ["http://ns.ausnc.org.au/schemas/ausnc_md_model/AusNCObject"]})
+      actual = module_class.graph_type({'@type' => ['http://ns.ausnc.org.au/schemas/ausnc_md_model/AusNCObject']})
       expect(actual).to eq(expected)
     end
-    
+
   end
 
   describe '#get_qualified_term' do
@@ -195,6 +199,31 @@ describe SolrHelper do
                     'DC_extent_sim' => [1234, 5678],
                     'DC_extent_tesim' => [1234, 5678]}
         actual = module_class.map_document_fields(example)
+        expect(actual).to eq(expected)
+      end
+
+    end
+
+    describe '#normalise_whitespace' do
+
+      it 'replaces multiple whitespaces with a single space' do
+        test_normalise_whitespace("the \ncat \t\t sat", 'the cat sat')
+      end
+
+      it 'trims surrounding whitespace' do
+        test_normalise_whitespace('  the cat sat   ', 'the cat sat')
+      end
+
+      it 'does not modify clean strings' do
+        test_normalise_whitespace('the cat sat', 'the cat sat')
+      end
+
+      it 'does not modify non strings values' do
+        test_normalise_whitespace(1234, 1234)
+      end
+
+      def test_normalise_whitespace(example, expected)
+        actual = module_class.normalise_whitespace(example)
         expect(actual).to eq(expected)
       end
 
