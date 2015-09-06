@@ -1,7 +1,4 @@
-require 'rspec'
-require 'json'
-require 'yaml'
-require_relative '../solr_helper'
+require 'spec_helper'
 
 describe SolrHelper do
 
