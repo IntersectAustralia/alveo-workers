@@ -52,12 +52,11 @@ module SolrHelper
 
 
   def extract_value(value)
+    result = value
     if value.is_a? Array
       result = value.first.values.first
-    else
-      result = value
     end
-    result   
+    normalise_whitespace(result)
   end
 
   ##
@@ -158,6 +157,14 @@ module SolrHelper
 
   def get_unqualified_term(uri)
     uri.split('/').last
+  end
+
+  def normalise_whitespace(value_string)
+    result = value_string
+    if result.is_a? String
+      result = result.gsub(/\s+/, ' ').strip
+    end
+    result
   end
 
   def get_default_item_fields
