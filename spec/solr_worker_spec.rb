@@ -1,6 +1,4 @@
-require 'rspec'
-require_relative '../solr_worker'
-require_relative 'support/bunny_mock'
+require 'spec_helper'
 
 describe SolrWorker do
 
