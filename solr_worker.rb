@@ -1,37 +1,18 @@
-require 'bunny'
-require 'json'
-
 class SolrWorker
 
-  def initialize(options, connection_class=Bunny)
-    connection = connection_class.new(options)
-    connection.start
-    channel = connection.create_channel
-    @exchange = channel.default_exchange
-    @queue = channel.queue(options[:queue])
-    @queue.bind(@exchange)
+
+  def initialize(options, connection_class)
+    super(options, connection_class)
   end
 
-  def get_exchange
-    @exchange
-  end
-
-  def subscribe
-    @queue.subscribe do |delivery_info, metadata, payload|
-      on_message(payload)
-    end
-  end
-
-  def on_message(payload)
-    message = JSON.parse(payload)
+  def process_message(message)
     if message[:action] = 'index'
-      index_item()
+      index_item(message[:content])
     end
   end
 
-  def index_item()
+  def index_item(content)
 
   end
-
 
 end
