@@ -105,7 +105,11 @@ class BunnyMock
     end
 
     def publish(msg, msg_attrs = {})
-      queues.each { |q| q.messages << msg }
+      queues.each { |q|
+        if msg_attrs[:routing_key] == q.name
+          q.messages << msg
+        end
+      }
     end
 
     def bound_to?(queue_name)
