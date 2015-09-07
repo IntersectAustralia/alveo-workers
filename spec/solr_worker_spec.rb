@@ -36,13 +36,17 @@ describe SolrWorker do
 
   describe '#add_document' do
 
-    it 'returns a response of 0 for a successful add' do
-      expected = {'responseHeader' => {'status' => 0, 'QTime' => 60}}
-      mock_solr_client.set_responses([expected])
-      expect(solr_worker).to receive(:add_document).and_return(expected)
-      message = '{"action": "add", "document": {"field": "value"}}'
-      mock_exchange.publish(message, routing_key: 'solr')
-      solr_worker.subscribe
+    # NOTE: Any point to this test?
+    it 'does not raise an error if the solr response is 0' do
+      mock_solr_response = {'responseHeader' => {'status' => 0}}
+      mock_solr_client.set_responses([mock_solr_response])
+      expect{solr_worker.add_document({})}.to_not raise_error
+    end
+
+    it 'raises an error a response for an unsuccessful add' do
+      mock_solr_response = {'responseHeader' => {'status' => 1}}
+      mock_solr_client.set_responses([mock_solr_response])
+      expect{solr_worker.add_document({})}.to raise_error(RuntimeError)
     end
 
   end

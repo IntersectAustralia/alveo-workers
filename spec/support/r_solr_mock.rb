@@ -8,28 +8,12 @@ class RSolrMock
     @responses += response
   end
 
-  def post(options)
+  def respond(options)
     @responses.shift
   end
 
-
-  # def connect(options)
-  #   Connection.new
-  # end
-
-
-  class Connection
-
-    @responses = []
-
-    def set_responses(response)
-      @responses += response
-    end
-
-    def post(options)
-      @responses.shift
-    end
-
+  def add(options)
+    respond(options)
   end
 
 end

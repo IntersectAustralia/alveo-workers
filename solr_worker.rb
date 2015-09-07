@@ -18,9 +18,11 @@ class SolrWorker < Worker
   end
 
   def add_document(document)
-    # require 'pry'
-    # binding.pry
-    @solr_client.add document
+    response = @solr_client.add document
+    status = response['responseHeader']['status']
+    if status != 0
+      raise "Solr returned an unexpected status: #{status}"
+    end
   end
 
 end
