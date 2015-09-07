@@ -5,7 +5,6 @@ class SolrWorker < Worker
   def initialize(options)
     rabbitmq_options = options[:rabbitmq]
     solr_options = options[:solr]
-    rabbitmq_options[:work_queue]
     super(rabbitmq_options)
     solr_client_class = Module.const_get(solr_options[:client_class])
     @solr_client = solr_client_class.new(solr_options[:url])
