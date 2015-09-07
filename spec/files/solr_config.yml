@@ -44,3 +44,8 @@ solr:
   rabbitmq:
     <<: *rabbitmq_common
     work_queue: solr
+
+upload:
+  rabbitmq:
+    <<: *rabbitmq_common
+    work_queue: upload

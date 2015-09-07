@@ -25,6 +25,9 @@ class Worker
     end
   end
 
+  # TODO
+  # - add explicit acknowledgements
+  # - add 'prefect' (batch) setting
   def on_message(payload)
     begin
       message = JSON.parse(payload)
