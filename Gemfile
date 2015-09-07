@@ -3,6 +3,7 @@ source 'https://rubygems.org'
 gem 'bunny', '>= 2.0.1'
 gem 'json'
 gem 'json-ld'
+gem 'rsolr'
 
 group :test do
   gem 'rspec', :require => false

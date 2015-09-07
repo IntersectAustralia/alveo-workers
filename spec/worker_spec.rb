@@ -3,7 +3,8 @@ require 'spec_helper'
 describe Worker do
 
   let(:worker) {
-    Worker.new({work_queue: 'work', error_queue: 'error'}, BunnyMock)
+    options = {work_queue: 'work', error_queue: 'error', client_class: 'BunnyMock'}
+    Worker.new(options)
   }
 
   describe '#on_message' do

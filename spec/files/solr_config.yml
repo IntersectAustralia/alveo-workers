@@ -1,6 +1,11 @@
 ---
 
+rabbitmq: &rabbitmq_common
+  client_class: Bunny
+
 solr:
+  url: 'http://alveo-qa-solr.intersect.org.au:8080/solr/hcsvlab'
+  client_class: RSolr
   rdf_relation_to_facet_map:
     'http://purl.org/dc/terms/isPartOf': collection_name_facet
     'http://ns.ausnc.org.au/schemas/ausnc_md_model/mode': AUSNC_mode_facet
@@ -31,7 +36,11 @@ solr:
     'http://alveo.edu.au/vocabulary/': AUSTALK_
     'http://ns.austalk.edu.au/': Alveo_
     'http://hcsvlab.org/vocabulary/': http_hcsvlab_org_vocabulary
+    'http://www.w3.org/1999/02/22-rdf-syntax-ns#': RDF_
   document_field_to_rdf_relation_map:
     DC_type_facet: 'http://purl.org/dc/terms/type'
     DC_extent_sim: 'http://purl.org/dc/terms/extent'
     DC_extent_tesim: 'http://purl.org/dc/terms/extent'
+  rabbitmq:
+    <<: *rabbitmq_common
+    work_queue: solr

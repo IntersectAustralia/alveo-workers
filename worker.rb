@@ -3,10 +3,12 @@ require 'json'
 
 class Worker
 
-  def initialize(options, connection_class=Bunny)
-    connection = connection_class.new(options)
-    connection.start
-    channel = connection.create_channel
+  def initialize(options)
+    bunny_client_class = Module.const_get(options[:client_class])
+    # TODO: clean the options
+    bunny_client = bunny_client_class.new(options)
+    bunny_client.start
+    channel = bunny_client.create_channel
     @exchange = channel.default_exchange
     @work_queue = channel.queue(options[:work_queue])
     @work_queue.bind(@exchange)
