@@ -5,6 +5,7 @@ require 'yaml'
 require 'simplecov'
 
 require_relative 'support/bunny_mock'
+require_relative 'support/r_solr_mock'
 
 SimpleCov.start do
   add_filter 'spec' # ignore spec files
