@@ -1,5 +1,12 @@
 module SolrHelper
 
+
+  # TODO:
+  # Maybe refactor this to a multistage process
+  # - Map mapped fields
+  # - Generate dynamic fields
+  #
+
   def map_facet_fields(json_ld_hash)
     item_graph = nil
     document_graphs = []
@@ -70,6 +77,14 @@ module SolrHelper
     solr_prefix + term
   end
 
+  def generate_handle(item_graph)
+    collection = get_collection(item_graph)
+    identifier = get_identifier(item_graph)
+    if collection.nil? || identifier.nil?
+      raise 'Insufficient metadata to generate item handle'
+    end
+    "#{collection}:#{identifier}"
+  end
 
   def extract_value(value)
     result = value
@@ -189,14 +204,19 @@ module SolrHelper
     result
   end
 
+  def get_identifier(item_graph)
+    identifier = extract_value(item_graph[@config['mapped_fields']['identifier_field']])
+    get_unqualified_term(identifier)
+  end
+
   def get_collection(item_graph)
-    collection_uri = extract_value(item_graph[@config['permissions']['collection_field']])
+    collection_uri = extract_value(item_graph[@config['mapped_fields']['collection_field']])
     get_unqualified_term(collection_uri)
   end
 
   def get_data_owner(item_graph)
-    data_owner = @config['permissions']['default_data_owner']
-    data_owner_field = @config['permissions']['data_owner_field']
+    data_owner = @config['mapped_fields']['default_data_owner']
+    data_owner_field = @config['mapped_fields']['data_owner_field']
     if item_graph[data_owner_field]
       data_owner = extract_value(item_graph[data_owner_field])
     end
