@@ -6,7 +6,7 @@ rabbitmq: &rabbitmq_common
 solr:
   url: 'http://alveo-qa-solr.intersect.org.au:8080/solr/hcsvlab'
   client_class: RSolr
-  rdf_relation_to_facet_map:
+  rdf_relation_to_facet_map: #mapped fields
     'http://purl.org/dc/terms/isPartOf': collection_name_facet
     'http://ns.ausnc.org.au/schemas/ausnc_md_model/mode': AUSNC_mode_facet
     'http://ns.ausnc.org.au/schemas/ausnc_md_model/speech_style': AUSNC_speech_style_facet
@@ -19,7 +19,7 @@ solr:
     'http://ns.ausnc.org.au/schemas/ausnc_md_model/audience': AUSNC_audience_facet
     'http://www.language-archives.org/OLAC/1.1/discourse_type': OLAC_discourse_type_facet
     'http://www.language-archives.org/OLAC/1.1/language': OLAC_language_facet
-  rdf_ns_to_solr_prefix_map:
+  rdf_ns_to_solr_prefix_map: #dyamic fields solr prefix
     'http://ns.ausnc.org.au/schemas/ace/': ACE_
     'http://ns.ausnc.org.au/schemas/ausnc_md_model/': AUSNC_
     'http://ns.ausnc.org.au/schemas/austlit/': AUSTLIT_
@@ -44,6 +44,10 @@ solr:
   rabbitmq:
     <<: *rabbitmq_common
     work_queue: solr
+  permissions:
+    default_data_owner: steve.cassidy@mq.edu.au
+    data_owner_field: http://id.loc.gov/vocabulary/relators/rpy
+    collection_field: http://purl.org/dc/terms/isPartOf
 
 upload:
   rabbitmq:
