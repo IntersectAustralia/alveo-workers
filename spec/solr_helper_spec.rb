@@ -251,7 +251,7 @@ describe SolrHelper do
     describe '#generate_access_rights' do
 
       it 'assigns ownership to the default data owner if none is provided' do
-        config = {'permissions' => {'default_data_owner' => 'data_owner@intersect.org.au',
+        config = {'mapped_fields' => {'default_data_owner' => 'data_owner@intersect.org.au',
                                    'data_owner_field' => 'http://id.loc.gov/vocabulary/relators/rpy',
                                    'collection_field' => 'http://purl.org/dc/terms/isPartOf'}}
         solr_helper.configure(config)
@@ -269,10 +269,25 @@ describe SolrHelper do
       end
 
       it 'throws an error if it can not assign a data owner' do
-        config = {'permissions' => {'data_owner_field' => 'http://id.loc.gov/vocabulary/relators/rpy',
+        config = {'mapped_fields' => {'data_owner_field' => 'http://id.loc.gov/vocabulary/relators/rpy',
                                     'collection_field' => 'http://purl.org/dc/terms/isPartOf'}}
         example = {'http://purl.org/dc/terms/isPartOf' => [{'@id' => 'http://ns.ausnc.org.au/corpora/collection'}]}
         expect{solr_helper.generate_access_rights(example)}.to raise_error(StandardError)
+      end
+
+    end
+
+    describe '#generate_handle' do
+
+      it 'generates a handle for an item from the collection and identifier' do
+        config = {'mapped_fields' => {'identifier_field' => '@id',
+                                      'collection_field' => 'http://purl.org/dc/terms/isPartOf'}}
+        solr_helper.configure(config)
+        example = {'@id' => 'http://ns.ausnc.org.au/corpora/ace/items/item',
+                   'http://purl.org/dc/terms/isPartOf' => [{'@id' => 'http://ns.ausnc.org.au/corpora/collection'}]}
+        expected = 'collection:item'
+        actual = solr_helper.generate_handle(example)
+        expect(actual).to eq(expected)
       end
 
     end

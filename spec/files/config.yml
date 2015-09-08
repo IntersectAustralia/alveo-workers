@@ -44,10 +44,11 @@ solr:
   rabbitmq:
     <<: *rabbitmq_common
     work_queue: solr
-  permissions:
+  mapped_fields: # better name?
     default_data_owner: steve.cassidy@mq.edu.au
     data_owner_field: http://id.loc.gov/vocabulary/relators/rpy
     collection_field: http://purl.org/dc/terms/isPartOf
+    identifier_field: '@id'
 
 upload:
   rabbitmq:
