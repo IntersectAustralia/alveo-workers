@@ -40,10 +40,19 @@ module SolrHelper
   def generate_item_fields(rdf_predicate, value)
     solr_field = map_rdf_predicate_to_solr_field(rdf_predicate)
     solr_value = extract_value(value)
-    { "#{solr_field}_ssim" => value, "#{solr_field}_tesim" => value }
+    { "#{solr_field}_ssim" => solr_value, "#{solr_field}_tesim" => solr_value }
   end
 
-  def generate_access_rights(person, group)
+  def generate_access_rights(item_graph)
+    data_owner = get_data_owner(item_graph)
+    collection = get_collection(item_graph)
+    if data_owner.nil? or collection.nil?
+      raise 'Insufficient metadata to generate access rights'
+    end
+    build_access_rights_map(data_owner, collection)
+  end
+
+  def build_access_rights_map(person, group)
     {
         discover_access_person_ssim: person,
         read_access_person_ssim: person,
@@ -68,6 +77,10 @@ module SolrHelper
       result = value.first.values.first
     end
     normalise_whitespace(result)
+  end
+
+  def configure(config)
+    @config = config
   end
 
   ##
@@ -174,6 +187,20 @@ module SolrHelper
       result = result.gsub(/\s+/, ' ').strip
     end
     result
+  end
+
+  def get_collection(item_graph)
+    collection_uri = extract_value(item_graph[@config['permissions']['collection_field']])
+    get_unqualified_term(collection_uri)
+  end
+
+  def get_data_owner(item_graph)
+    data_owner = @config['permissions']['default_data_owner']
+    data_owner_field = @config['permissions']['data_owner_field']
+    if item_graph[data_owner_field]
+      data_owner = extract_value(item_graph[data_owner_field])
+    end
+    data_owner
   end
 
   def get_default_item_fields

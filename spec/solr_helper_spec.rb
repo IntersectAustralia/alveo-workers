@@ -2,8 +2,8 @@ require 'spec_helper'
 
 describe SolrHelper do
 
-  let(:module_class) { Class.new.include(SolrHelper).new }
-  let(:solr_config) { YAML.load_file('./spec/files/solr_config.yml') }
+  let(:solr_helper) { Class.new.include(SolrHelper).new }
+  let(:config) { YAML.load_file('./spec/files/config.yml') }
 
   describe '#date_group' do
 
@@ -20,7 +20,7 @@ describe SolrHelper do
     end
 
     def test_date_group(example, expected, resolution=10)
-      actual = module_class.date_group(example, resolution)
+      actual = solr_helper.date_group(example, resolution)
       expect(actual).to eq(expected)
     end
 
@@ -67,12 +67,12 @@ describe SolrHelper do
     it 'throws an exception when parsing "Phase N season"' do
       example = 'Phase I fall'
       expect{
-        module_class.extract_year(example)
+        solr_helper.extract_year(example)
       }.to raise_error(ArgumentError)
     end
 
     def test_extract_year(example, expected)
-      actual = module_class.extract_year(example)
+      actual = solr_helper.extract_year(example)
       expect(actual).to eq(expected)
     end
 
@@ -84,7 +84,7 @@ describe SolrHelper do
     describe '#set_rdf_relation_to_facet_map' do
 
       it 'initialises the @default_item_fields' do
-        rdf_relation_to_facet_map = solr_config['solr']['rdf_relation_to_facet_map']
+        rdf_relation_to_facet_map = config['solr']['rdf_relation_to_facet_map']
         expected = {'AUSNC_audience_facet' => 'unspecified',
                     'AUSNC_communication_setting_facet' => 'unspecified',
                     'AUSNC_mode_facet' => 'unspecified',
@@ -97,8 +97,8 @@ describe SolrHelper do
                     'AUSNC_communication_context_facet' => 'unspecified',
                     'AUSNC_communication_medium_facet' => 'unspecified',
                     'OLAC_discourse_type_facet' => 'unspecified'}
-        module_class.set_rdf_relation_to_facet_map(rdf_relation_to_facet_map)
-        actual = module_class.instance_variable_get(:@default_item_fields)
+        solr_helper.set_rdf_relation_to_facet_map(rdf_relation_to_facet_map)
+        actual = solr_helper.instance_variable_get(:@default_item_fields)
         expect(actual).to eq(expected)
       end
 
@@ -107,13 +107,13 @@ describe SolrHelper do
     describe '#set_document_field_to_rdf_relationmap' do
 
       it 'initialises the @default_document' do
-        # rdf_relation_to_document_field_map = solr_config['solr']['rdf_relation_to_document_field_map']
+        # rdf_relation_to_document_field_map = config['solr']['rdf_relation_to_document_field_map']
         document_field_to_rdf_relation_map = {'DC_type_facet' => 'http://purl.org/dc/terms/type',
                                               'DC_extent_sim' => 'http://purl.org/dc/terms/extent',
                                               'DC_extent_tesim' => 'http://purl.org/dc/terms/extent'}
-        module_class.set_document_field_to_rdf_relation_map(document_field_to_rdf_relation_map)
+        solr_helper.set_document_field_to_rdf_relation_map(document_field_to_rdf_relation_map)
         expected = {'DC_type_facet' => [], 'DC_extent_sim' => [], 'DC_extent_tesim' => []}
-        actual = module_class.instance_variable_get(:@default_document_fields)
+        actual = solr_helper.instance_variable_get(:@default_document_fields)
         expect(actual).to eq(expected)
       end
 
@@ -122,10 +122,10 @@ describe SolrHelper do
     describe '#generate_item_fields' do
 
       it 'generates a hash with _ssim and _tesim values to index' do
-        rdf_ns_to_solr_prefix_map = solr_config['solr']['rdf_ns_to_solr_prefix_map']
-        module_class.set_rdf_ns_to_solr_prefix_map(rdf_ns_to_solr_prefix_map)
+        rdf_ns_to_solr_prefix_map = config['solr']['rdf_ns_to_solr_prefix_map']
+        solr_helper.set_rdf_ns_to_solr_prefix_map(rdf_ns_to_solr_prefix_map)
         expected = { 'DC_contributor_ssim' => 'Kanye West', 'DC_contributor_tesim' => 'Kanye West' }
-        actual = module_class.generate_item_fields('http://purl.org/dc/terms/contributor', 'Kanye West')
+        actual = solr_helper.generate_item_fields('http://purl.org/dc/terms/contributor', [{'@id'=> 'Kanye West'}])
         expect(actual).to eq(expected)
       end
 
@@ -134,10 +134,10 @@ describe SolrHelper do
     describe '#map_rdf_predicate_to_solr_field' do
 
       it 'maps RDF prefix to a solr prefix' do
-        rdf_ns_to_solr_prefix_map = solr_config['solr']['rdf_ns_to_solr_prefix_map']
-        module_class.set_rdf_ns_to_solr_prefix_map(rdf_ns_to_solr_prefix_map)
+        rdf_ns_to_solr_prefix_map = config['solr']['rdf_ns_to_solr_prefix_map']
+        solr_helper.set_rdf_ns_to_solr_prefix_map(rdf_ns_to_solr_prefix_map)
         expected = 'DC_contributor'
-        actual = module_class.map_rdf_predicate_to_solr_field('http://purl.org/dc/terms/contributor')
+        actual = solr_helper.map_rdf_predicate_to_solr_field('http://purl.org/dc/terms/contributor')
         expect(actual).to eq(expected)
       end
 
@@ -160,7 +160,7 @@ describe SolrHelper do
     end
 
     def test_extract_value(example, expected)
-      actual = module_class.extract_value(example)
+      actual = solr_helper.extract_value(example)
       expect(actual).to eq(expected)
     end
 
@@ -170,7 +170,7 @@ describe SolrHelper do
 
     it 'returns the qualified type term when given a graph hash' do
       expected = 'AusNCObject'
-      actual = module_class.graph_type({'@type' => ['http://ns.ausnc.org.au/schemas/ausnc_md_model/AusNCObject']})
+      actual = solr_helper.graph_type({'@type' => ['http://ns.ausnc.org.au/schemas/ausnc_md_model/AusNCObject']})
       expect(actual).to eq(expected)
     end
 
@@ -181,7 +181,7 @@ describe SolrHelper do
     it 'parses a fully qualified term into its namespace and term' do
       expected_ns = 'http://ns.ausnc.org.au/schemas/ausnc_md_model/'
       expected_term = 'speech_style'
-      (acutal_ns, actual_term) = module_class.get_qualified_term('http://ns.ausnc.org.au/schemas/ausnc_md_model/speech_style')
+      (acutal_ns, actual_term) = solr_helper.get_qualified_term('http://ns.ausnc.org.au/schemas/ausnc_md_model/speech_style')
       expect(acutal_ns).to eq(expected_ns)
       expect(actual_term).to eq(expected_term)
     end
@@ -189,8 +189,8 @@ describe SolrHelper do
     describe '#map_document_fields' do
 
       it 'maps and merges document metadata' do
-        document_field_to_rdf_relation_map = solr_config['solr']['document_field_to_rdf_relation_map']
-        module_class.set_document_field_to_rdf_relation_map(document_field_to_rdf_relation_map)
+        document_field_to_rdf_relation_map = config['solr']['document_field_to_rdf_relation_map']
+        solr_helper.set_document_field_to_rdf_relation_map(document_field_to_rdf_relation_map)
         example = [{"http://purl.org/dc/terms/extent" => [{"@value" => 1234}],
                     "http://purl.org/dc/terms/type" => [{"@value" => "Original"}]},
                    {"http://purl.org/dc/terms/extent" => [{"@value" => 5678}],
@@ -198,7 +198,7 @@ describe SolrHelper do
         expected = {'DC_type_facet' => ['Original', 'Raw'],
                     'DC_extent_sim' => [1234, 5678],
                     'DC_extent_tesim' => [1234, 5678]}
-        actual = module_class.map_document_fields(example)
+        actual = solr_helper.map_document_fields(example)
         expect(actual).to eq(expected)
       end
 
@@ -223,13 +223,13 @@ describe SolrHelper do
       end
 
       def test_normalise_whitespace(example, expected)
-        actual = module_class.normalise_whitespace(example)
+        actual = solr_helper.normalise_whitespace(example)
         expect(actual).to eq(expected)
       end
 
     end
 
-    describe '#generate_access_rights' do
+    describe '#build_access_rights_map' do
 
       it 'generates a hash with group and person access rights values to index' do
         example_person = 'data_owner@intersect.org.au'
@@ -242,8 +242,37 @@ describe SolrHelper do
             read_access_person_ssim: 'data_owner@intersect.org.au',
             edit_access_person_ssim: 'data_owner@intersect.org.au'
         }
-        actual = module_class.generate_access_rights(example_person, example_group)
+        actual = solr_helper.build_access_rights_map(example_person, example_group)
         expect(actual).to eq(expected)
+      end
+
+    end
+
+    describe '#generate_access_rights' do
+
+      it 'assigns ownership to the default data owner if none is provided' do
+        config = {'permissions' => {'default_data_owner' => 'data_owner@intersect.org.au',
+                                   'data_owner_field' => 'http://id.loc.gov/vocabulary/relators/rpy',
+                                   'collection_field' => 'http://purl.org/dc/terms/isPartOf'}}
+        solr_helper.configure(config)
+        example = {'http://purl.org/dc/terms/isPartOf' => [{'@id' => 'http://ns.ausnc.org.au/corpora/collection'}]}
+        expected = {
+            discover_access_group_ssim: 'collection-discover',
+            read_access_group_ssim: 'collection-read',
+            edit_access_group_ssim: 'collection-edit',
+            discover_access_person_ssim: 'data_owner@intersect.org.au',
+            read_access_person_ssim: 'data_owner@intersect.org.au',
+            edit_access_person_ssim: 'data_owner@intersect.org.au'
+        }
+        actual = solr_helper.generate_access_rights(example)
+        expect(actual).to eq(expected)
+      end
+
+      it 'throws an error if it can not assign a data owner' do
+        config = {'permissions' => {'data_owner_field' => 'http://id.loc.gov/vocabulary/relators/rpy',
+                                    'collection_field' => 'http://purl.org/dc/terms/isPartOf'}}
+        example = {'http://purl.org/dc/terms/isPartOf' => [{'@id' => 'http://ns.ausnc.org.au/corpora/collection'}]}
+        expect{solr_helper.generate_access_rights(example)}.to raise_error(StandardError)
       end
 
     end
