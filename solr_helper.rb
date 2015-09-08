@@ -7,19 +7,36 @@ module SolrHelper
   # - Generate dynamic fields
   #
 
-  def map_facet_fields(json_ld_hash)
+  def create_solr_document(json_ld_hash)
+    (item_graph, document_graphs) = separate_graphs(json_ld_hash)
+    mapped_fields = map_fields(item_graph, document_graphs)
+    generate_fields = generate_fields(item_graph)
+    mapped_fields.merge(generate_fields)
+  end
+
+  def separate_graphs(json_ld_hash)
     item_graph = nil
     document_graphs = []
-    json_ld_hash['@graph'].each { |graph_hash|
+    json_ld_hash.first.each { |graph_hash|
       if is_item? graph_hash
         item_graph = graph_hash
       elsif is_document? graph_hash
         document_graphs << graph_hash
       end
     }
-    map_item_fields item_graph
-    map_document_fields document_graphs
-    result
+    [item_graph, document_graphs]
+  end
+
+  def generate_fields(item_graph)
+    generated_fields = generate_access_rights(item_graph)
+    generated_fields[date_group_facet: generate_date_group(item_graph)]
+    generated_fields[handle: generate_handle(item_graph)]
+  end
+
+  def map_fields(item_graph)
+    item_fields = map_item_fields(item_graph)
+    document_fields = map_document_fields(document_graphs)
+    item_fields.merge(document_fields)
   end
 
   def map_item_fields(item_graph)
@@ -126,6 +143,12 @@ module SolrHelper
     @rdf_ns_to_solr_prefix_map = rdf_ns_to_solr_prefix_map
   end
 
+  def generate_date_group(item_graph)
+    created_field = extract_value(item_graph[@config['mapped_fields']['created_field']])
+    date_group(created_field)
+  end
+
+
   ##
   # call-seq:
   #   date_group('6 September 1986') => '1980 - 1989'
@@ -134,10 +157,10 @@ module SolrHelper
   # Takes the year from a `dc:created` string and returns the range
   # that it falls within, as specified by optional resolution parameter
 
-  def date_group(dc_created_string, resolution=10)
+  def date_group(created_field, resolution=10)
     result = 'Unknown'
     begin
-      year = extract_year(dc_created_string)
+      year = extract_year(created_field)
       increment = year / resolution
       range_start = increment * resolution
       range_end = range_start + resolution - 1
@@ -165,9 +188,9 @@ module SolrHelper
   # * "4 Spring 1986"
   # * "Phase I fall"
 
-  def extract_year(dc_created_string)
-    dc_created_string.chomp!('?')
-    date_array = dc_created_string.split(/[\-\/\&\s]/)
+  def extract_year(created_field)
+    created_field.chomp!('?')
+    date_array = created_field.split(/[\-\/\&\s]/)
     begin
       candidate = Integer date_array.first
       if candidate > 31

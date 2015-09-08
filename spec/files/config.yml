@@ -49,6 +49,7 @@ solr:
     data_owner_field: http://id.loc.gov/vocabulary/relators/rpy
     collection_field: http://purl.org/dc/terms/isPartOf
     identifier_field: '@id'
+    created_field: http://purl.org/dc/terms/created
 
 upload:
   rabbitmq:
