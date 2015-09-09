@@ -2,6 +2,7 @@
 
 rabbitmq: &rabbitmq_common
   client_class: Bunny
+  error_queue: error
 
 solr:
   url: 'http://alveo-qa-solr.intersect.org.au:8080/solr/hcsvlab'
@@ -55,3 +56,8 @@ upload:
   rabbitmq:
     <<: *rabbitmq_common
     work_queue: upload
+
+ingester:
+  <<: *rabbitmq_common
+  work_queue: upload
+  error_log: ingester_errors.log

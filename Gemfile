@@ -4,6 +4,10 @@ gem 'bunny', '>= 2.0.1'
 gem 'json'
 gem 'json-ld'
 gem 'rsolr'
+#gem 'rdf'
+#gem 'linkeddata'
+gem 'rdf-turtle'
+
 
 group :test do
   gem 'rspec', :require => false
