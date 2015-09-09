@@ -1,6 +1,9 @@
 class SolrWorker < Worker
 
-  # TODO: MonkeyPatch persistent HTTP connections
+  # TODO:
+  #   - MonkeyPatch persistent HTTP connections
+  #   - Implement commit strategy
+  #   - Implement batching
 
   def initialize(options)
     rabbitmq_options = options[:rabbitmq]
