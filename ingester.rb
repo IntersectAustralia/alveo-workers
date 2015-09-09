@@ -19,6 +19,8 @@ class Ingester
   def ingest_rdf(dir)
     Dir.foreach(dir) { |file|
       if File.extname(file) == '.rdf'
+        # TODO: distinguish between item metadata
+        #       and annotation rdf
         begin
           process_rdf(file)
         rescue  Exception => e

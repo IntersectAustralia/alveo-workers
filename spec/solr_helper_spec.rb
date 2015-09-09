@@ -2,6 +2,8 @@ require 'spec_helper'
 
 describe SolrHelper do
 
+  # TODO: Use a common config across all tests
+  #       to simplify setup
   let(:solr_helper) { Class.new.include(SolrHelper).new }
   let(:config) { YAML.load_file('./spec/files/config.yml') }
 
@@ -125,7 +127,7 @@ describe SolrHelper do
         rdf_ns_to_solr_prefix_map = config['solr']['rdf_ns_to_solr_prefix_map']
         solr_helper.set_rdf_ns_to_solr_prefix_map(rdf_ns_to_solr_prefix_map)
         expected = { 'DC_contributor_ssim' => 'Kanye West', 'DC_contributor_tesim' => 'Kanye West' }
-        actual = solr_helper.generate_item_fields('http://purl.org/dc/terms/contributor', [{'@id'=> 'Kanye West'}])
+        actual = solr_helper.generate_item_fields('http://purl.org/dc/terms/contributor', 'Kanye West')
         expect(actual).to eq(expected)
       end
 
@@ -151,6 +153,11 @@ describe SolrHelper do
 
       it 'does not modify non Hashes' do
         test_extract_value('Skills, trades and hobbies', 'Skills, trades and hobbies')
+        test_extract_value(1234, 1234)
+      end
+
+      it 'extracts the first value of arrays' do
+        test_extract_value(['Skills, trades and hobbies'], 'Skills, trades and hobbies')
       end
 
       it 'normailises whitespace in the extracted value' do
@@ -251,10 +258,10 @@ describe SolrHelper do
     describe '#generate_access_rights' do
 
       it 'assigns ownership to the default data owner if none is provided' do
-        config = {'mapped_fields' => {'default_data_owner' => 'data_owner@intersect.org.au',
-                                   'data_owner_field' => 'http://id.loc.gov/vocabulary/relators/rpy',
-                                   'collection_field' => 'http://purl.org/dc/terms/isPartOf'}}
-        solr_helper.configure(config)
+        config = {'default_data_owner' => 'data_owner@intersect.org.au',
+                  'data_owner_field' => 'http://id.loc.gov/vocabulary/relators/rpy',
+                  'collection_field' => 'http://purl.org/dc/terms/isPartOf'}
+        solr_helper.set_mapped_fields(config)
         example = {'http://purl.org/dc/terms/isPartOf' => [{'@id' => 'http://ns.ausnc.org.au/corpora/collection'}]}
         expected = {
             discover_access_group_ssim: 'collection-discover',
@@ -269,8 +276,9 @@ describe SolrHelper do
       end
 
       it 'throws an error if it can not assign a data owner' do
-        config = {'mapped_fields' => {'data_owner_field' => 'http://id.loc.gov/vocabulary/relators/rpy',
-                                    'collection_field' => 'http://purl.org/dc/terms/isPartOf'}}
+        config = {'data_owner_field' => 'http://id.loc.gov/vocabulary/relators/rpy',
+                  'collection_field' => 'http://purl.org/dc/terms/isPartOf'}
+        solr_helper.set_mapped_fields(config)
         example = {'http://purl.org/dc/terms/isPartOf' => [{'@id' => 'http://ns.ausnc.org.au/corpora/collection'}]}
         expect{solr_helper.generate_access_rights(example)}.to raise_error(StandardError)
       end
@@ -280,15 +288,53 @@ describe SolrHelper do
     describe '#generate_handle' do
 
       it 'generates a handle for an item from the collection and identifier' do
-        config = {'mapped_fields' => {'identifier_field' => '@id',
-                                      'collection_field' => 'http://purl.org/dc/terms/isPartOf'}}
-        solr_helper.configure(config)
+        config = {'identifier_field' => '@id',
+                  'collection_field' => 'http://purl.org/dc/terms/isPartOf'}
+        solr_helper.set_mapped_fields(config)
         example = {'@id' => 'http://ns.ausnc.org.au/corpora/ace/items/item',
                    'http://purl.org/dc/terms/isPartOf' => [{'@id' => 'http://ns.ausnc.org.au/corpora/collection'}]}
         expected = 'collection:item'
         actual = solr_helper.generate_handle(example)
         expect(actual).to eq(expected)
       end
+
+    end
+
+    describe '#separate_graphs' do
+
+      it 'separates a JSON-LD hash into item and document graphs' do
+        example = [{'@type' => ['http://ns.ausnc.org.au/schemas/ausnc_md_model/AusNCObject']},
+                   {'@type' => ['http://xmlns.com/foaf/0.1/Document']},
+                   {'@type' => ['http://xmlns.com/foaf/0.1/Document']}]
+        expected_item = {'@type' => ['http://ns.ausnc.org.au/schemas/ausnc_md_model/AusNCObject']}
+        expected_documents = [{'@type' => ['http://xmlns.com/foaf/0.1/Document']},
+                              {'@type' => ['http://xmlns.com/foaf/0.1/Document']}]
+        (actual_item, actual_documents) = solr_helper.separate_graphs(example)
+        expect(actual_item).to eq(expected_item)
+        expect(actual_documents).to eq(expected_documents)
+      end
+
+    end
+
+    describe '#map_fields' do
+
+      it 'maps item and document fields' do
+
+      end
+
+    end
+
+    describe '#map_item_fields' do
+
+      it 'maps mapped item fields' do
+        rdf_relation_to_facet_map = {'http://purl.org/dc/terms/isPartOf' => 'collection_name_facet'}
+        solr_helper.set_rdf_relation_to_facet_map(rdf_relation_to_facet_map)
+        example = {'http://purl.org/dc/terms/isPartOf' => [{'@id' => 'http://ns.ausnc.org.au/corpora/ace'}]}
+        expected = {'collection_name_facet' => 'ace'}
+        actual = solr_helper.map_item_fields(example)
+        expect(actual).to eq(expected)
+      end
+
 
     end
 

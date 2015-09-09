@@ -8,7 +8,8 @@ module SolrHelper
   #
 
   def create_solr_document(json_ld_hash)
-    (item_graph, document_graphs) = separate_graphs(json_ld_hash)
+    expanded_metadata = expand_json_ld(json_ld_hash)
+    (item_graph, document_graphs) = separate_graphs(expanded_metadata)
     mapped_fields = map_fields(item_graph, document_graphs)
     generate_fields = generate_fields(item_graph)
     mapped_fields.merge(generate_fields)
@@ -17,7 +18,7 @@ module SolrHelper
   def separate_graphs(json_ld_hash)
     item_graph = nil
     document_graphs = []
-    json_ld_hash.first.each { |graph_hash|
+    json_ld_hash.each { |graph_hash|
       if is_item? graph_hash
         item_graph = graph_hash
       elsif is_document? graph_hash
@@ -41,9 +42,12 @@ module SolrHelper
 
   def map_item_fields(item_graph)
     result = get_default_item_fields
-    item_graph.each { |key, value|
-      if @facet_field_map.has_key? key
-        result[facet_field_map[key]] = value
+    item_graph.each { |key, rdf_value|
+      # TODO: Maybe make a helper out of these two steps
+      uri = extract_value(rdf_value)
+      value = get_unqualified_term(uri)
+      if @rdf_relation_to_facet_map.has_key? key
+        result[@rdf_relation_to_facet_map[key]] = value
       else
         result.merge(generate_item_fields(key, value))
       end
@@ -62,9 +66,9 @@ module SolrHelper
   end
 
   def generate_item_fields(rdf_predicate, value)
+    # TODO: Handle the case if the ref_predicate is not in the map
     solr_field = map_rdf_predicate_to_solr_field(rdf_predicate)
-    solr_value = extract_value(value)
-    { "#{solr_field}_ssim" => solr_value, "#{solr_field}_tesim" => solr_value }
+    { "#{solr_field}_ssim" => value, "#{solr_field}_tesim" => value }
   end
 
   def generate_access_rights(item_graph)
@@ -105,14 +109,29 @@ module SolrHelper
 
   def extract_value(value)
     result = value
-    if value.is_a? Array
-      result = value.first.values.first
+    while result.is_a?(Hash) or result.is_a?(Array) do
+      if result.is_a?(Hash)
+        result = result.values.first
+      else
+        result = result.first
+      end
     end
     normalise_whitespace(result)
   end
 
-  def configure(config)
-    @config = config
+  # TODO
+  # refactor these config methods
+  def set_solr_config(config)
+    set_mapped_fields(config[:mapped_fields])
+    set_rdf_relation_to_facet_map(config[:rdf_relation_to_facet_map])
+    set_rdf_ns_to_solr_prefix_map(config[:rdf_ns_to_solr_prefix_map])
+    set_document_field_to_rdf_relation_map(config[:document_field_to_rdf_relation_map])
+  end
+
+  # TODO
+  # refactor these config methods
+  def set_mapped_fields(mapped_fields)
+    @mapped_fields = mapped_fields
   end
 
   ##
@@ -123,6 +142,8 @@ module SolrHelper
   # 'dcterms:isPartOf': collection_name_facet
   #
 
+  # TODO
+  # refactor these config methods
   def set_rdf_relation_to_facet_map(rdf_relation_to_facet_map)
     @rdf_relation_to_facet_map = rdf_relation_to_facet_map
     @default_item_fields = {}
@@ -131,6 +152,8 @@ module SolrHelper
     }
   end
 
+  # TODO
+  # refactor these config methods
   def set_document_field_to_rdf_relation_map(document_field_to_rdf_relation_map)
     @document_field_to_rdf_relation_map = document_field_to_rdf_relation_map
     @default_document_fields = {}
@@ -139,12 +162,14 @@ module SolrHelper
     }
   end
 
+  # TODO
+  # refactor these config methods
   def set_rdf_ns_to_solr_prefix_map(rdf_ns_to_solr_prefix_map)
     @rdf_ns_to_solr_prefix_map = rdf_ns_to_solr_prefix_map
   end
 
   def generate_date_group(item_graph)
-    created_field = extract_value(item_graph[@config['mapped_fields']['created_field']])
+    created_field = extract_value(item_graph[@mapped_fields['created_field']])
     date_group(created_field)
   end
 
@@ -206,7 +231,8 @@ module SolrHelper
   end
 
   def graph_type(graph_hash)
-    get_unqualified_term(graph_hash['@type'].first)
+    graph_term = extract_value(graph_hash['@type'])
+    get_unqualified_term(graph_term)
   end
 
   def get_qualified_term(uri)
@@ -228,18 +254,18 @@ module SolrHelper
   end
 
   def get_identifier(item_graph)
-    identifier = extract_value(item_graph[@config['mapped_fields']['identifier_field']])
+    identifier = extract_value(item_graph[@mapped_fields['identifier_field']])
     get_unqualified_term(identifier)
   end
 
   def get_collection(item_graph)
-    collection_uri = extract_value(item_graph[@config['mapped_fields']['collection_field']])
+    collection_uri = extract_value(item_graph[@mapped_fields['collection_field']])
     get_unqualified_term(collection_uri)
   end
 
   def get_data_owner(item_graph)
-    data_owner = @config['mapped_fields']['default_data_owner']
-    data_owner_field = @config['mapped_fields']['data_owner_field']
+    data_owner = @mapped_fields['default_data_owner']
+    data_owner_field = @mapped_fields['data_owner_field']
     if item_graph[data_owner_field]
       data_owner = extract_value(item_graph[data_owner_field])
     end

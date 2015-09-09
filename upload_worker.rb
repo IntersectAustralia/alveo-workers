@@ -17,16 +17,9 @@ class UploadWorker < Worker
   end
 
   def add_item(metadata)
-    expanded_metadata = expand_json_ld(metadata)
-
+    solr_document = create_solr_document(metadata)
+    message = "'action': 'add', 'document': #{solr_document}"
+    @exchange.publish(message, routing_key: @work_queue)
   end
-
-  def set_solr_config(solr_config)
-    set_rdf_relation_to_facet_map
-    set_rdf_ns_to_solr_prefix_map
-    set_document_field_to_rdf_relation_map
-    set_default_data_owner
-  end
-
 
 end
