@@ -1,0 +1,201 @@
+[
+  {
+    "@id": "http://ns.ausnc.org.au/corpora/ace/items/E29a",
+    "@type": [
+      "http://ns.ausnc.org.au/schemas/ausnc_md_model/AusNCObject"
+    ],
+    "http://hcsvlab.org/vocabulary/display_document": [
+      {
+        "@id": "http://ns.ausnc.org.au/corpora/ace/source/E29a#Text"
+      }
+    ],
+    "http://hcsvlab.org/vocabulary/indexable_document": [
+      {
+        "@id": "http://ns.ausnc.org.au/corpora/ace/source/E29a#Text"
+      }
+    ],
+    "http://ns.ausnc.org.au/schemas/ace/genre": [
+      {
+        "@value": "Skills, trades and hobbies"
+      }
+    ],
+    "http://ns.ausnc.org.au/schemas/ausnc_md_model/audience": [
+      {
+        "@id": "http://ns.ausnc.org.au/schemas/ausnc_md_model/mass_market"
+      }
+    ],
+    "http://ns.ausnc.org.au/schemas/ausnc_md_model/communication_setting": [
+      {
+        "@id": "http://ns.ausnc.org.au/schemas/ausnc_md_model/popular"
+      }
+    ],
+    "http://ns.ausnc.org.au/schemas/ausnc_md_model/document": [
+      {
+        "@id": "http://ns.ausnc.org.au/corpora/ace/source/E29a#Original"
+      },
+      {
+        "@id": "http://ns.ausnc.org.au/corpora/ace/source/E29a#Raw"
+      },
+      {
+        "@id": "http://ns.ausnc.org.au/corpora/ace/source/E29a#Text"
+      }
+    ],
+    "http://ns.ausnc.org.au/schemas/ausnc_md_model/itemwordcount": [
+      {
+        "@value": "1665",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
+      }
+    ],
+    "http://ns.ausnc.org.au/schemas/ausnc_md_model/mode": [
+      {
+        "@id": "http://ns.ausnc.org.au/schemas/ausnc_md_model/written"
+      }
+    ],
+    "http://ns.ausnc.org.au/schemas/ausnc_md_model/publication_status": [
+      {
+        "@id": "http://ns.ausnc.org.au/schemas/ausnc_md_model/published"
+      }
+    ],
+    "http://ns.ausnc.org.au/schemas/ausnc_md_model/source": [
+      {
+        "@value": "Business Review Weekly 10 October 1986                  (2010 words)"
+      }
+    ],
+    "http://ns.ausnc.org.au/schemas/ausnc_md_model/written_mode": [
+      {
+        "@id": "http://ns.ausnc.org.au/schemas/ausnc_md_model/print"
+      }
+    ],
+    "http://purl.org/dc/terms/contributor": [
+      {
+        "@value": "Pamela Williams"
+      }
+    ],
+    "http://purl.org/dc/terms/created": [
+      {
+        "@value": "10 October 1986"
+      }
+    ],
+    "http://purl.org/dc/terms/identifier": [
+      {
+        "@value": "E29a"
+      }
+    ],
+    "http://purl.org/dc/terms/isPartOf": [
+      {
+        "@id": "http://ns.ausnc.org.au/corpora/ace"
+      }
+    ],
+    "http://purl.org/dc/terms/publisher": [
+      {
+        "@value": "Samples Used by Permission of BRW Publications"
+      }
+    ],
+    "http://purl.org/dc/terms/title": [
+      {
+        "@value": "Employer bickering come to a head"
+      }
+    ],
+    "http://www.language-archives.org/OLAC/1.1/language": [
+      {
+        "@value": "eng"
+      }
+    ]
+  },
+  {
+    "@id": "http://ns.ausnc.org.au/corpora/ace/source/E29a#Original",
+    "@type": [
+      "http://xmlns.com/foaf/0.1/Document"
+    ],
+    "http://purl.org/dc/terms/extent": [
+      {
+        "@value": "343844",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
+      }
+    ],
+    "http://purl.org/dc/terms/identifier": [
+      {
+        "@value": "ace_e.txt"
+      }
+    ],
+    "http://purl.org/dc/terms/source": [
+      {
+        "@id": "file:/data/production_collections/ausnc/ace/ace_e.txt"
+      }
+    ],
+    "http://purl.org/dc/terms/title": [
+      {
+        "@value": "E29a#Original"
+      }
+    ],
+    "http://purl.org/dc/terms/type": [
+      {
+        "@value": "Original"
+      }
+    ]
+  },
+  {
+    "@id": "http://ns.ausnc.org.au/corpora/ace/source/E29a#Raw",
+    "@type": [
+      "http://xmlns.com/foaf/0.1/Document"
+    ],
+    "http://purl.org/dc/terms/extent": [
+      {
+        "@value": "10398",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
+      }
+    ],
+    "http://purl.org/dc/terms/identifier": [
+      {
+        "@value": "E29a-raw.txt"
+      }
+    ],
+    "http://purl.org/dc/terms/source": [
+      {
+        "@id": "file:/data/production_collections/ausnc/ace/E29a-raw.txt"
+      }
+    ],
+    "http://purl.org/dc/terms/title": [
+      {
+        "@value": "E29a#Raw"
+      }
+    ],
+    "http://purl.org/dc/terms/type": [
+      {
+        "@value": "Raw"
+      }
+    ]
+  },
+  {
+    "@id": "http://ns.ausnc.org.au/corpora/ace/source/E29a#Text",
+    "@type": [
+      "http://xmlns.com/foaf/0.1/Document"
+    ],
+    "http://purl.org/dc/terms/extent": [
+      {
+        "@value": "10117",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
+      }
+    ],
+    "http://purl.org/dc/terms/identifier": [
+      {
+        "@value": "E29a-plain.txt"
+      }
+    ],
+    "http://purl.org/dc/terms/source": [
+      {
+        "@id": "file:/data/production_collections/ausnc/ace/E29a-plain.txt"
+      }
+    ],
+    "http://purl.org/dc/terms/title": [
+      {
+        "@value": "E29a#Text"
+      }
+    ],
+    "http://purl.org/dc/terms/type": [
+      {
+        "@value": "Text"
+      }
+    ]
+  }
+]

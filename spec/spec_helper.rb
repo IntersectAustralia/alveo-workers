@@ -14,6 +14,7 @@ end
 require_relative '../solr_helper'
 require_relative '../metadata_helper'
 
+require_relative '../ingester'
 require_relative '../worker'
 require_relative '../solr_worker'
 require_relative '../upload_worker'
