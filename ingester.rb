@@ -18,11 +18,15 @@ class Ingester
 
   def ingest_rdf(dir)
     Dir.foreach(dir) { |file|
+      # require 'pry'
+      # binding.pry
       if File.extname(file) == '.rdf'
-        # TODO: distinguish between item metadata
-        #       and annotation rdf
         begin
-          process_rdf(file)
+          if File.basename(file, '.rdf').end_with? 'metadata'
+            process_metadata_rdf(file)
+          else
+            # TODO: process annotaion rdf
+          end
         rescue  Exception => e
           @error_logger.error "#{e.class}: #{e.to_s}"
         end
@@ -30,11 +34,24 @@ class Ingester
     }
   end
 
-  def process_rdf(rdf_file)
+  def process_metadata_rdf(rdf_file)
     graph = RDF::Graph.load(rdf_file, :format => :ttl)
     json_ld = graph.dump(:jsonld)
     message = "{'action': 'add item', 'metadata':#{json_ld}}"
     @exchange.publish(message, routing_key: @work_queue)
   end
 
+end
+
+def main(directory)
+  require 'yaml'
+  config = YAML.load('spec/files/config.yml')
+  ingester = Ingester.new(config[:ingester])
+  ingester.ingest_rdf(directory)
+end
+
+
+if __FILE__ == $PROGRAM_NAME
+  # TODO: use an argument parser
+  main(ARGV)
 end
