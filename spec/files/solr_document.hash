@@ -33,7 +33,7 @@
  "DC_extent_sim"=>["10117", "343844", "10398"],
  "DC_extent_tesim"=>["10117", "343844", "10398"],
  "date_group_facet"=>"1980 - 1989",
- :id=>"49312",
+# :id=>"49312", Ignore this for now, until we know what it's used for
  :handle=>"ace:E29a",
  :discover_access_group_ssim=>"ace-discover",
  :read_access_group_ssim=>"ace-read",
