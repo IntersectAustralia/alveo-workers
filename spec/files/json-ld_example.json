@@ -33,7 +33,7 @@
           "@id": "http://ns.ausnc.org.au/corpora/ace/source/E29a#Raw"
         }
       ],
-      "ausnc:itemwordcount": 1665,
+      "ausnc:itemwordcount": "1665",
       "ausnc:mode": {
         "@id": "ausnc:written"
       },
@@ -64,7 +64,7 @@
     {
       "@id": "http://ns.ausnc.org.au/corpora/ace/source/E29a#Text",
       "@type": "foaf:Document",
-      "dcterms:extent": 10117,
+      "dcterms:extent": "10117",
       "dcterms:identifier": "E29a-plain.txt",
       "dcterms:source": {
         "@id": "file:///data/production_collections/ausnc/ace/E29a-plain.txt"
@@ -75,7 +75,7 @@
     {
       "@id": "http://ns.ausnc.org.au/corpora/ace/source/E29a#Original",
       "@type": "foaf:Document",
-      "dcterms:extent": 343844,
+      "dcterms:extent": "343844",
       "dcterms:identifier": "ace_e.txt",
       "dcterms:source": {
         "@id": "file:///data/production_collections/ausnc/ace/ace_e.txt"
@@ -86,7 +86,7 @@
     {
       "@id": "http://ns.ausnc.org.au/corpora/ace/source/E29a#Raw",
       "@type": "foaf:Document",
-      "dcterms:extent": 10398,
+      "dcterms:extent": "10398",
       "dcterms:identifier": "E29a-raw.txt",
       "dcterms:source": {
         "@id": "file:///data/production_collections/ausnc/ace/E29a-raw.txt"

@@ -38,8 +38,9 @@ solr:
     'http://www.loc.gov/loc.terms/relators/': LoC_
     'http://alveo.edu.au/vocabulary/': AUSTALK_
     'http://ns.austalk.edu.au/': Alveo_
-    'http://hcsvlab.org/vocabulary/': http_hcsvlab_org_vocabulary
+    'http://hcsvlab.org/vocabulary/': http_hcsvlab_org_vocabulary_
     'http://www.w3.org/1999/02/22-rdf-syntax-ns#': RDF_
+    'http://www.w3.org/1999/02/22-rdf-syntax-ns/': RDF_ # TODO: hack
   document_field_to_rdf_relation_map:
     DC_type_facet: 'http://purl.org/dc/terms/type'
     DC_extent_sim: 'http://purl.org/dc/terms/extent'
@@ -50,7 +51,7 @@ solr:
     user: solr
     pass: solr
   mapped_fields: # better name?
-    default_data_owner: steve.cassidy@mq.edu.au
+    default_data_owner: data_owner@intersect.org.au
     data_owner_field: http://id.loc.gov/vocabulary/relators/rpy
     collection_field: http://purl.org/dc/terms/isPartOf
     identifier_field: '@id'
