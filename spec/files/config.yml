@@ -3,6 +3,8 @@
 rabbitmq: &rabbitmq_common
   client_class: Bunny
   error_queue: error
+  host:
+  vhost: /alveo
 
 solr:
   url: 'http://alveo-qa-solr.intersect.org.au:8080/solr/hcsvlab'
@@ -45,6 +47,8 @@ solr:
   rabbitmq:
     <<: *rabbitmq_common
     work_queue: solr
+    user: solr
+    pass: solr
   mapped_fields: # better name?
     default_data_owner: steve.cassidy@mq.edu.au
     data_owner_field: http://id.loc.gov/vocabulary/relators/rpy
@@ -56,8 +60,12 @@ upload:
   rabbitmq:
     <<: *rabbitmq_common
     work_queue: upload
+    user: upload
+    pass: upload
 
 ingester:
   <<: *rabbitmq_common
   work_queue: upload
   error_log: ingester_errors.log
+  user: ingester
+  pass: ingester

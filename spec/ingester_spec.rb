@@ -14,7 +14,7 @@ describe Ingester do
     ingester.instance_variable_get(:@exchange)
   }
 
-  describe '#prcocess_rdf' do
+  describe '#process_metadata_rdf' do
 
     it 'converts a Turle RDF file a JSON-LD string and publishes it' do
       example = './spec/files/turtle_example.rdf'
@@ -22,9 +22,19 @@ describe Ingester do
       expected = "{'action': 'add item', 'metadata':#{json_ld}}"
       queue = BunnyMock::Queue.new(ingester_options[:work_queue])
       queue.bind(exchange)
-      ingester.process_rdf(example)
+      ingester.process_metadata_rdf(example)
       actual = queue.messages.first
       expect(actual).to eq(expected)
+    end
+
+  end
+
+  describe '#ingest_rdf' do
+
+    it 'distinguishes between metadata and annotation RDF files' do
+      allow(Dir).to receive(:foreach).and_yield('example-ann.rdf').and_yield('example-metadata.rdf')
+      expect(ingester).to receive(:process_metadata_rdf).with('example-metadata.rdf').once
+      ingester.ingest_rdf('.')
     end
 
   end
