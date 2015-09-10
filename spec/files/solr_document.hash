@@ -4,7 +4,7 @@
  "http_hcsvlab_org_vocabulary_display_document_tesim"=>["E29a#Text"],
  "http_hcsvlab_org_vocabulary_indexable_document_sim"=>["E29a#Text"],
  "http_hcsvlab_org_vocabulary_indexable_document_tesim"=>["E29a#Text"],
- "ACE_genre_sim"=>["Skills,trades and hobbies"],
+ "ACE_genre_sim"=>["Skills, trades and hobbies"],
  "ACE_genre_tesim"=>["Skills, trades and hobbies"],
  "AUSNC_audience_facet"=>"mass_market",
  "AUSNC_communication_setting_facet"=>"popular",

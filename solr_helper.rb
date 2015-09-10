@@ -1,3 +1,5 @@
+require 'json/ld'
+
 module SolrHelper
 
 
@@ -8,11 +10,13 @@ module SolrHelper
   #
 
   def create_solr_document(json_ld_hash)
-    expanded_metadata = expand_json_ld(json_ld_hash)
+    expanded_metadata = JSON::LD::API.expand(json_ld_hash)
     (item_graph, document_graphs) = separate_graphs(expanded_metadata)
     mapped_fields = map_fields(item_graph, document_graphs)
-    generate_fields = generate_fields(item_graph)
-    mapped_fields.merge!(generate_fields)
+    generated_fields = generate_fields(item_graph)
+    # require 'pry'
+    # binding.pry
+    mapped_fields.merge!(generated_fields)
   end
 
   def separate_graphs(json_ld_hash)
@@ -30,8 +34,9 @@ module SolrHelper
 
   def generate_fields(item_graph)
     generated_fields = generate_access_rights(item_graph)
-    generated_fields[date_group_facet: generate_date_group(item_graph)]
-    generated_fields[handle: generate_handle(item_graph)]
+    generated_fields['date_group_facet'] = generate_date_group(item_graph)
+    generated_fields[:handle] = generate_handle(item_graph)
+    generated_fields
   end
 
   def map_fields(item_graph, document_graphs)
@@ -66,9 +71,18 @@ module SolrHelper
   end
 
   def generate_item_fields(rdf_predicate, value)
+    # TODO: clean up these special cases
+    if rdf_predicate == '@id'
+      rdf_predicate = 'http://purl.org/dc/terms/identifier'
+    elsif rdf_predicate == '@type'
+      rdf_predicate = 'http://www.w3.org/1999/02/22-rdf-syntax-ns/type'
+    end
+
     # TODO: Handle the case if the rdf_predicate is not in the map
     solr_field = map_rdf_predicate_to_solr_field(rdf_predicate)
-    { "#{solr_field}_ssim" => value, "#{solr_field}_tesim" => value }
+    # NOTE: Is there any reason that singular values are stored in arrays?
+    #       investigated whether there was a reason behind this originally
+    { "#{solr_field}_sim" => [value], "#{solr_field}_tesim" => [value] }
   end
 
   def generate_access_rights(item_graph)
@@ -242,8 +256,12 @@ module SolrHelper
   end
 
   def get_unqualified_term(uri)
-    # TODO: Maybe raise an error here if the URI is invalid?
-    uri.split('/').last
+    result = uri
+    if uri.is_a? String
+      # TODO: Maybe raise an error here if the URI is invalid?
+      result = uri.split('/').last
+    end
+    result
   end
 
   def normalise_whitespace(value_string)
