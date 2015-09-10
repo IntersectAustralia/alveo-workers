@@ -143,6 +143,12 @@ describe SolrHelper do
         expect(actual).to eq(expected)
       end
 
+      # TODO: get a better exception message
+      it 'maps raises an Exception if there is no mapping defined' do
+        solr_helper.set_rdf_ns_to_solr_prefix_map({})
+        expect{solr_helper.map_rdf_predicate_to_solr_field('http://purl.org/dc/terms/contributor')}.to raise_error(StandardError)
+      end
+
     end
 
     describe '#extract_value' do
@@ -198,10 +204,10 @@ describe SolrHelper do
       it 'maps and merges document metadata' do
         document_field_to_rdf_relation_map = config['solr']['document_field_to_rdf_relation_map']
         solr_helper.set_document_field_to_rdf_relation_map(document_field_to_rdf_relation_map)
-        example = [{"http://purl.org/dc/terms/extent" => [{"@value" => 1234}],
-                    "http://purl.org/dc/terms/type" => [{"@value" => "Original"}]},
-                   {"http://purl.org/dc/terms/extent" => [{"@value" => 5678}],
-                    "http://purl.org/dc/terms/type" => [{"@value" => "Raw"}]}]
+        example = [{'http://purl.org/dc/terms/extent' => [{'@value' => 1234}],
+                    'http://purl.org/dc/terms/type' => [{'@value' => 'Original'}]},
+                   {'http://purl.org/dc/terms/extent' => [{'@value' => 5678}],
+                    'http://purl.org/dc/terms/type' => [{'@value' => 'Raw'}]}]
         expected = {'DC_type_facet' => ['Original', 'Raw'],
                     'DC_extent_sim' => [1234, 5678],
                     'DC_extent_tesim' => [1234, 5678]}
@@ -298,6 +304,17 @@ describe SolrHelper do
         expect(actual).to eq(expected)
       end
 
+      # TODO: Not touching the code we would expect it to
+      it 'throws an error if collection or identifier are nil' do
+        config = {'identifier_field' => '@id',
+                  'collection_field' => 'http://purl.org/dc/terms/isPartOf'}
+        solr_helper.set_mapped_fields(config)
+        example = {'@id' => 'http://ns.ausnc.org.au/corpora/ace/items/item'}
+        expect{solr_helper.generate_handle(example)}.to raise_error(StandardError)
+        example = {'http://purl.org/dc/terms/isPartOf' => [{'@id' => 'http://ns.ausnc.org.au/corpora/collection'}]}
+        expect{solr_helper.generate_handle(example)}.to raise_error(StandardError)
+      end
+
     end
 
     describe '#separate_graphs' do
@@ -316,14 +333,6 @@ describe SolrHelper do
 
     end
 
-    describe '#map_fields' do
-
-      it 'maps item and document fields' do
-
-      end
-
-    end
-
     describe '#map_item_fields' do
 
       it 'maps mapped item fields' do
@@ -335,7 +344,59 @@ describe SolrHelper do
         expect(actual).to eq(expected)
       end
 
+      it 'maps generated item fields' do
+        solr_helper.set_rdf_relation_to_facet_map({})
+        rdf_ns_to_solr_prefix_map = {'http://ns.ausnc.org.au/schemas/ace/' => 'ACE_'}
+        solr_helper.set_rdf_ns_to_solr_prefix_map(rdf_ns_to_solr_prefix_map)
+        example = {'http://ns.ausnc.org.au/schemas/ace/genre' => [{'@value' => 'Skills, trades and hobbies'}]}
 
+        expected = {'ACE_genre_ssim' => 'Skills, trades and hobbies', 'ACE_genre_tesim' => 'Skills, trades and hobbies'}
+        actual = solr_helper.map_item_fields(example)
+        expect(actual).to eq(expected)
+      end
+
+    end
+
+    describe '#map_fields' do
+
+      it 'maps document and item fields' do
+        document_field_to_rdf_relation_map = {'DC_type_facet' => 'http://purl.org/dc/terms/type',
+                                              'DC_extent_sim' => 'http://purl.org/dc/terms/extent',
+                                              'DC_extent_tesim' => 'http://purl.org/dc/terms/extent'}
+        solr_helper.set_document_field_to_rdf_relation_map(document_field_to_rdf_relation_map)
+        rdf_relation_to_facet_map = {'http://purl.org/dc/terms/isPartOf' => 'collection_name_facet'}
+        solr_helper.set_rdf_relation_to_facet_map(rdf_relation_to_facet_map)
+        rdf_ns_to_solr_prefix_map = {'http://ns.ausnc.org.au/schemas/ace/' => 'ACE_'}
+        solr_helper.set_rdf_ns_to_solr_prefix_map(rdf_ns_to_solr_prefix_map)
+        example_item_graph = {'http://purl.org/dc/terms/isPartOf' => [{'@id' => 'http://ns.ausnc.org.au/corpora/ace'}],
+                              'http://ns.ausnc.org.au/schemas/ace/genre' => [{'@value' => 'Skills, trades and hobbies'}]}
+        example_document_graphs = [{'http://purl.org/dc/terms/extent' => [{'@value' => 1234}],
+                                    'http://purl.org/dc/terms/type' => [{'@value' => 'Original'}]},
+                                   {'http://purl.org/dc/terms/extent' => [{'@value' => 5678}],
+                                    'http://purl.org/dc/terms/type' => [{'@value' => 'Raw'}]}]
+        expected = {'collection_name_facet' => 'ace',
+                    'ACE_genre_ssim' => 'Skills, trades and hobbies', 'ACE_genre_tesim' => 'Skills, trades and hobbies',
+                    'DC_type_facet' => ['Original', 'Raw'],
+                    'DC_extent_sim' => [1234, 5678],
+                    'DC_extent_tesim' => [1234, 5678]}
+        actual = solr_helper.map_fields(example_item_graph, example_document_graphs)
+        expect(actual).to eq(expected)
+      end
+
+    end
+
+  end
+
+  describe '#create_solr_document' do
+
+    it 'transforms JSON-LD into a Solr document hash' do
+      # require 'pry'
+      # binding.pry
+      solr_helper.set_solr_config(config['solr'])
+      example = JSON.load(File.open('spec/files/json-ld_example.json'))
+      expected = eval(File.open('spec/files/solr_document.hash').read)
+      actual = solr_helper.create_solr_document(example)
+      expect(actual).to eq(expected)
     end
 
   end
