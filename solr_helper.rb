@@ -48,9 +48,18 @@ module SolrHelper
   def map_item_fields(item_graph)
     result = get_default_item_fields
     item_graph.each { |key, rdf_value|
-      # TODO: Maybe make a helper out of these two steps
-      uri = extract_value(rdf_value)
-      value = get_unqualified_term(uri)
+      # TODO: this is hacky
+      if key == 'http://ns.ausnc.org.au/schemas/ausnc_md_model/document'
+        value = []
+        rdf_value.each { |doc_value|
+          uri = extract_value(doc_value)
+          value << get_unqualified_term(uri)
+        }
+      elsif
+        # TODO: Maybe make a helper out of these two steps
+        uri = extract_value(rdf_value)
+        value = get_unqualified_term(uri)
+      end
       if @rdf_relation_to_facet_map.has_key? key
         result[@rdf_relation_to_facet_map[key]] = value
       else
@@ -78,11 +87,15 @@ module SolrHelper
       rdf_predicate = 'http://www.w3.org/1999/02/22-rdf-syntax-ns/type'
     end
 
+    if !value.is_a? Array
+      value = [value]
+    end
+
     # TODO: Handle the case if the rdf_predicate is not in the map
     solr_field = map_rdf_predicate_to_solr_field(rdf_predicate)
     # NOTE: Is there any reason that singular values are stored in arrays?
     #       investigated whether there was a reason behind this originally
-    { "#{solr_field}_sim" => [value], "#{solr_field}_tesim" => [value] }
+    { "#{solr_field}_sim" => value, "#{solr_field}_tesim" => value }
   end
 
   def generate_access_rights(item_graph)
