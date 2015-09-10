@@ -12,7 +12,7 @@ module SolrHelper
     (item_graph, document_graphs) = separate_graphs(expanded_metadata)
     mapped_fields = map_fields(item_graph, document_graphs)
     generate_fields = generate_fields(item_graph)
-    mapped_fields.merge(generate_fields)
+    mapped_fields.merge!(generate_fields)
   end
 
   def separate_graphs(json_ld_hash)
@@ -34,10 +34,10 @@ module SolrHelper
     generated_fields[handle: generate_handle(item_graph)]
   end
 
-  def map_fields(item_graph)
+  def map_fields(item_graph, document_graphs)
     item_fields = map_item_fields(item_graph)
     document_fields = map_document_fields(document_graphs)
-    item_fields.merge(document_fields)
+    item_fields.merge!(document_fields)
   end
 
   def map_item_fields(item_graph)
@@ -49,7 +49,7 @@ module SolrHelper
       if @rdf_relation_to_facet_map.has_key? key
         result[@rdf_relation_to_facet_map[key]] = value
       else
-        result.merge(generate_item_fields(key, value))
+        result.merge!(generate_item_fields(key, value))
       end
     }
     result
@@ -66,7 +66,7 @@ module SolrHelper
   end
 
   def generate_item_fields(rdf_predicate, value)
-    # TODO: Handle the case if the ref_predicate is not in the map
+    # TODO: Handle the case if the rdf_predicate is not in the map
     solr_field = map_rdf_predicate_to_solr_field(rdf_predicate)
     { "#{solr_field}_ssim" => value, "#{solr_field}_tesim" => value }
   end
@@ -122,10 +122,10 @@ module SolrHelper
   # TODO
   # refactor these config methods
   def set_solr_config(config)
-    set_mapped_fields(config[:mapped_fields])
-    set_rdf_relation_to_facet_map(config[:rdf_relation_to_facet_map])
-    set_rdf_ns_to_solr_prefix_map(config[:rdf_ns_to_solr_prefix_map])
-    set_document_field_to_rdf_relation_map(config[:document_field_to_rdf_relation_map])
+    set_mapped_fields(config['mapped_fields'])
+    set_rdf_relation_to_facet_map(config['rdf_relation_to_facet_map'])
+    set_rdf_ns_to_solr_prefix_map(config['rdf_ns_to_solr_prefix_map'])
+    set_document_field_to_rdf_relation_map(config['document_field_to_rdf_relation_map'])
   end
 
   # TODO
@@ -242,6 +242,7 @@ module SolrHelper
   end
 
   def get_unqualified_term(uri)
+    # TODO: Maybe raise an error here if the URI is invalid?
     uri.split('/').last
   end
 
