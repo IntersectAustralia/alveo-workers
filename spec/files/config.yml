@@ -70,11 +70,12 @@
 :upload:
   :rabbitmq:
     <<: *rabbitmq_common
-    :work_queue: upload
+    :work_queue: upload # change work_queue to consumption_queue
     :user: upload
     :pass: upload
   :solr:
     <<: *solr_common
+  :production_queue: solr
 
 :ingester:
   <<: *rabbitmq_common
