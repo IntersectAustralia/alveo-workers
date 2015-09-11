@@ -8,11 +8,16 @@ class Worker
     # TODO: clean the options
     bunny_client = bunny_client_class.new(options)
     bunny_client.start
-    channel = bunny_client.create_channel
-    @exchange = channel.direct(options[:exchange])
-    @work_queue = channel.queue(options[:work_queue])
-    @work_queue.bind(@exchange)
-    @error_queue = options[:error_queue]
+    @channel = bunny_client.create_channel
+    @exchange = @channel.direct(options[:exchange])
+    @work_queue = add_queue(options[:work_queue])
+    @error_queue = add_queue(options[:error_queue])
+  end
+
+  def add_queue(name)
+    queue = @channel.queue(name)
+    queue.bind(@exchange, routing_key: name)
+    queue
   end
 
   def get_exchange
@@ -20,6 +25,7 @@ class Worker
   end
 
   def subscribe
+    # TODO: rename work_queue to consumer_queue
     @work_queue.subscribe do |delivery_info, metadata, payload|
       on_message(payload)
     end
@@ -32,8 +38,8 @@ class Worker
     begin
       message = JSON.parse(payload)
       process_message(message)
-    rescue Exception => exception
-      send_error_message(exception)
+    rescue StandardError => e
+      send_error_message(e)
     end
   end
 

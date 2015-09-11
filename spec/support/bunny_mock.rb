@@ -15,6 +15,10 @@ class BunnyMock
     nil
   end
 
+  def close
+    nil
+  end
+
   def create_channel
     BunnyMock::Channel.new
   end
@@ -55,7 +59,7 @@ class BunnyMock
       self.delivery_count = 0
     end
 
-    def bind(exchange)
+    def bind(exchange, opts={})
       exchange.queues << self
     end
 

@@ -5,10 +5,12 @@ require_relative 'solr_worker'
 
 
 def main(config)
-  upload_worker = UploadWorker.new(config[:upload])
-  upload_worker.subscribe()
+  # upload_worker = UploadWorker.new(config[:upload])
+  # upload_worker.subscribe()
   solr_worker = SolrWorker.new(config[:solr_worker])
   solr_worker.subscribe()
+  require 'pry'
+  binding.pry
 end
 
 

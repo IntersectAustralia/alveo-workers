@@ -7,11 +7,12 @@ class Ingester
 
   def initialize(options)
     bunny_client_class = Module.const_get(options[:client_class])
-    bunny_client = bunny_client_class.new(options)
-    bunny_client.start
-    channel = bunny_client.create_channel
-    @exchange = channel.default_exchange
-    @work_queue = options[:work_queue]
+    @bunny_client = bunny_client_class.new(options)
+    @bunny_client.start
+    channel = @bunny_client.create_channel
+    @exchange = channel.direct(options[:exchange])
+    @work_queue = channel.queue(options[:work_queue])
+    @work_queue.bind(@exchange, routing_key: @work_queue.name)
     @error_logger = Logger.new(options[:error_log])
   end
 
@@ -19,9 +20,10 @@ class Ingester
   def ingest_rdf(dir)
     Dir.foreach(dir) { |file|
       if File.extname(file) == '.rdf'
+        file_path = File.join(dir, file)
         begin
           if File.basename(file, '.rdf').end_with? 'metadata'
-            process_metadata_rdf(file)
+            process_metadata_rdf(file_path)
           else
             # TODO: process annotaion rdf
           end
@@ -30,13 +32,16 @@ class Ingester
         end
       end
     }
+    @bunny_client.close
   end
 
   def process_metadata_rdf(rdf_file)
     graph = RDF::Graph.load(rdf_file, :format => :ttl)
     json_ld = graph.dump(:jsonld)
-    message = "{'action': 'add item', 'metadata':#{json_ld}}"
-    @exchange.publish(message, routing_key: @work_queue)
+    #TODO: Move actions to message headers
+    message = "{\"action\": \"add item\", \"metadata\":#{json_ld}}"
+    # TODO: parameterise the routing key
+    @exchange.publish(message, routing_key: 'upload')
   end
 
 end
