@@ -3,9 +3,8 @@ require 'spec_helper'
 describe SolrWorker do
 
   let(:solr_worker) {
-    options = {solr:
-                   {error_queue: 'error',
-                    client_class: 'RSolrMock'},
+    options = {error_queue: 'error',
+               client_class: 'RSolrMock',
                rabbitmq:
                    {client_class: 'BunnyMock',
                     work_queue: 'solr'}}

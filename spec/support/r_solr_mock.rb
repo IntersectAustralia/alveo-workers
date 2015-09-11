@@ -16,4 +16,8 @@ class RSolrMock
     respond(options)
   end
 
+  def self.connect(options)
+    return RSolrMock.new(options)
+  end
+
 end

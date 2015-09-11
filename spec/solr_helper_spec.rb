@@ -86,7 +86,7 @@ describe SolrHelper do
     describe '#set_rdf_relation_to_facet_map' do
 
       it 'initialises the @default_item_fields' do
-        rdf_relation_to_facet_map = config['solr']['rdf_relation_to_facet_map']
+        rdf_relation_to_facet_map = config[:solr]['rdf_relation_to_facet_map']
         expected = {'AUSNC_audience_facet' => 'unspecified',
                     'AUSNC_communication_setting_facet' => 'unspecified',
                     'AUSNC_mode_facet' => 'unspecified',
@@ -109,7 +109,6 @@ describe SolrHelper do
     describe '#set_document_field_to_rdf_relationmap' do
 
       it 'initialises the @default_document' do
-        # rdf_relation_to_document_field_map = config['solr']['rdf_relation_to_document_field_map']
         document_field_to_rdf_relation_map = {'DC_type_facet' => 'http://purl.org/dc/terms/type',
                                               'DC_extent_sim' => 'http://purl.org/dc/terms/extent',
                                               'DC_extent_tesim' => 'http://purl.org/dc/terms/extent'}
@@ -124,7 +123,7 @@ describe SolrHelper do
     describe '#generate_item_fields' do
 
       it 'generates a hash with _ssim and _tesim values to index' do
-        rdf_ns_to_solr_prefix_map = config['solr']['rdf_ns_to_solr_prefix_map']
+        rdf_ns_to_solr_prefix_map = config[:solr]['rdf_ns_to_solr_prefix_map']
         solr_helper.set_rdf_ns_to_solr_prefix_map(rdf_ns_to_solr_prefix_map)
         expected = {'DC_contributor_sim' => ['Kanye West'], 'DC_contributor_tesim' => ['Kanye West'] }
         actual = solr_helper.generate_item_fields('http://purl.org/dc/terms/contributor', 'Kanye West')
@@ -136,7 +135,7 @@ describe SolrHelper do
     describe '#map_rdf_predicate_to_solr_field' do
 
       it 'maps RDF prefix to a solr prefix' do
-        rdf_ns_to_solr_prefix_map = config['solr']['rdf_ns_to_solr_prefix_map']
+        rdf_ns_to_solr_prefix_map = config[:solr]['rdf_ns_to_solr_prefix_map']
         solr_helper.set_rdf_ns_to_solr_prefix_map(rdf_ns_to_solr_prefix_map)
         expected = 'DC_contributor'
         actual = solr_helper.map_rdf_predicate_to_solr_field('http://purl.org/dc/terms/contributor')
@@ -202,7 +201,7 @@ describe SolrHelper do
     describe '#map_document_fields' do
 
       it 'maps and merges document metadata' do
-        document_field_to_rdf_relation_map = config['solr']['document_field_to_rdf_relation_map']
+        document_field_to_rdf_relation_map = config[:solr]['document_field_to_rdf_relation_map']
         solr_helper.set_document_field_to_rdf_relation_map(document_field_to_rdf_relation_map)
         example = [{'http://purl.org/dc/terms/extent' => [{'@value' => 1234}],
                     'http://purl.org/dc/terms/type' => [{'@value' => 'Original'}]},
@@ -390,8 +389,8 @@ describe SolrHelper do
   describe '#create_solr_document' do
 
     it 'transforms JSON-LD into a Solr document hash' do
-      solr_helper.set_solr_config(config['solr'])
-      example = JSON.load(File.open('spec/files/json-ld_example.json'))
+      solr_helper.set_solr_config(config[:solr])
+      example = JSON.load(File.open('spec/files/json-ld_expanded_example.json'))
       expected = eval(File.open('spec/files/solr_document.hash').read)
       actual = solr_helper.create_solr_document(example)
       expect(actual).to eq(expected)

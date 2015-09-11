@@ -31,18 +31,19 @@
     ],
     "http://ns.ausnc.org.au/schemas/ausnc_md_model/document": [
       {
-        "@id": "http://ns.ausnc.org.au/corpora/ace/source/E29a#Text"
-      },
-      {
         "@id": "http://ns.ausnc.org.au/corpora/ace/source/E29a#Original"
       },
       {
         "@id": "http://ns.ausnc.org.au/corpora/ace/source/E29a#Raw"
+      },
+      {
+        "@id": "http://ns.ausnc.org.au/corpora/ace/source/E29a#Text"
       }
     ],
     "http://ns.ausnc.org.au/schemas/ausnc_md_model/itemwordcount": [
       {
-        "@value": "1665"
+        "@value": "1665",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
       }
     ],
     "http://ns.ausnc.org.au/schemas/ausnc_md_model/mode": [
@@ -102,44 +103,14 @@
     ]
   },
   {
-    "@id": "http://ns.ausnc.org.au/corpora/ace/source/E29a#Text",
-    "@type": [
-      "http://xmlns.com/foaf/0.1/Document"
-    ],
-    "http://purl.org/dc/terms/extent": [
-      {
-        "@value": "10117"
-      }
-    ],
-    "http://purl.org/dc/terms/identifier": [
-      {
-        "@value": "E29a-plain.txt"
-      }
-    ],
-    "http://purl.org/dc/terms/source": [
-      {
-        "@id": "file:///data/production_collections/ausnc/ace/E29a-plain.txt"
-      }
-    ],
-    "http://purl.org/dc/terms/title": [
-      {
-        "@value": "E29a#Text"
-      }
-    ],
-    "http://purl.org/dc/terms/type": [
-      {
-        "@value": "Text"
-      }
-    ]
-  },
-  {
     "@id": "http://ns.ausnc.org.au/corpora/ace/source/E29a#Original",
     "@type": [
       "http://xmlns.com/foaf/0.1/Document"
     ],
     "http://purl.org/dc/terms/extent": [
       {
-        "@value": "343844"
+        "@value": "343844",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
       }
     ],
     "http://purl.org/dc/terms/identifier": [
@@ -149,7 +120,7 @@
     ],
     "http://purl.org/dc/terms/source": [
       {
-        "@id": "file:///data/production_collections/ausnc/ace/ace_e.txt"
+        "@id": "file:/data/production_collections/ausnc/ace/ace_e.txt"
       }
     ],
     "http://purl.org/dc/terms/title": [
@@ -170,7 +141,8 @@
     ],
     "http://purl.org/dc/terms/extent": [
       {
-        "@value": "10398"
+        "@value": "10398",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
       }
     ],
     "http://purl.org/dc/terms/identifier": [
@@ -180,7 +152,7 @@
     ],
     "http://purl.org/dc/terms/source": [
       {
-        "@id": "file:///data/production_collections/ausnc/ace/E29a-raw.txt"
+        "@id": "file:/data/production_collections/ausnc/ace/E29a-raw.txt"
       }
     ],
     "http://purl.org/dc/terms/title": [
@@ -191,6 +163,38 @@
     "http://purl.org/dc/terms/type": [
       {
         "@value": "Raw"
+      }
+    ]
+  },
+  {
+    "@id": "http://ns.ausnc.org.au/corpora/ace/source/E29a#Text",
+    "@type": [
+      "http://xmlns.com/foaf/0.1/Document"
+    ],
+    "http://purl.org/dc/terms/extent": [
+      {
+        "@value": "10117",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
+      }
+    ],
+    "http://purl.org/dc/terms/identifier": [
+      {
+        "@value": "E29a-plain.txt"
+      }
+    ],
+    "http://purl.org/dc/terms/source": [
+      {
+        "@id": "file:/data/production_collections/ausnc/ace/E29a-plain.txt"
+      }
+    ],
+    "http://purl.org/dc/terms/title": [
+      {
+        "@value": "E29a#Text"
+      }
+    ],
+    "http://purl.org/dc/terms/type": [
+      {
+        "@value": "Text"
       }
     ]
   }

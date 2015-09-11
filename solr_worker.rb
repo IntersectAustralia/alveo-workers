@@ -1,3 +1,6 @@
+require 'rsolr'
+require_relative 'worker'
+
 class SolrWorker < Worker
 
   # TODO:
@@ -7,10 +10,10 @@ class SolrWorker < Worker
 
   def initialize(options)
     rabbitmq_options = options[:rabbitmq]
-    solr_options = options[:solr]
+    solr_options = options
     super(rabbitmq_options)
     solr_client_class = Module.const_get(solr_options[:client_class])
-    @solr_client = solr_client_class.new(solr_options[:url])
+    @solr_client = solr_client_class.connect(solr_options[:url])
   end
 
   def process_message(message)
