@@ -1,14 +1,15 @@
 ---
 
-rabbitmq: &rabbitmq_common
-  client_class: Bunny
-  error_queue: error
-  host:
-  vhost: /alveo
+:rabbitmq: &rabbitmq_common
+  :client_class: Bunny
+  :error_queue: error
+  :host: alveo-qa-mq.intersect.org.au
+  :vhost: /alveo
+  :exchange: 'alveo.workers'
 
-solr:
-  url: 'http://alveo-qa-solr.intersect.org.au:8080/solr/hcsvlab'
-  client_class: RSolr
+:solr: &solr_common
+#  :url: 'http://alveo-qa-solr.intersect.org.au:8080/solr/hcsvlab'
+#  :client_class: RSolr
   rdf_relation_to_facet_map: #mapped fields
     'http://purl.org/dc/terms/isPartOf': collection_name_facet
     'http://ns.ausnc.org.au/schemas/ausnc_md_model/mode': AUSNC_mode_facet
@@ -45,11 +46,11 @@ solr:
     DC_type_facet: 'http://purl.org/dc/terms/type'
     DC_extent_sim: 'http://purl.org/dc/terms/extent'
     DC_extent_tesim: 'http://purl.org/dc/terms/extent'
-  rabbitmq:
-    <<: *rabbitmq_common
-    work_queue: solr
-    user: solr
-    pass: solr
+#  :rabbitmq:
+#    <<: *rabbitmq_common
+#    :work_queue: solr
+#    :user: solr
+#    :pass: solr
   mapped_fields: # better name?
     default_data_owner: data_owner@intersect.org.au
     data_owner_field: http://id.loc.gov/vocabulary/relators/rpy
@@ -57,16 +58,27 @@ solr:
     identifier_field: '@id'
     created_field: http://purl.org/dc/terms/created
 
-upload:
-  rabbitmq:
-    <<: *rabbitmq_common
-    work_queue: upload
-    user: upload
-    pass: upload
+:solr_worker:
+  :url: 'http://alveo-qa-solr.intersect.org.au:8080/solr/hcsvlab'
+  :client_class: RSolr
+  :rabbitmq:
+      <<: *rabbitmq_common
+      :work_queue: solr
+      :user: solr
+      :pass: solr
 
-ingester:
+:upload:
+  :rabbitmq:
+    <<: *rabbitmq_common
+    :work_queue: upload
+    :user: upload
+    :pass: upload
+  :solr:
+    <<: *solr_common
+
+:ingester:
   <<: *rabbitmq_common
-  work_queue: upload
-  error_log: ingester_errors.log
-  user: ingester
-  pass: ingester
+  :work_queue: upload
+  :error_log: ingester_errors.log
+  :user: ingester
+  :pass: ingester

@@ -9,13 +9,10 @@ module SolrHelper
   # - Generate dynamic fields
   #
 
-  def create_solr_document(json_ld_hash)
-    expanded_metadata = JSON::LD::API.expand(json_ld_hash)
-    (item_graph, document_graphs) = separate_graphs(expanded_metadata)
+  def create_solr_document(expanded_json_ld)
+    (item_graph, document_graphs) = separate_graphs(expanded_json_ld)
     mapped_fields = map_fields(item_graph, document_graphs)
     generated_fields = generate_fields(item_graph)
-    # require 'pry'
-    # binding.pry
     mapped_fields.merge!(generated_fields)
   end
 

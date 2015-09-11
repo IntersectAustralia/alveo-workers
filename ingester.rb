@@ -18,8 +18,6 @@ class Ingester
 
   def ingest_rdf(dir)
     Dir.foreach(dir) { |file|
-      # require 'pry'
-      # binding.pry
       if File.extname(file) == '.rdf'
         begin
           if File.basename(file, '.rdf').end_with? 'metadata'
@@ -45,7 +43,7 @@ end
 
 def main(directory)
   require 'yaml'
-  config = YAML.load('spec/files/config.yml')
+  config = YAML.load_file('spec/files/config.yml')
   ingester = Ingester.new(config[:ingester])
   ingester.ingest_rdf(directory)
 end
@@ -53,5 +51,5 @@ end
 
 if __FILE__ == $PROGRAM_NAME
   # TODO: use an argument parser
-  main(ARGV)
+  main(ARGV[0])
 end

@@ -9,7 +9,7 @@ class Worker
     bunny_client = bunny_client_class.new(options)
     bunny_client.start
     channel = bunny_client.create_channel
-    @exchange = channel.default_exchange
+    @exchange = channel.direct(options[:exchange])
     @work_queue = channel.queue(options[:work_queue])
     @work_queue.bind(@exchange)
     @error_queue = options[:error_queue]
