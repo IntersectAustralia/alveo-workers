@@ -28,7 +28,7 @@ class UploadWorker < Worker
     # message = "\"action\": \"add\", \"document\": #{solr_document}"
     # TODO: extract to message builder utility class
     message = "{\"action\": \"add\", \"document\": #{solr_document.to_json}}"
-    @exchange.publish(message, routing_key: 'solr')
+    @exchange.publish(message, routing_key: @producer_queue.name)
   end
 
 end
