@@ -170,20 +170,16 @@ module SolrHelper
   # refactor these config methods
   def set_rdf_relation_to_facet_map(rdf_relation_to_facet_map)
     @rdf_relation_to_facet_map = rdf_relation_to_facet_map
-    @default_item_fields = {}
-    rdf_relation_to_facet_map.each_value { |value|
-      @default_item_fields[value] = 'unspecified'
-    }
   end
 
   # TODO
   # refactor these config methods
   def set_document_field_to_rdf_relation_map(document_field_to_rdf_relation_map)
     @document_field_to_rdf_relation_map = document_field_to_rdf_relation_map
-    @default_document_fields = {}
-    document_field_to_rdf_relation_map.each_key { |key|
-      @default_document_fields[key] = []
-    }
+    # @default_document_fields = {}
+    # document_field_to_rdf_relation_map.each_key { |key|
+    #   @default_document_fields[key] = []
+    # }
   end
 
   # TODO
@@ -302,11 +298,19 @@ module SolrHelper
   end
 
   def get_default_item_fields
-    @default_item_fields.clone
+    default_item_fields = {}
+    @rdf_relation_to_facet_map.each_value { |value|
+      default_item_fields[value] = 'unspecified'
+    }
+    default_item_fields
   end
 
   def get_default_document_fields
-    @default_document_fields.clone
+    default_document_fields = {}
+    @document_field_to_rdf_relation_map.each_key { |key|
+      default_document_fields[key] = []
+    }
+    default_document_fields
   end
 
   def is_document?(graph_hash)

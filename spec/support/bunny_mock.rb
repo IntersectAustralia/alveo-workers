@@ -124,6 +124,16 @@ class BunnyMock
       queues.any?{|q| q.name == queue_name}
     end
 
+    def get_queue(queue_name)
+      result = nil
+      queues.each { |q|
+        if q.name == queue_name
+          result = q
+        end
+      }
+      result
+    end
+
     def method_missing(method, *args)
       method_name  = method.to_s
       is_predicate = false

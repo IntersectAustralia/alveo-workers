@@ -2,8 +2,11 @@ require 'spec_helper'
 
 describe Worker do
 
+  let(:options) {
+    {work_queue: 'work', error_queue: 'error', client_class: 'BunnyMock'}
+  }
+
   let(:worker) {
-    options = {work_queue: 'work', error_queue: 'error', client_class: 'BunnyMock'}
     Worker.new(options)
   }
 
@@ -30,9 +33,8 @@ describe Worker do
       message = 'not a JSON string'
       expected = ['{"error":"JSON::ParserError","message":"757: unexpected token at \'not a JSON string\'"}']
       exchange = worker.get_exchange
-      error_queue = BunnyMock::Queue.new 'error'
-      error_queue.bind(exchange)
       exchange.publish(message, routing_key: 'work')
+      error_queue = exchange.get_queue(options[:error_queue])
       worker.subscribe
       expect(error_queue.messages).to eq(expected)
     end

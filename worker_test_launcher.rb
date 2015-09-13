@@ -9,8 +9,6 @@ def main(config)
   # upload_worker.subscribe()
   solr_worker = SolrWorker.new(config[:solr_worker])
   solr_worker.subscribe()
-  require 'pry'
-  binding.pry
 end
 
 
