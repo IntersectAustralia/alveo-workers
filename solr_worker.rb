@@ -11,8 +11,6 @@ class SolrWorker < Worker
   def initialize(options)
     rabbitmq_options = options[:rabbitmq]
     super(rabbitmq_options)
-    # require 'pry'
-    # binding.pry
     solr_client_class = Module.const_get(options[:client_class])
     @solr_client = solr_client_class.connect(url: options[:url])
   end
@@ -24,7 +22,6 @@ class SolrWorker < Worker
   end
 
   def add_document(document)
-    puts document
     response = @solr_client.add(document)
     status = response['responseHeader']['status']
     if status != 0

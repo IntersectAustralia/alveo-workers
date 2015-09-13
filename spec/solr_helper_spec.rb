@@ -83,9 +83,9 @@ describe SolrHelper do
   describe '#map_facet_fields' do
 
 
-    describe '#set_rdf_relation_to_facet_map' do
+    describe '#get_default_item_fields' do
 
-      it 'initialises the @default_item_fields' do
+      it 'initialises the default_item_fields' do
         rdf_relation_to_facet_map = config[:solr]['rdf_relation_to_facet_map']
         expected = {'AUSNC_audience_facet' => 'unspecified',
                     'AUSNC_communication_setting_facet' => 'unspecified',
@@ -100,21 +100,21 @@ describe SolrHelper do
                     'AUSNC_communication_medium_facet' => 'unspecified',
                     'OLAC_discourse_type_facet' => 'unspecified'}
         solr_helper.set_rdf_relation_to_facet_map(rdf_relation_to_facet_map)
-        actual = solr_helper.instance_variable_get(:@default_item_fields)
+        actual = solr_helper.get_default_item_fields
         expect(actual).to eq(expected)
       end
 
     end
 
-    describe '#set_document_field_to_rdf_relationmap' do
+    describe '#get_default_document_fields' do
 
-      it 'initialises the @default_document' do
+      it 'initialises the default_document' do
         document_field_to_rdf_relation_map = {'DC_type_facet' => 'http://purl.org/dc/terms/type',
                                               'DC_extent_sim' => 'http://purl.org/dc/terms/extent',
                                               'DC_extent_tesim' => 'http://purl.org/dc/terms/extent'}
         solr_helper.set_document_field_to_rdf_relation_map(document_field_to_rdf_relation_map)
         expected = {'DC_type_facet' => [], 'DC_extent_sim' => [], 'DC_extent_tesim' => []}
-        actual = solr_helper.instance_variable_get(:@default_document_fields)
+        actual = solr_helper.get_default_document_fields
         expect(actual).to eq(expected)
       end
 
@@ -213,6 +213,26 @@ describe SolrHelper do
         actual = solr_helper.map_document_fields(example)
         expect(actual).to eq(expected)
       end
+
+      it 'does not merge the results of successive calls' do
+        document_field_to_rdf_relation_map = config[:solr]['document_field_to_rdf_relation_map']
+        solr_helper.set_document_field_to_rdf_relation_map(document_field_to_rdf_relation_map)
+        example1 = [{'http://purl.org/dc/terms/extent' => [{'@value' => 1234}],
+                    'http://purl.org/dc/terms/type' => [{'@value' => 'Original'}]},
+                   {'http://purl.org/dc/terms/extent' => [{'@value' => 5678}],
+                    'http://purl.org/dc/terms/type' => [{'@value' => 'Raw'}]}]
+        example2 = [{'http://purl.org/dc/terms/extent' => [{'@value' => 1234}],
+                    'http://purl.org/dc/terms/type' => [{'@value' => 'Original'}]},
+                   {'http://purl.org/dc/terms/extent' => [{'@value' => 5678}],
+                    'http://purl.org/dc/terms/type' => [{'@value' => 'Raw'}]}]
+        expected = {'DC_type_facet' => ['Original', 'Raw'],
+                    'DC_extent_sim' => [1234, 5678],
+                    'DC_extent_tesim' => [1234, 5678]}
+        solr_helper.map_document_fields(example1)
+        actual = solr_helper.map_document_fields(example2)
+        expect(actual).to eq(expected)
+      end
+
 
     end
 

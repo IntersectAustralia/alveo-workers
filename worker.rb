@@ -49,7 +49,7 @@ class Worker
 
   def send_error_message(exception)
     error_message = {error: exception.class, message: exception.to_s}.to_json
-    @exchange.publish(error_message, routing_key: @error_queue)
+    @exchange.publish(error_message, routing_key: @error_queue.name)
   end
 
 end
