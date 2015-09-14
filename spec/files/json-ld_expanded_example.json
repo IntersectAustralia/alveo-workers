@@ -118,7 +118,7 @@
     ],
     "http://purl.org/dc/terms/source": [
       {
-        "@id": "file:///data/production_collections/ausnc/ace/E29a-plain.txt"
+        "@id": "file:///Users/ilya/workspace/alveo-workers/spec/files/indexable_document.txt"
       }
     ],
     "http://purl.org/dc/terms/title": [

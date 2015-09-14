@@ -203,10 +203,10 @@ describe SolrHelper do
       it 'maps and merges document metadata' do
         document_field_to_rdf_relation_map = config[:solr]['document_field_to_rdf_relation_map']
         solr_helper.set_document_field_to_rdf_relation_map(document_field_to_rdf_relation_map)
-        example = [{'http://purl.org/dc/terms/extent' => [{'@value' => 1234}],
-                    'http://purl.org/dc/terms/type' => [{'@value' => 'Original'}]},
-                   {'http://purl.org/dc/terms/extent' => [{'@value' => 5678}],
-                    'http://purl.org/dc/terms/type' => [{'@value' => 'Raw'}]}]
+        example = {'doc1' => {'http://purl.org/dc/terms/extent' => [{'@value' => 1234}],
+                          'http://purl.org/dc/terms/type' => [{'@value' => 'Original'}]},
+                   'doc2' => {'http://purl.org/dc/terms/extent' => [{'@value' => 5678}],
+                    'http://purl.org/dc/terms/type' => [{'@value' => 'Raw'}]}}
         expected = {'DC_type_facet' => ['Original', 'Raw'],
                     'DC_extent_sim' => [1234, 5678],
                     'DC_extent_tesim' => [1234, 5678]}
@@ -217,14 +217,14 @@ describe SolrHelper do
       it 'does not merge the results of successive calls' do
         document_field_to_rdf_relation_map = config[:solr]['document_field_to_rdf_relation_map']
         solr_helper.set_document_field_to_rdf_relation_map(document_field_to_rdf_relation_map)
-        example1 = [{'http://purl.org/dc/terms/extent' => [{'@value' => 1234}],
-                    'http://purl.org/dc/terms/type' => [{'@value' => 'Original'}]},
-                   {'http://purl.org/dc/terms/extent' => [{'@value' => 5678}],
-                    'http://purl.org/dc/terms/type' => [{'@value' => 'Raw'}]}]
-        example2 = [{'http://purl.org/dc/terms/extent' => [{'@value' => 1234}],
-                    'http://purl.org/dc/terms/type' => [{'@value' => 'Original'}]},
-                   {'http://purl.org/dc/terms/extent' => [{'@value' => 5678}],
-                    'http://purl.org/dc/terms/type' => [{'@value' => 'Raw'}]}]
+        example1 = {'doc1' => {'http://purl.org/dc/terms/extent' => [{'@value' => 1234}],
+                              'http://purl.org/dc/terms/type' => [{'@value' => 'Original'}]},
+                   'doc2' => {'http://purl.org/dc/terms/extent' => [{'@value' => 5678}],
+                              'http://purl.org/dc/terms/type' => [{'@value' => 'Raw'}]}}
+        example2 = {'doc1' => {'http://purl.org/dc/terms/extent' => [{'@value' => 1234}],
+                              'http://purl.org/dc/terms/type' => [{'@value' => 'Original'}]},
+                   'doc2' => {'http://purl.org/dc/terms/extent' => [{'@value' => 5678}],
+                              'http://purl.org/dc/terms/type' => [{'@value' => 'Raw'}]}}
         expected = {'DC_type_facet' => ['Original', 'Raw'],
                     'DC_extent_sim' => [1234, 5678],
                     'DC_extent_tesim' => [1234, 5678]}
@@ -340,11 +340,13 @@ describe SolrHelper do
 
       it 'separates a JSON-LD hash into item and document graphs' do
         example = [{'@type' => ['http://ns.ausnc.org.au/schemas/ausnc_md_model/AusNCObject']},
-                   {'@type' => ['http://xmlns.com/foaf/0.1/Document']},
-                   {'@type' => ['http://xmlns.com/foaf/0.1/Document']}]
+                   {'@type' => ['http://xmlns.com/foaf/0.1/Document'],
+                    '@id' => 'doc1'},
+                   {'@type' => ['http://xmlns.com/foaf/0.1/Document'],
+                    '@id' => 'doc2'}]
         expected_item = {'@type' => ['http://ns.ausnc.org.au/schemas/ausnc_md_model/AusNCObject']}
-        expected_documents = [{'@type' => ['http://xmlns.com/foaf/0.1/Document']},
-                              {'@type' => ['http://xmlns.com/foaf/0.1/Document']}]
+        expected_documents = {'doc1' => {'@type' => ['http://xmlns.com/foaf/0.1/Document'], '@id' => 'doc1'},
+                              'doc2' => {'@type' => ['http://xmlns.com/foaf/0.1/Document'], '@id' => 'doc2'}}
         (actual_item, actual_documents) = solr_helper.separate_graphs(example)
         expect(actual_item).to eq(expected_item)
         expect(actual_documents).to eq(expected_documents)
@@ -389,10 +391,10 @@ describe SolrHelper do
         solr_helper.set_rdf_ns_to_solr_prefix_map(rdf_ns_to_solr_prefix_map)
         example_item_graph = {'http://purl.org/dc/terms/isPartOf' => [{'@id' => 'http://ns.ausnc.org.au/corpora/ace'}],
                               'http://ns.ausnc.org.au/schemas/ace/genre' => [{'@value' => 'Skills, trades and hobbies'}]}
-        example_document_graphs = [{'http://purl.org/dc/terms/extent' => [{'@value' => '1234'}],
-                                    'http://purl.org/dc/terms/type' => [{'@value' => 'Original'}]},
-                                   {'http://purl.org/dc/terms/extent' => [{'@value' => '5678'}],
-                                    'http://purl.org/dc/terms/type' => [{'@value' => 'Raw'}]}]
+        example_document_graphs = {'doc1' => {'http://purl.org/dc/terms/extent' => [{'@value' => '1234'}],
+                                   'http://purl.org/dc/terms/type' => [{'@value' => 'Original'}]},
+                                   'doc2' => {'http://purl.org/dc/terms/extent' => [{'@value' => '5678'}],
+                                   'http://purl.org/dc/terms/type' => [{'@value' => 'Raw'}]}}
         expected = {'collection_name_facet' => 'ace',
                     'ACE_genre_sim' => ['Skills, trades and hobbies'], 'ACE_genre_tesim' => ['Skills, trades and hobbies'],
                     'DC_type_facet' => ['Original', 'Raw'],

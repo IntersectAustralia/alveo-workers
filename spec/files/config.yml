@@ -8,8 +8,6 @@
   :exchange: 'alveo.workers'
 
 :solr: &solr_common
-#  :url: 'http://alveo-qa-solr.intersect.org.au:8080/solr/hcsvlab'
-#  :client_class: RSolr
   rdf_relation_to_facet_map: #mapped fields
     'http://purl.org/dc/terms/isPartOf': collection_name_facet
     'http://ns.ausnc.org.au/schemas/ausnc_md_model/mode': AUSNC_mode_facet
@@ -43,23 +41,20 @@
     'http://www.w3.org/1999/02/22-rdf-syntax-ns#': RDF_
     'http://www.w3.org/1999/02/22-rdf-syntax-ns/': RDF_ # TODO: hack
   document_field_to_rdf_relation_map:
-    DC_type_facet: 'http://purl.org/dc/terms/type'
-    DC_extent_sim: 'http://purl.org/dc/terms/extent'
-    DC_extent_tesim: 'http://purl.org/dc/terms/extent'
-#  :rabbitmq:
-#    <<: *rabbitmq_common
-#    :work_queue: solr
-#    :user: solr
-#    :pass: solr
+    DC_type_facet: http://purl.org/dc/terms/type
+    DC_extent_sim: http://purl.org/dc/terms/extent
+    DC_extent_tesim: http://purl.org/dc/terms/extent
   mapped_fields: # better name?
     default_data_owner: data_owner@intersect.org.au
     data_owner_field: http://id.loc.gov/vocabulary/relators/rpy
     collection_field: http://purl.org/dc/terms/isPartOf
     identifier_field: '@id'
     created_field: http://purl.org/dc/terms/created
+    :indexable_document: http://hcsvlab.org/vocabulary/indexable_document
+    :source: http://purl.org/dc/terms/source
 
 :solr_worker:
-  :url: 'http://alveo-qa-solr.intersect.org.au:8080/solr/hcsvlab'
+  :url: http://alveo-qa-solr.intersect.org.au:8080/solr/hcsvlab
   :client_class: RSolr
   :rabbitmq:
       <<: *rabbitmq_common
