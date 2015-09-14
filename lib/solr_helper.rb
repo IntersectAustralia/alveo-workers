@@ -12,27 +12,28 @@ module SolrHelper
   def create_solr_document(expanded_json_ld)
     (item_graph, document_graphs) = separate_graphs(expanded_json_ld)
     mapped_fields = map_fields(item_graph, document_graphs)
-    generated_fields = generate_fields(item_graph)
+    generated_fields = generate_fields(item_graph, document_graphs)
     mapped_fields.merge!(generated_fields)
   end
 
   def separate_graphs(json_ld_hash)
     item_graph = nil
-    document_graphs = []
+    document_graphs = {}
     json_ld_hash.each { |graph_hash|
       if is_item? graph_hash
         item_graph = graph_hash
       elsif is_document? graph_hash
-        document_graphs << graph_hash
+        document_graphs[graph_hash['@id']] = graph_hash
       end
     }
     [item_graph, document_graphs]
   end
 
-  def generate_fields(item_graph)
+  def generate_fields(item_graph, document_graphs)
     generated_fields = generate_access_rights(item_graph)
-    generated_fields['date_group_facet'] = generate_date_group(item_graph)
+    generated_fields[:date_group_facet] = generate_date_group(item_graph)
     generated_fields[:handle] = generate_handle(item_graph)
+    generated_fields[:full_text] = generate_full_text(item_graph, document_graphs)
     generated_fields
   end
 
@@ -68,7 +69,7 @@ module SolrHelper
 
   def map_document_fields(document_graphs)
     result = get_default_document_fields
-    document_graphs.each { |document|
+    document_graphs.each_value { |document|
       @document_field_to_rdf_relation_map.each { |key, value|
         result[key] << extract_value(document[value])
       }
@@ -93,6 +94,15 @@ module SolrHelper
     # NOTE: Is there any reason that singular values are stored in arrays?
     #       investigated whether there was a reason behind this originally
     { "#{solr_field}_sim" => value, "#{solr_field}_tesim" => value }
+  end
+
+  def generate_full_text(item_graph, document_graphs)
+    document_uri = extract_value(item_graph[@mapped_fields[:indexable_document]])
+    document_graph = document_graphs[document_uri]
+    file_uri = extract_value(document_graph[@mapped_fields[:source]])
+    file_path = URI.parse(file_uri).path
+    full_text = File.open(file_path).read
+    normalise_whitespace(full_text)
   end
 
   def generate_access_rights(item_graph)
