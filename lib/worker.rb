@@ -3,6 +3,8 @@ require 'json'
 
 class Worker
 
+  attr_reader :processed
+
   def initialize(options)
     bunny_client_class = Module.const_get(options[:client_class])
     # TODO: clean the options
@@ -12,6 +14,7 @@ class Worker
     @exchange = @channel.direct(options[:exchange])
     @work_queue = add_queue(options[:work_queue])
     @error_queue = add_queue(options[:error_queue])
+    @processed = 0
   end
 
   def add_queue(name)
@@ -28,6 +31,7 @@ class Worker
     # TODO: rename work_queue to consumer_queue
     @work_queue.subscribe do |delivery_info, metadata, payload|
       on_message(payload)
+      @processed += 1
     end
   end
 
@@ -37,10 +41,9 @@ class Worker
   def on_message(payload)
     begin
       message = JSON.parse(payload)
-      puts message['action']
       process_message(message)
     rescue StandardError => e
-      send_error_message(e)
+      send_error_message(e, payload)
     end
   end
 
@@ -48,10 +51,11 @@ class Worker
     raise 'Method must be implemented by subclasses'
   end
 
-  def send_error_message(exception)
+  def send_error_message(exception, payload)
     error_message = {error: exception.class,
                      message: exception.to_s,
-                     backtrace: exception.backtrace.join("\n")}
+                     backtrace: exception.backtrace.join("\n"),
+                     input: payload}
     @exchange.publish(error_message.to_json, routing_key: @error_queue.name)
   end
 
