@@ -32,8 +32,8 @@ describe Ingester do
   describe '#ingest_rdf' do
 
     it 'distinguishes between metadata and annotation RDF files' do
-      allow(Dir).to receive(:foreach).and_yield('example-ann.rdf').and_yield('example-metadata.rdf')
-      expect(ingester).to receive(:process_metadata_rdf).with('./example-metadata.rdf').once
+      allow(ingester).to receive(:get_rdf_file_paths).and_return(['example-ann.rdf', 'example-metadata.rdf'])
+      expect(ingester).to receive(:process_metadata_rdf).with('example-metadata.rdf').once
       ingester.ingest_rdf('.')
     end
 
