@@ -8,6 +8,8 @@ def main(config)
   launch_workers(config)
   begin
     while true
+      print "Upload Worker messages processed: #{@upload_worker.processed} " \
+            "Solr Worker messages processed: #{@solr_worker.processed}\r"
       sleep 1
     end
   rescue SignalException

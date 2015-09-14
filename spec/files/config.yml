@@ -8,6 +8,7 @@
   :exchange: 'alveo.workers'
 
 :solr: &solr_common
+  :url: http://alveo-qa-solr.intersect.org.au:8080/solr/hcsvlab # Duplicate field, refactor
   rdf_relation_to_facet_map: #mapped fields
     'http://purl.org/dc/terms/isPartOf': collection_name_facet
     'http://ns.ausnc.org.au/schemas/ausnc_md_model/mode': AUSNC_mode_facet
