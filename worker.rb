@@ -37,6 +37,7 @@ class Worker
   def on_message(payload)
     begin
       message = JSON.parse(payload)
+      puts message['action']
       process_message(message)
     rescue StandardError => e
       send_error_message(e)

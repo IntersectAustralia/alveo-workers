@@ -5,10 +5,21 @@ require_relative 'solr_worker'
 
 
 def main(config)
-  # upload_worker = UploadWorker.new(config[:upload])
-  # upload_worker.subscribe()
-  solr_worker = SolrWorker.new(config[:solr_worker])
-  solr_worker.subscribe()
+  launch_workers(config)
+  begin
+    while true
+      sleep 1
+    end
+  rescue SignalException
+    @solr_worker.commit
+  end
+end
+
+def launch_workers(config)
+  @upload_worker = UploadWorker.new(config[:upload])
+  @upload_worker.subscribe()
+  @solr_worker = SolrWorker.new(config[:solr_worker])
+  @solr_worker.subscribe()
 end
 
 
