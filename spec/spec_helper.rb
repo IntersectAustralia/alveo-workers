@@ -11,10 +11,10 @@ SimpleCov.start do
   add_filter 'spec' # ignore spec files
 end
 
-require_relative '../solr_helper'
-require_relative '../metadata_helper'
+require_relative '../lib/solr_helper'
+require_relative '../lib/metadata_helper'
 
-require_relative '../ingester'
-require_relative '../worker'
-require_relative '../solr_worker'
-require_relative '../upload_worker'
+require_relative '../lib/ingester'
+require_relative '../lib/worker'
+require_relative '../lib/solr_worker'
+require_relative '../lib/upload_worker'

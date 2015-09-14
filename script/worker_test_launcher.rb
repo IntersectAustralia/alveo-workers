@@ -1,7 +1,7 @@
 require 'yaml'
 
-require_relative 'upload_worker'
-require_relative 'solr_worker'
+require_relative '../lib/upload_worker'
+require_relative '../lib/solr_worker'
 
 
 def main(config)
@@ -25,6 +25,6 @@ end
 
 if __FILE__ == $PROGRAM_NAME
   # TODO: use an argument parser
-  config = YAML.load_file('spec/files/config.yml')
+  config = YAML.load_file('../spec/files/config.yml')
   main(config)
 end
