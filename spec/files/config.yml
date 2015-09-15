@@ -7,6 +7,11 @@
   :vhost: /alveo
   :exchange: 'alveo.workers'
 
+:sesame:
+  :base_url: http://alveo-qa-sesame.intersect.org.au:8080/openrdf-sesame/
+  :paths:
+    :repositories: repositories
+
 :solr: &solr_common
   :url: http://alveo-qa-solr.intersect.org.au:8080/solr/hcsvlab # Duplicate field, refactor
   rdf_relation_to_facet_map: #mapped fields
