@@ -31,7 +31,7 @@ describe Worker do
 
     it 'sends errors to the error queue' do
       message = 'not a JSON string'
-      expected = '{"error":"JSON::ParserError","message":"757: unexpected token at \'not a JSON string\'"'
+      expected = "[{\n  \"error\": \"JSON::ParserError\",\n  \"message\": \"757: unexpected token at 'not a JSON string'\""
       exchange = worker.get_exchange
       exchange.publish(message, routing_key: 'work')
       error_queue = exchange.get_queue(options[:error_queue])
