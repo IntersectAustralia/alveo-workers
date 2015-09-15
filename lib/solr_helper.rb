@@ -221,6 +221,7 @@ module SolrHelper
       range_end = range_start + resolution - 1
       result = "#{range_start} - #{range_end}"
     rescue ArgumentError
+      # TODO: Log error
     end
     result
   end

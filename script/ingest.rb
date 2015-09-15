@@ -1,8 +1,10 @@
-require_relative '../lib/ingester'
+$LOAD_PATH.unshift("#{File.dirname(__FILE__)}/../lib")
+
+require 'ingester'
+require 'yaml'
 
 def main(directory)
-  require 'yaml'
-  config = YAML.load_file('../spec/files/config.yml')
+  config = YAML.load_file("#{File.dirname(__FILE__)}/../spec/files/config.yml")
   ingester = Ingester.new(config[:ingester])
   ingester.ingest_rdf(directory)
 end

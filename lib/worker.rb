@@ -54,9 +54,10 @@ class Worker
   def send_error_message(exception, payload)
     error_message = {error: exception.class,
                      message: exception.to_s,
-                     backtrace: exception.backtrace.join("\n"),
-                     input: payload}
-    @exchange.publish(error_message.to_json, routing_key: @error_queue.name)
+                     backtrace: exception.backtrace}
+    error_message = JSON.pretty_generate(error_message)
+    error_message = "[#{error_message},\n{\"input\": #{payload}}]"
+    @exchange.publish(error_message, routing_key: @error_queue.name)
   end
 
 end
