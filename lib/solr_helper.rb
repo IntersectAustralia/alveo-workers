@@ -3,12 +3,6 @@ require 'json/ld'
 module SolrHelper
 
 
-  # TODO:
-  # Maybe refactor this to a multistage process
-  # - Map mapped fields
-  # - Generate dynamic fields
-  #
-
   def create_solr_document(expanded_json_ld)
     (item_graph, document_graphs) = separate_graphs(expanded_json_ld)
     mapped_fields = map_fields(item_graph, document_graphs)
@@ -168,14 +162,6 @@ module SolrHelper
     @mapped_fields = mapped_fields
   end
 
-  ##
-  # Sets  the rdf_relation_to_facet_map, which should be a Hash of key-value
-  # pairs which map from the JSON-LD relation key to the Solr document
-  # facet value. e.g.
-  #
-  # 'dcterms:isPartOf': collection_name_facet
-  #
-
   # TODO
   # refactor these config methods
   def set_rdf_relation_to_facet_map(rdf_relation_to_facet_map)
@@ -186,10 +172,6 @@ module SolrHelper
   # refactor these config methods
   def set_document_field_to_rdf_relation_map(document_field_to_rdf_relation_map)
     @document_field_to_rdf_relation_map = document_field_to_rdf_relation_map
-    # @default_document_fields = {}
-    # document_field_to_rdf_relation_map.each_key { |key|
-    #   @default_document_fields[key] = []
-    # }
   end
 
   # TODO

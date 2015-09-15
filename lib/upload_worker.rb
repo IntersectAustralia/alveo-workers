@@ -25,7 +25,6 @@ class UploadWorker < Worker
     expanded_json_ld = expand_json_ld(metadata)
     solr_document = create_solr_document(expanded_json_ld)
     # TODO: Move action type to message header
-    # message = "\"action\": \"add\", \"document\": #{solr_document}"
     # TODO: extract to message builder utility class
     message = "{\"action\": \"add\", \"document\": #{solr_document.to_json}}"
     @exchange.publish(message, routing_key: @producer_queue.name)

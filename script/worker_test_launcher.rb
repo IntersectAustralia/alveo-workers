@@ -14,6 +14,7 @@ def main(config)
       sleep 1
     end
   rescue SignalException
+    # TODO: Add methods to shut workers down gracefully
     @solr_worker.commit
   end
 end
