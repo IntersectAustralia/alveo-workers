@@ -29,4 +29,8 @@ class SolrWorker < Worker
     end
   end
 
+  def commit
+    @solr_client.commit
+  end
+
 end
