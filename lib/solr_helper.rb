@@ -333,10 +333,5 @@ module SolrHelper
     field == 'http://ns.ausnc.org.au/schemas/ausnc_md_model/document'
   end
 
-  # def send_error_message(e, input)
-  #   if @error_messanger
-  #     @error_messanger.send_error_message(e, input)
-  #   end
-  # end
 
 end
