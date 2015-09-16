@@ -2,7 +2,6 @@ require 'json/ld'
 
 module SolrHelper
 
-
   def create_solr_document(expanded_json_ld)
     (item_graph, document_graphs) = separate_graphs(expanded_json_ld)
     mapped_fields = map_fields(item_graph, document_graphs)
@@ -39,26 +38,32 @@ module SolrHelper
 
   def map_item_fields(item_graph)
     result = get_default_item_fields
-    item_graph.each { |key, rdf_value|
-      # TODO: this is hacky
-      if key == 'http://ns.ausnc.org.au/schemas/ausnc_md_model/document'
-        value = []
-        rdf_value.each { |doc_value|
-          uri = extract_value(doc_value)
-          value << get_unqualified_term(uri)
-        }
-      elsif
-        # TODO: Maybe make a helper out of these two steps
-        uri = extract_value(rdf_value)
-        value = get_unqualified_term(uri)
-      end
-      if @rdf_relation_to_facet_map.has_key? key
-        result[@rdf_relation_to_facet_map[key]] = value
+    item_graph.each { |rdf_field, rdf_value|
+      value = map_item_value(rdf_field, rdf_value)
+      if @rdf_relation_to_facet_map.has_key? rdf_field
+        result[@rdf_relation_to_facet_map[rdf_field]] = value
       else
-        result.merge!(generate_item_fields(key, value))
+        result.merge!(generate_item_fields(rdf_field, value))
       end
     }
     result
+  end
+
+  def map_item_value(rdf_field, rdf_value)
+    if is_document_field?(rdf_field)
+      value = map_item_documents(rdf_value)
+    elsif
+      value = extract_unqualified_value(rdf_value)
+    end
+    value
+  end
+
+  def map_item_documents(rdf_value)
+    value = []
+    rdf_value.each { |doc_value|
+      value << extract_unqualified_value(doc_value)
+    }
+    value
   end
 
   def map_document_fields(document_graphs)
@@ -72,13 +77,6 @@ module SolrHelper
   end
 
   def generate_item_fields(rdf_predicate, value)
-    # TODO: clean up these special cases
-    if rdf_predicate == '@id'
-      rdf_predicate = 'http://purl.org/dc/terms/identifier'
-    elsif rdf_predicate == '@type'
-      rdf_predicate = 'http://www.w3.org/1999/02/22-rdf-syntax-ns/type'
-    end
-
     if !value.is_a? Array
       value = [value]
     end
@@ -119,11 +117,18 @@ module SolrHelper
     }
   end
 
-  # TODO change predicate to 'term'
   def map_rdf_predicate_to_solr_field(uri)
+    uri = expand_collapsed_uri(uri)
     (namespace, term) = get_qualified_term(uri)
     solr_prefix = @rdf_ns_to_solr_prefix_map[namespace]
     solr_prefix + term
+  end
+
+  def expand_collapsed_uri(uri)
+    if @rdf_collapsed_term_map.has_key? uri
+      uri = @rdf_collapsed_term_map[uri]
+    end
+    uri
   end
 
   def generate_handle(item_graph)
@@ -154,6 +159,13 @@ module SolrHelper
     set_rdf_relation_to_facet_map(config['rdf_relation_to_facet_map'])
     set_rdf_ns_to_solr_prefix_map(config['rdf_ns_to_solr_prefix_map'])
     set_document_field_to_rdf_relation_map(config['document_field_to_rdf_relation_map'])
+    set_rdf_collapsed_term_map(config[:rdf_collapsed_term_map])
+  end
+
+  # TODO: Following methods are mainly used to ease testing
+  #       look at getting rid of them
+  def set_rdf_collapsed_term_map(rdf_collapsed_term_map)
+    @rdf_collapsed_term_map = rdf_collapsed_term_map
   end
 
   # TODO
@@ -185,7 +197,6 @@ module SolrHelper
     date_group(created_field)
   end
 
-
   ##
   # call-seq:
   #   date_group('6 September 1986') => '1980 - 1989'
@@ -202,8 +213,10 @@ module SolrHelper
       range_start = increment * resolution
       range_end = range_start + resolution - 1
       result = "#{range_start} - #{range_end}"
-    rescue ArgumentError
-      # TODO: Log error
+    rescue StandardError => e
+      if defined? self.send_error_message
+        send_error_message(e, created_field)
+      end
     end
     result
   end
@@ -244,8 +257,7 @@ module SolrHelper
   end
 
   def graph_type(graph_hash)
-    graph_term = extract_value(graph_hash['@type'])
-    get_unqualified_term(graph_term)
+    extract_unqualified_value(graph_hash['@type'])
   end
 
   def get_qualified_term(uri)
@@ -272,13 +284,16 @@ module SolrHelper
   end
 
   def get_identifier(item_graph)
-    identifier = extract_value(item_graph[@mapped_fields['identifier_field']])
-    get_unqualified_term(identifier)
+    extract_unqualified_value(item_graph[@mapped_fields['identifier_field']])
   end
 
   def get_collection(item_graph)
-    collection_uri = extract_value(item_graph[@mapped_fields['collection_field']])
-    get_unqualified_term(collection_uri)
+    extract_unqualified_value(item_graph[@mapped_fields['collection_field']])
+  end
+
+  def extract_unqualified_value(graph)
+    value = extract_value(graph)
+    get_unqualified_term(value)
   end
 
   def get_data_owner(item_graph)
@@ -313,5 +328,15 @@ module SolrHelper
   def is_item?(graph_hash)
     graph_type(graph_hash) == 'AusNCObject'
   end
+
+  def is_document_field?(field)
+    field == 'http://ns.ausnc.org.au/schemas/ausnc_md_model/document'
+  end
+
+  # def send_error_message(e, input)
+  #   if @error_messanger
+  #     @error_messanger.send_error_message(e, input)
+  #   end
+  # end
 
 end

@@ -123,8 +123,7 @@ describe SolrHelper do
     describe '#generate_item_fields' do
 
       it 'generates a hash with _ssim and _tesim values to index' do
-        rdf_ns_to_solr_prefix_map = config[:solr]['rdf_ns_to_solr_prefix_map']
-        solr_helper.set_rdf_ns_to_solr_prefix_map(rdf_ns_to_solr_prefix_map)
+        solr_helper.set_solr_config(config[:solr])
         expected = {'DC_contributor_sim' => ['Kanye West'], 'DC_contributor_tesim' => ['Kanye West']}
         actual = solr_helper.generate_item_fields('http://purl.org/dc/terms/contributor', 'Kanye West')
         expect(actual).to eq(expected)
@@ -135,8 +134,7 @@ describe SolrHelper do
     describe '#map_rdf_predicate_to_solr_field' do
 
       it 'maps RDF prefix to a solr prefix' do
-        rdf_ns_to_solr_prefix_map = config[:solr]['rdf_ns_to_solr_prefix_map']
-        solr_helper.set_rdf_ns_to_solr_prefix_map(rdf_ns_to_solr_prefix_map)
+        solr_helper.set_solr_config(config[:solr])
         expected = 'DC_contributor'
         actual = solr_helper.map_rdf_predicate_to_solr_field('http://purl.org/dc/terms/contributor')
         expect(actual).to eq(expected)
@@ -367,6 +365,9 @@ describe SolrHelper do
     end
 
     it 'maps generated item fields' do
+      rdf_collapsed_term_map = {'@id' => 'http://purl.org/dc/terms/identifier',
+                                '@type' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns/type'}
+      solr_helper.set_rdf_collapsed_term_map(rdf_collapsed_term_map)
       solr_helper.set_rdf_relation_to_facet_map({})
       rdf_ns_to_solr_prefix_map = {'http://ns.ausnc.org.au/schemas/ace/' => 'ACE_'}
       solr_helper.set_rdf_ns_to_solr_prefix_map(rdf_ns_to_solr_prefix_map)
@@ -386,6 +387,9 @@ describe SolrHelper do
                                             'DC_extent_sim' => 'http://purl.org/dc/terms/extent',
                                             'DC_extent_tesim' => 'http://purl.org/dc/terms/extent'}
       solr_helper.set_document_field_to_rdf_relation_map(document_field_to_rdf_relation_map)
+      rdf_collapsed_term_map = {'@id' => 'http://purl.org/dc/terms/identifier',
+                                '@type' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns/type'}
+      solr_helper.set_rdf_collapsed_term_map(rdf_collapsed_term_map)
       rdf_relation_to_facet_map = {'http://purl.org/dc/terms/isPartOf' => 'collection_name_facet'}
       solr_helper.set_rdf_relation_to_facet_map(rdf_relation_to_facet_map)
       rdf_ns_to_solr_prefix_map = {'http://ns.ausnc.org.au/schemas/ace/' => 'ACE_'}

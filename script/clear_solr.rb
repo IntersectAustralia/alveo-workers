@@ -2,7 +2,7 @@ require 'rsolr'
 
 def main
   require 'yaml'
-  config = YAML.load_file('../spec/files/config.yml')
+  config = YAML.load_file("#{File.dirname(__FILE__)}/../spec/files/config.yml")
   solr = RSolr.connect(url: config[:solr][:url])
   solr.delete_by_query '*:*'
   solr.commit
