@@ -9,6 +9,8 @@ class Worker
     bunny_client_class = Module.const_get(options[:client_class])
     # TODO: clean the options
     bunny_client = bunny_client_class.new(options)
+    # TODO Maybe move the following to start method
+    #      There should also be stop methods to cleanup connections
     bunny_client.start
     @channel = bunny_client.create_channel
     @exchange = @channel.direct(options[:exchange])

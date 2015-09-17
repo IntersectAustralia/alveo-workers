@@ -11,8 +11,10 @@ class Ingester
     @bunny_client.start
     channel = @bunny_client.create_channel
     @exchange = channel.direct(options[:exchange])
-    @work_queue = channel.queue(options[:work_queue])
-    @work_queue.bind(@exchange, routing_key: @work_queue.name)
+    @upload_queue = channel.queue(options[:upload_queue])
+    @upload_queue.bind(@exchange, routing_key: @upload_queue.name)
+    @sesame_queue = channel.queue(options[:sesame_queue])
+    @sesame_queue.bind(@exchange, routing_key: @sesame_queue.name)
     @error_logger = Logger.new(options[:error_log])
   end
 
@@ -24,13 +26,13 @@ class Ingester
   end
 
   def ingest_rdf(dir)
+    collection = File.basename(dir)
     get_rdf_file_paths(dir).each { |file_path|
       begin
-        if File.basename(file_path, '.rdf').end_with? 'metadata'
+        if is_metadata? file_path
           process_metadata_rdf(file_path)
-        else
-          # TODO: process annotaion rdf
         end
+        add_to_sesame(collection, file_path)
       rescue  Exception => e
         @error_logger.error "#{e.class}: #{e.to_s}"
       end
@@ -44,7 +46,23 @@ class Ingester
     #TODO: Move actions to message headers
     message = "{\"action\": \"add item\", \"metadata\":#{json_ld}}"
     # TODO: parameterise the routing key
-    @exchange.publish(message, routing_key: 'upload')
+    @exchange.publish(message, routing_key: @upload_queue.name)
+  end
+
+  def add_to_sesame(collection, rdf_file)
+    # require 'pry'
+    # binding.pry
+    turtle = File.open(rdf_file).read
+    message = "{\"action\": \"add\",\"collection\": \"#{collection}\", \"payload\": #{turtle.to_json} }"
+    @exchange.publish(message, routing_key: @sesame_queue.name)
+  end
+
+  # def json_escape(string)
+  #   string.gsub(/(['"\\\/\b\f\n\r\t])/, '\\\\\1')
+  # end
+
+  def is_metadata?(file_path)
+    File.basename(file_path, '.rdf').end_with?('metadata')
   end
 
 end

@@ -3,14 +3,15 @@ $LOAD_PATH.unshift("#{File.dirname(__FILE__)}/../lib")
 require 'yaml'
 require 'upload_worker'
 require 'solr_worker'
-
+require 'sesame_worker'
 
 def main(config)
   launch_workers(config)
   begin
     while true
-      print "Upload Worker messages processed: #{@upload_worker.processed} " \
-            "Solr Worker messages processed: #{@solr_worker.processed}\r"
+      print "Upload: #{@upload_worker.processed} " \
+            "Solr: #{@solr_worker.processed} " \
+            "Sesame: #{@sesame_worker.processed}\r"
       sleep 1
     end
   rescue SignalException
@@ -20,10 +21,12 @@ def main(config)
 end
 
 def launch_workers(config)
-  @upload_worker = UploadWorker.new(config[:upload])
+  @upload_worker = UploadWorker.new(config[:upload_worker])
   @upload_worker.subscribe()
   @solr_worker = SolrWorker.new(config[:solr_worker])
   @solr_worker.subscribe()
+  @sesame_worker = SesameWorker.new(config[:sesame_worker])
+  @sesame_worker.subscribe()
 end
 
 

@@ -1,17 +1,4 @@
 ---
-
-:rabbitmq: &rabbitmq_common
-  :client_class: Bunny
-  :error_queue: error
-  :host: alveo-qa-mq.intersect.org.au
-  :vhost: /alveo
-  :exchange: 'alveo.workers'
-
-:sesame:
-  :base_url: http://alveo-qa-sesame.intersect.org.au:8080/openrdf-sesame/
-  :paths:
-    :repositories: repositories
-
 :solr: &solr_common
   :url: http://alveo-qa-solr.intersect.org.au:8080/solr/hcsvlab # Duplicate field, refactor
   rdf_relation_to_facet_map: #mapped fields
@@ -59,6 +46,26 @@
     :indexable_document: http://hcsvlab.org/vocabulary/indexable_document
     :source: http://purl.org/dc/terms/source
 
+:rabbitmq: &rabbitmq_common
+  :client_class: Bunny
+  :error_queue: error
+  :host: alveo-qa-mq.intersect.org.au
+  :vhost: /alveo
+  :exchange: 'alveo.workers'
+
+:sesame_worker:
+  :base_url: http://alveo-qa-sesame.intersect.org.au:8080/openrdf-sesame/
+  :client_class: SesameClient
+  :work_queue: sesame
+  :paths:
+    :repositories: repositories
+    :system: repositories/SYSTEM/statements
+  :rabbitmq:
+        <<: *rabbitmq_common
+        :work_queue: sesame
+        :user: sesame
+        :pass: sesame
+
 :solr_worker:
   :url: http://alveo-qa-solr.intersect.org.au:8080/solr/hcsvlab
   :client_class: RSolr
@@ -68,7 +75,7 @@
       :user: solr
       :pass: solr
 
-:upload:
+:upload_worker:
   :rabbitmq:
     <<: *rabbitmq_common
     :work_queue: upload # change work_queue to consumption_queue
@@ -76,11 +83,13 @@
     :pass: upload
   :solr:
     <<: *solr_common
-  :production_queue: solr
+  :solr_queue: solr
+  :sesame_queue: sesame
 
 :ingester:
   <<: *rabbitmq_common
-  :work_queue: upload
   :error_log: ingester_errors.log
   :user: ingester
   :pass: ingester
+  :upload_queue: upload
+  :sesame_queue: sesame
