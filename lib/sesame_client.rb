@@ -84,9 +84,6 @@ class SesameClient
     request = Net::HTTP::Post.new(uri)
     request.add_field('Content-Type', @mime_types[:turtle])
     request.body = ttl_string
-    # require 'pry'
-    # binding.pry
-    puts request.inspect
     @connection.request(request)
   end
 
