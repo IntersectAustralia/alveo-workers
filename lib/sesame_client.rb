@@ -20,6 +20,8 @@ end
 
 class SesameClient
 
+  @@PATHS = {}
+
   def initialize(config)
     @base_url = config[:base_url]
     @paths = config[:paths]
@@ -43,12 +45,15 @@ class SesameClient
     if existing_repositories.include? name
       raise "Repository already contains a collection named #{name}"
     end
-    # TODO: check if repository exists
     uri = get_named_path(:system)
     request = Net::HTTP::Post.new(uri)
     request.add_field('Content-Type', @mime_types[:trig])
     request.body = get_repository_template(name)
-    @connection.request(request)
+    reponse = @connection.request(request)
+    if reponse.code != 204
+      raise "Error creating repository: #{reponse.message} (#{reponse.code})"
+    end
+    name
   end
 
   # TODO: move to module
