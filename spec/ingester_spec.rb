@@ -20,7 +20,7 @@ describe Ingester do
       example = './spec/files/turtle_example.rdf'
       json_ld = File.open('./spec/files/ttl_to_json-ld_expanded_example.json').read
       expected = "{\"action\": \"add item\", \"metadata\":#{json_ld}}"
-      queue = BunnyMock::Queue.new(ingester_options[:work_queue])
+      queue = BunnyMock::Queue.new(ingester_options[:upload_queue])
       queue.bind(exchange)
       ingester.process_metadata_rdf(example)
       actual = queue.messages.first

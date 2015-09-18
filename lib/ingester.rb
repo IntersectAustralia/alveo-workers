@@ -45,21 +45,14 @@ class Ingester
     json_ld = graph.dump(:jsonld)
     #TODO: Move actions to message headers
     message = "{\"action\": \"add item\", \"metadata\":#{json_ld}}"
-    # TODO: parameterise the routing key
     @exchange.publish(message, routing_key: @upload_queue.name)
   end
 
   def add_to_sesame(collection, rdf_file)
-    # require 'pry'
-    # binding.pry
     turtle = File.open(rdf_file).read
     message = "{\"action\": \"add\",\"collection\": \"#{collection}\", \"payload\": #{turtle.to_json} }"
     @exchange.publish(message, routing_key: @sesame_queue.name)
   end
-
-  # def json_escape(string)
-  #   string.gsub(/(['"\\\/\b\f\n\r\t])/, '\\\\\1')
-  # end
 
   def is_metadata?(file_path)
     File.basename(file_path, '.rdf').end_with?('metadata')
