@@ -84,6 +84,7 @@ class SesameClient
       )
   end
 
+  # TODO handle reponse errors
   def insert_statements(repository, ttl_string)
     uri = URI.parse("http://alveo-qa-sesame.intersect.org.au:8080/openrdf-sesame/repositories/#{repository}/statements")
     request = Net::HTTP::Post.new(uri)
