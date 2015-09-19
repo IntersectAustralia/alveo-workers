@@ -1,22 +1,6 @@
 require 'net/http/persistent'
 require 'json'
-
-# TODO: Refactor to persistent overrides module
-class Net::HTTP::Get
-
-  def method_missing(method, *args)
-    @uri.send(method, *args)
-  end
-
-end
-
-class Net::HTTP::Post
-
-  def method_missing(method, *args)
-    @uri.send(method, *args)
-  end
-
-end
+require_relative 'net_http_overrides'
 
 class SesameClient
 
@@ -112,6 +96,16 @@ class SesameClient
 
   def get_named_path(path)
     URI.join(@base_url, @paths[path])
+  end
+
+  def build_request(path, request_class, headers={}, body=nil)
+    path = uri.parse(path)
+    request = request_class.new(uri)
+    headers.each_pair { |field, value|
+      request.add_field(field, value)
+    }
+    request.body = body if body
+    request
   end
 
 end
