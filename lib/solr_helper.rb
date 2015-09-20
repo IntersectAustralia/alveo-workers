@@ -10,6 +10,8 @@ module SolrHelper
     mapped_fields.merge!(generated_fields)
   end
 
+  private
+
   def separate_graphs(json_ld_hash)
     item_graph = nil
     document_graphs = {}

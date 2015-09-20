@@ -1,11 +1,14 @@
 require 'spec_helper'
 
-
 describe SolrHelper do
 
-  # TODO: Use a common config across all tests
-  #       to simplify setup
-  let(:solr_helper) { Class.new.include(SolrHelper).new }
+  let(:solr_helper) {
+    mock_class = Class.new
+    mock_class.include(SolrHelper)
+    mock_class.include(SpecHelper::ExposePrivate)
+    mock_class.new
+  }
+
   let(:config) { YAML.load_file('./spec/files/config.yml') }
 
   let(:rdf_ns_to_solr_prefix_map) {

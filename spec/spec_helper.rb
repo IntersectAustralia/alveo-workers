@@ -21,4 +21,14 @@ require_relative '../lib/solr_worker'
 require_relative '../lib/upload_worker'
 require_relative '../lib/sesame_client'
 
+module SpecHelper
+  
+  module ExposePrivate 
 
+      def method_missing(method, *args)
+        send(method, *args)
+      end
+      
+  end
+
+end
