@@ -20,6 +20,7 @@ require_relative '../lib/worker'
 require_relative '../lib/solr_worker'
 require_relative '../lib/upload_worker'
 require_relative '../lib/sesame_client'
+require_relative '../lib/persistent_client'
 
 module SpecHelper
   
@@ -28,7 +29,7 @@ module SpecHelper
       def method_missing(method, *args)
         send(method, *args)
       end
-      
+
   end
 
 end
