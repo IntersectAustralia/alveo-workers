@@ -70,7 +70,7 @@ class SesameClient
 
   # TODO handle reponse errors
   def insert_statements(repository, ttl_string)
-    uri = URI.parse("http://alveo-qa-sesame.intersect.org.au:8080/openrdf-sesame/repositories/#{repository}/statements")
+    uri = get_statements_uri(repository)
     request = Net::HTTP::Post.new(uri)
     request.add_field('Content-Type', @mime_types[:turtle])
     request.body = ttl_string
@@ -98,14 +98,11 @@ class SesameClient
     URI.join(@base_url, @paths[path])
   end
 
-  def build_request(path, request_class, headers={}, body=nil)
-    path = uri.parse(path)
-    request = request_class.new(uri)
-    headers.each_pair { |field, value|
-      request.add_field(field, value)
-    }
-    request.body = body if body
-    request
+  def get_statements_uri(repository)
+    statements_path = "repositories/#{repository}/statements"
+    URI.join(@base_url, statements_path)
   end
+
+
 
 end
