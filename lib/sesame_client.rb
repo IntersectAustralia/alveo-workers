@@ -1,8 +1,9 @@
 require 'net/http/persistent'
 require 'json'
 require_relative 'net_http_overrides'
+require_relative 'persistent_client'
 
-class SesameClient
+class SesameClient < PersistentClient
 
   @@PATHS = {}
 
@@ -14,14 +15,7 @@ class SesameClient
                    trig: 'application/x-trig',
                    turtle: 'text/turtle'
                   }
-  end
-
-  def connect
-    @connection = Net::HTTP::Persistent.new('Sesame Client')
-  end
-
-  def close
-    @connection.shutdown
+    super('SesameClient')
   end
 
   def create_repository(name)
@@ -29,14 +23,9 @@ class SesameClient
     if existing_repositories.include? name
       raise "Repository already contains a collection named #{name}"
     end
-    uri = get_named_path(:system)
-    request = Net::HTTP::Post.new(uri)
-    request.add_field('Content-Type', @mime_types[:trig])
-    request.body = get_repository_template(name)
-    reponse = @connection.request(request)
-    if reponse.code != 204
-      raise "Error creating repository: #{reponse.message} (#{reponse.code})"
-    end
+    uri = get_statements_uri('SYSTEM')
+    body = get_repository_template(name)
+    request(uri, :post, {'Content-Type' => @mime_types[:trig]}, body)
     name
   end
 
@@ -71,31 +60,21 @@ class SesameClient
   # TODO handle reponse errors
   def insert_statements(repository, ttl_string)
     uri = get_statements_uri(repository)
-    request = Net::HTTP::Post.new(uri)
-    request.add_field('Content-Type', @mime_types[:turtle])
-    request.body = ttl_string
-    @connection.request(request)
+    request(uri, :post, {'Content-Type' => @mime_types[:turtle]}, ttl_string)
   end
 
   def repositories
+    uri = get_repositories_uri
     repositories = []
-    query_results = sparql_query(:repositories)
+    query_results = parse_json_response(request(uri, :get, {'Accept' => @mime_types[:sparql_json]}))
     query_results['results']['bindings'].each { |repository|
       repositories << repository['id']['value']
     }
     repositories
   end
 
-  def sparql_query(path)
-    uri = get_named_path(path)
-    query = Net::HTTP::Get.new(uri)
-    query.add_field('Accept', @mime_types[:sparql_json])
-    response = @connection.request(query)
-    JSON.parse(response.body)
-  end
-
-  def get_named_path(path)
-    URI.join(@base_url, @paths[path])
+  def get_repositories_uri
+    URI.join(@base_url, 'repositories')
   end
 
   def get_statements_uri(repository)

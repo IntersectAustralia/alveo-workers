@@ -8,6 +8,7 @@ describe SesameClient do
     @connection = double(Net::HTTP::Persistent)
     @sesame_client = SesameClient.new(config)
     @sesame_client.instance_variable_set(:@connection, @connection)
+    
   end
 
   describe '#create_repository' do
@@ -22,23 +23,8 @@ describe SesameClient do
     end
 
     it 'raises an Error if the repository already exists' do
+      allow(@sesame_client).to receive(:repositories).and_return(['SYSTEM', 'existing'])
       expect{@sesame_client.create_repository('existing')}.to raise_error(StandardError)
-    end
-    
-    it 'raises and error if the reponse was not 204' do
-      set_mock_response(Net::HTTPNoContent, 204, '')
-      expect{@sesame_client.create_repository('new')}.to raise_error(StandardError)
-    end
-
-  end
-
-  describe '#sparql_query' do
-
-    it 'parses the JSON response body'  do
-      set_mock_response(Net::HTTPOK, 200, '{"key": "value"}')
-      expected = {'key' => 'value'}
-      actual = @sesame_client.sparql_query(:system)
-      expect(actual).to eq(expected)
     end
 
   end
@@ -60,7 +46,8 @@ describe SesameClient do
     it 'returns a list of repositories in Sesame' do
       response = {'results' => {'bindings' => [{'id' => {'value' => 'SYSTEM'}},
                                                {'id' => {'value' => 'existing'}}]}}
-      allow(@sesame_client).to receive(:sparql_query).and_return(response)
+      allow(@sesame_client).to receive(:request)
+      allow(@sesame_client).to receive(:parse_json_response).and_return(response)
       expected = ['SYSTEM', 'existing']
       actual = @sesame_client.repositories
       expect(actual).to eq(expected)
@@ -70,8 +57,7 @@ describe SesameClient do
 
 
   def set_mock_response(reponse_class, code, body)
-    mock_response = double(reponse_class)
-    allow(mock_response).to receive(:code).and_return(code)
+    mock_response = reponse_class.new('1.1', code, '')
     allow(mock_response).to receive(:body).and_return(body)
     allow(@connection).to receive(:request).and_return(mock_response)
     mock_response
