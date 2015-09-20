@@ -2,7 +2,6 @@ require 'spec_helper'
 
 describe SesameClient do
 
-
   before(:each) do
     config = { base_url: 'http://sesame.org/sesame',
       paths: {system: 'SYSTEM'} }
