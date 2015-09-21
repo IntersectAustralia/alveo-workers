@@ -6,7 +6,7 @@ require 'solr_worker'
 require 'sesame_worker'
 
 def main(config)
-  launch_workers(config)
+  start_workers(config)
   begin
     while true
       print "Upload: #{@upload_worker.processed} " \
@@ -15,18 +15,23 @@ def main(config)
       sleep 1
     end
   rescue SignalException
-    # TODO: Add methods to shut workers down gracefully
-    @solr_worker.commit
+    stop_workers
   end
 end
 
-def launch_workers(config)
+def stop_workers
+  @upload_worker.stop
+  @solr_worker.stop
+  @sesame_worker.stop
+end
+
+def start_workers(config)
   @upload_worker = UploadWorker.new(config[:upload_worker])
-  @upload_worker.subscribe()
+  @upload_worker.start
   @solr_worker = SolrWorker.new(config[:solr_worker])
-  @solr_worker.subscribe()
+  @solr_worker.start
   @sesame_worker = SesameWorker.new(config[:sesame_worker])
-  @sesame_worker.subscribe()
+  @sesame_worker.start
 end
 
 

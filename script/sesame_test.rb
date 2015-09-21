@@ -6,7 +6,6 @@ require 'sesame_client'
 
 def main(config)
   sesame_client = SesameClient.new(config[:sesame_worker])
-  sesame_client.connect
   turtle = File.open("#{File.dirname(__FILE__)}/../spec/files/turtle_example.rdf").read
   require 'pry'
   binding.pry

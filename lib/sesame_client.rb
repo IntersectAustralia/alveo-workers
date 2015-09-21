@@ -57,7 +57,6 @@ class SesameClient < PersistentClient
       )
   end
 
-  # TODO handle reponse errors
   def insert_statements(repository, ttl_string)
     uri = get_statements_uri(repository)
     request(uri, :post, {'Content-Type' => @mime_types[:turtle]}, ttl_string)

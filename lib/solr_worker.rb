@@ -15,6 +15,11 @@ class SolrWorker < Worker
     @solr_client = solr_client_class.connect(url: options[:url])
   end
 
+  def stop
+    super
+    @solr_client.commit
+  end
+
   def process_message(message)
     if message['action'] = 'add'
       add_document(message['document'])
@@ -27,10 +32,6 @@ class SolrWorker < Worker
     if status != 0
       raise "Solr returned an unexpected status: #{status}"
     end
-  end
-
-  def commit
-    @solr_client.commit
   end
 
 end

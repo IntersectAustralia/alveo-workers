@@ -8,16 +8,10 @@ class SesameWorker < Worker
     super(rabbitmq_options)
     sesame_client_class = Module.const_get(options[:client_class])
     @sesame_client = sesame_client_class.new(options)
-    @sesame_client.connect
-  end
-
-  def start
-    @sesame_client.connect
-    # super bunny#start
   end
 
   def stop
-    # super bunny#stop
+    super
     @sesame_client.close
   end
 
