@@ -15,7 +15,7 @@ class SolrWorker < Worker
     @solr_client = solr_client_class.connect(url: options[:url])
   end
 
-  def stop
+  def close
     super
     @solr_client.commit
   end

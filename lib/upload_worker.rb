@@ -13,7 +13,7 @@ class UploadWorker < Worker
     set_solr_config(options[:solr])
   end
 
-  def start
+  def connect
     super
     @solr_queue = add_queue(@solr_queue_name)
   end

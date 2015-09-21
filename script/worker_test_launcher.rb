@@ -23,14 +23,20 @@ def stop_workers
   @upload_worker.stop
   @solr_worker.stop
   @sesame_worker.stop
+  @upload_worker.close
+  @solr_worker.close
+  @sesame_worker.close
 end
 
 def start_workers(config)
   @upload_worker = UploadWorker.new(config[:upload_worker])
-  @upload_worker.start
   @solr_worker = SolrWorker.new(config[:solr_worker])
-  @solr_worker.start
   @sesame_worker = SesameWorker.new(config[:sesame_worker])
+  @upload_worker.connect
+  @solr_worker.connect
+  @sesame_worker.connect
+  @upload_worker.start
+  @solr_worker.start
   @sesame_worker.start
 end
 

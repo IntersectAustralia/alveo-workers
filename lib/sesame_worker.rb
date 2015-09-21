@@ -10,7 +10,7 @@ class SesameWorker < Worker
     @sesame_client = sesame_client_class.new(options)
   end
 
-  def stop
+  def close
     super
     @sesame_client.close
   end

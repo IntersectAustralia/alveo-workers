@@ -10,14 +10,6 @@ class Worker
     bunny_client_class = Module.const_get(@options[:client_class])
     # TODO: clean the options
     @bunny_client = bunny_client_class.new(@options)
-    # TODO Maybe move the following to start method
-    #      There should also be stop methods to cleanup connections
-    # @bunny_client.start
-    # @channel = @bunny_client.create_channel
-    # @exchange = @channel.direct(options[:exchange])
-    # @work_queue = add_queue(options[:work_queue])
-    # @error_queue = add_queue(options[:error_queue])
-    # @processed = 0
   end
 
   def add_queue(name)
@@ -26,25 +18,29 @@ class Worker
     queue
   end
 
-  def get_exchange
-    @exchange
-  end
+  # def get_exchange
+  #   @exchange
+  # end
 
-  def start
+  def connect
     @bunny_client.start
     @channel = @bunny_client.create_channel
     @exchange = @channel.direct(@options[:exchange])
     @work_queue = add_queue(@options[:work_queue])
     @error_queue = add_queue(@options[:error_queue])
+  end
+
+  def close
+    @channel.close
+    @bunny_client.close
+  end
+
+  def start
     @processed = 0
-    # NOTE: This could be a problem if it starts processing messages before output queues
-    # are initialised in the subclasses
     subscribe
   end
 
   def stop
-    @channel.close
-    @bunny_client.close
   end
 
   def subscribe
