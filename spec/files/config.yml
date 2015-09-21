@@ -86,10 +86,15 @@
   :solr_queue: solr
   :sesame_queue: sesame
 
-:ingester:
+:ingester: &ingester
   <<: *rabbitmq_common
   :error_log: ingester_errors.log
   :user: ingester
   :pass: ingester
   :upload_queue: upload
   :sesame_queue: sesame
+
+:mt_ingester:
+  :worker_count: 4
+  :ingester:
+    <<: *ingester

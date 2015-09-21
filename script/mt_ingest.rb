@@ -1,20 +1,18 @@
 $LOAD_PATH.unshift("#{File.dirname(__FILE__)}/../lib")
 
-require 'ingester'
+require 'multithreaded_ingester'
 require 'yaml'
 require 'benchmark'
 
 def main(directory)
   config = YAML.load_file("#{File.dirname(__FILE__)}/../spec/files/config.yml")
-  ingester = Ingester.new(config[:ingester])
-  ingester.connect
+  mt_ingester = MultithreadedIngester.new(config[:mt_ingester])
   collection = File.basename(directory)
   Benchmark.bm { |reporter|
     reporter.report("Ingest (#{collection}):") {
-      ingester.ingest_directory(directory)
+      mt_ingester.ingest(directory)
     }
   }
-  ingester.close
 end
 
 
