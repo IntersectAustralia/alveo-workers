@@ -2,14 +2,6 @@ require 'spec_helper'
 
 describe Worker do
 
-  # let(:options) {
-  #   {work_queue: 'work', error_queue: 'error', client_class: 'BunnyMock'}
-  # }
-  #
-  # let(:worker) {
-  #   Worker.new(options)
-  # }
-
   before(:all) do
     @options = {work_queue: 'work', error_queue: 'error', client_class: 'BunnyMock'}
     @worker = Worker.new(@options)

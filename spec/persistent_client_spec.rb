@@ -24,6 +24,17 @@ describe PersistentClient do
 
   end
 
+  describe '#perform_request' do
 
+    it 'raises and Exceptions if the response is not successful' do
+      connection = @persistent_client.instance_variable_get(:@connection)
+      response = Net::HTTPForbidden.new('', 403, 'Forbidden')
+      allow(connection).to receive(:request).and_return(response)
+      expect{
+        @persistent_client.perform_request('')
+      }.to raise_error(StandardError, 'Error performing request: Forbidden (403)')
+    end
+
+  end
 
 end

@@ -18,10 +18,6 @@ class Worker
     queue
   end
 
-  # def get_exchange
-  #   @exchange
-  # end
-
   def connect
     @bunny_client.start
     @channel = @bunny_client.create_channel
