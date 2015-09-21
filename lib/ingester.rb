@@ -4,30 +4,41 @@ require 'json/ld'
 
 class Ingester
 
-
   def initialize(options)
     bunny_client_class = Module.const_get(options[:client_class])
     @bunny_client = bunny_client_class.new(options)
-    @bunny_client.start
-    channel = @bunny_client.create_channel
-    @exchange = channel.direct(options[:exchange])
-    @upload_queue = channel.queue(options[:upload_queue])
-    @upload_queue.bind(@exchange, routing_key: @upload_queue.name)
-    @sesame_queue = channel.queue(options[:sesame_queue])
-    @sesame_queue.bind(@exchange, routing_key: @sesame_queue.name)
+    @exchange_name = options[:exchange]
+    @upload_queue_name = options[:upload_queue]
+    @sesame_queue_name = options[:sesame_queue]
     @error_logger = Logger.new(options[:error_log])
   end
 
+  def connect
+    @bunny_client.start
+    @channel = @bunny_client.create_channel
+    @exchange = @channel.direct(@exchange_name)
+    @upload_queue = add_queue(@upload_queue_name)
+    @sesame_queue = add_queue(@sesame_queue_name)
+  end
 
-  def get_rdf_file_paths(dir)
+  def close
+    @bunny_client.close
+  end
+
+  def add_queue(name)
+    queue = @channel.queue(name)
+    queue.bind(@exchange, routing_key: name)
+    queue
+  end
+
+  def self.get_rdf_file_paths(dir)
     Dir[File.join(dir, '**', '*')].keep_if { |path|
       (File.file? path) && (File.extname(path) == '.rdf')
     }
   end
 
-  def ingest_rdf(dir)
-    collection = File.basename(dir)
-    get_rdf_file_paths(dir).each { |file_path|
+  def process_job(collection, file_paths)
+    file_paths.each { |file_path|
       begin
         if is_metadata? file_path
           process_metadata_rdf(file_path)
@@ -37,7 +48,12 @@ class Ingester
         @error_logger.error "#{e.class}: #{e.to_s}"
       end
     }
-    @bunny_client.close
+  end
+
+  def ingest_directory(dir)
+    collection = File.basename(dir)
+    file_paths = get_rdf_file_paths(dir)
+    process_job(collection, file_paths)
   end
 
   def process_metadata_rdf(rdf_file)

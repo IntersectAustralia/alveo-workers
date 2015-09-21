@@ -6,7 +6,9 @@ require 'yaml'
 def main(directory)
   config = YAML.load_file("#{File.dirname(__FILE__)}/../spec/files/config.yml")
   ingester = Ingester.new(config[:ingester])
-  ingester.ingest_rdf(directory)
+  ingester.connect
+  ingester.ingest_directory(directory)
+  ingester.close
 end
 
 
