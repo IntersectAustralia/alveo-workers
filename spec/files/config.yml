@@ -47,7 +47,8 @@
     :source: http://purl.org/dc/terms/source
 
 :rabbitmq: &rabbitmq_common
-  :client_class: Bunny
+  #:client_class: Bunny
+  :client_class: MarchHare
   :error_queue: error
   :host: alveo-qa-mq.intersect.org.au
   :vhost: /alveo
@@ -95,6 +96,6 @@
   :sesame_queue: sesame
 
 :mt_ingester:
-  :worker_count: 4
+  :worker_count: 40
   :ingester:
     <<: *ingester
