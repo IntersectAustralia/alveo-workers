@@ -2,17 +2,12 @@ require 'spec_helper'
 
 describe Ingester do
 
-  let(:ingester_options) {
-    {work_queue: 'upload', error_queue: 'error', client_class: 'BunnyMock'}
-  }
-
-  let(:ingester) {
-    Ingester.new(ingester_options)
-  }
-
-  let(:exchange) {
-    ingester.instance_variable_get(:@exchange)
-  }
+  before(:all) do
+    @ingester_options = {work_queue: 'upload', error_queue: 'error', client_class: 'BunnyMock'}
+    @ingester = Ingester.new(@ingester_options)
+    @ingester.connect
+    @exchange = @ingester.instance_variable_get(:@exchange)
+  end
 
   describe '#process_metadata_rdf' do
 
@@ -20,24 +15,41 @@ describe Ingester do
       example = './spec/files/turtle_example.rdf'
       json_ld = File.open('./spec/files/ttl_to_json-ld_expanded_example.json').read
       expected = "{\"action\": \"add item\", \"metadata\":#{json_ld}}"
-      queue = BunnyMock::Queue.new(ingester_options[:upload_queue])
-      queue.bind(exchange)
-      ingester.process_metadata_rdf(example)
+      queue = BunnyMock::Queue.new(@ingester_options[:upload_queue])
+      queue.bind(@exchange)
+      @ingester.process_metadata_rdf(example)
       actual = queue.messages.first
       expect(actual).to eq(expected)
     end
 
   end
 
-  describe '#ingest_rdf' do
+  describe '#process_job' do
 
-    it 'distinguishes between metadata and annotation RDF files' do
-      allow(ingester).to receive(:get_rdf_file_paths).and_return(['example-ann.rdf', 'example-metadata.rdf'])
-      expect(ingester).to receive(:process_metadata_rdf).with('example-metadata.rdf').once
-      ingester.ingest_rdf('.')
+    it 'processes metadata RDFs' do
+      collection = 'collection'
+      example = 'item-metadata.rdf'
+      expect(@ingester).to receive(:process_metadata_rdf).with(example)
+      expect(@ingester).to receive(:add_to_sesame).with(collection, example)
+      @ingester.process_job(collection, [example])
+    end
+
+    it 'does not process annotations RDFs' do
+      collection = 'collection'
+      example = 'item-ann.rdf'
+      expect(@ingester).to receive(:add_to_sesame).with(collection, example)
+      @ingester.process_job(collection, [example])
+    end
+
+    it 'logs and error if there is an error when processing' do
+      collection = 'collection'
+      example = 'item-metadata.rdf'
+      allow(@ingester).to receive(:process_metadata_rdf).and_raise(StandardError)
+      error_logger = @ingester.instance_variable_get(:@error_logger)
+      expect(error_logger).to receive(:error)
+      @ingester.process_job(collection, [example])
     end
 
   end
-
 
 end
