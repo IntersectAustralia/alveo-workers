@@ -1,12 +1,16 @@
-require 'bunny'
+# require 'bunny'
 require 'rdf/turtle'
 require 'json/ld'
+require 'march_hare'
+require 'logger'
 
 class Ingester
 
   def initialize(options)
-    bunny_client_class = Module.const_get(options[:client_class])
-    @bunny_client = bunny_client_class.new(options)
+    @options = options
+    @bunny_client_class = Module.const_get(options[:client_class])
+    # @bunny_client = bunny_client_class.new(options)
+    # @bunny_client = bunny_client_class
     @exchange_name = options[:exchange]
     @upload_queue_name = options[:upload_queue]
     @sesame_queue_name = options[:sesame_queue]
@@ -14,7 +18,8 @@ class Ingester
   end
 
   def connect
-    @bunny_client.start
+    # @bunny_client.start
+    @bunny_client = @bunny_client_class.connect @options
     @channel = @bunny_client.create_channel
     @exchange = @channel.direct(@exchange_name)
     @upload_queue = add_queue(@upload_queue_name)
