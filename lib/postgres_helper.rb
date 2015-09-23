@@ -37,7 +37,7 @@ module PostgresHelper
     # item[:annotation_path] = nil
     # item[:collection_id] = nil
     item[:documents] = extract_documents_info(document_graphs)
-    item[:json_metadata] = build_json_metadata
+    item[:json_metadata] = build_json_metadata(item_graph, document_graphs)
     item
   end
 
@@ -81,9 +81,27 @@ module PostgresHelper
     "#{@@URI_BASE}#{collection}/#{identifier}"
   end
 
-  def build_json_metadata
-    ''
+  def build_json_metadata(item_graph, document_graphs)
+    json_metadata = {
+      catalog_url: '',
+      metadata: item_graph,
+      primary_text_url: get_primary_text_path(item_graph, document_graphs),
+      annotations_url: '',
+      documents: document_graphs,
+      documentsLocations: map_document_locations(document_graphs)
+    }
+    json_metadata.to_json
   end
 
+  def map_document_locations(document_graphs)
+    documentsLocations = {}
+    document_graphs.each { |document_graph|
+      # TODO: duplication of effort here and extract_document_info
+      file_name = extract_value(document_graph[@@identifier])
+      file_path = URI.parse(extract_value(document_graph[@@source])).path
+      documentsLocations[file_name] = file_path
+    }
+    documentsLocations
+  end
 
 end

@@ -93,6 +93,7 @@ describe PostgresHelper do
     it '#create_pg_statement' do
       allow(@postgres_helper).to receive(:separate_graphs).and_return([example_item_graph, {}])
       allow(@postgres_helper).to receive(:get_primary_text_path).and_return(nil)
+      allow(@postgres_helper).to receive(:build_json_metadata).and_return('')
       expected = {uri: 'https://app.alveo.edu.au/catalog/ace/E29a',
                   handle: 'ace:E29a',
                   primary_text_path: nil,
