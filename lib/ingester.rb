@@ -52,7 +52,7 @@ class Ingester
 
   def ingest_directory(dir)
     collection = File.basename(dir)
-    file_paths = get_rdf_file_paths(dir)
+    file_paths = self.class.get_rdf_file_paths(dir)
     process_job(collection, file_paths)
   end
 
