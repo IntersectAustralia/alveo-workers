@@ -14,6 +14,7 @@ end
 
 require_relative '../lib/solr_helper'
 require_relative '../lib/metadata_helper'
+require_relative '../lib/postgres_helper'
 
 require_relative '../lib/ingester'
 require_relative '../lib/worker'

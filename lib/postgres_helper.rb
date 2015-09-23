@@ -5,7 +5,7 @@ module PostgresHelper
   # TODO hacky, refactor methods to common module
   include SolrHelper
 
-  @MIME_TYPE = Hash.new('application/octet-stream').merge{
+  @@MIME_TYPE = Hash.new('application/octet-stream').merge({
       '.txt' => 'text/plain',
       '.xml' => 'text/xml',
       '.jpg' => 'image/jpeg',
@@ -17,7 +17,7 @@ module PostgresHelper
       '.mp4' => 'video/mp4',
       '.doc' => 'application/msword',
       '.pdf' => 'application/pdf'
-  }
+  })
 
 
   # TODO: Metadata helper?
@@ -30,14 +30,15 @@ module PostgresHelper
 
   def create_pg_statement(expanded_json_ld)
     (item_graph, document_graphs) = separate_graphs(expanded_json_ld)
-    fields = {}
-    fields[:uri] = generate_uri(item_graph)
-    fields[:handle] = generate_handle(item_graph)
-    fields[:primary_text_path] = get_primary_text_path(item_graph, document_graphs)
-    # fields[:annotation_path] = nil
-    # fields[:collection_id] = nil
-    fields[:documents] = extract_documents_info(document_graphs)
-    fields[:json_metadata] = build_json_metadata
+    item = {}
+    item[:uri] = generate_uri(item_graph)
+    item[:handle] = generate_handle(item_graph)
+    item[:primary_text_path] = get_primary_text_path(item_graph, document_graphs)
+    # item[:annotation_path] = nil
+    # item[:collection_id] = nil
+    item[:documents] = extract_documents_info(document_graphs)
+    item[:json_metadata] = build_json_metadata
+    item
   end
 
   def extract_documents_info(document_graphs)
@@ -54,14 +55,16 @@ module PostgresHelper
     doc_fields[:file_path] = URI.parse(extract_value(document_graph[@@source])).path
     doc_fields[:doc_type] = extract_value(document_graph[@@type])
     doc_fields[:mime_type] = get_mime_type(doc_fields[:file_name])
+    doc_fields
   end
 
   def get_mime_type(file_path)
-    @MIME_TYPE[File.extname(file_path)]
+    @@MIME_TYPE[File.extname(file_path)]
   end
 
   def get_primary_text_path(item_graph, document_graphs)
-    document_uri = extract_value(item_graph[@mapped_fields[@@primary_text]])
+    primary_text_path = nil
+    document_uri = extract_value(item_graph[@@primary_text])
     document_graph = document_graphs[document_uri]
     extract_value(document_graph[@@source])
   end
@@ -75,7 +78,7 @@ module PostgresHelper
     if collection.nil? || identifier.nil?
       raise 'Insufficient metadata to generate item uri'
     end
-    "#{@@URI_BASE}/#{collection}/#{identifier}"
+    "#{@@URI_BASE}#{collection}/#{identifier}"
   end
 
   def build_json_metadata
