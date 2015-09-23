@@ -3,27 +3,41 @@ $LOAD_PATH.unshift("#{File.dirname(__FILE__)}/../lib")
 require 'yaml'
 require 'upload_worker'
 require 'solr_worker'
-
+require 'sesame_worker'
 
 def main(config)
-  launch_workers(config)
+  start_workers(config)
   begin
     while true
-      print "Upload Worker messages processed: #{@upload_worker.processed} " \
-            "Solr Worker messages processed: #{@solr_worker.processed}\r"
+      print "Upload: #{@upload_worker.processed} " \
+            "Solr: #{@solr_worker.processed} " \
+            "Sesame: #{@sesame_worker.processed}\r"
       sleep 1
     end
   rescue SignalException
-    # TODO: Add methods to shut workers down gracefully
-    @solr_worker.commit
+    stop_workers
   end
 end
 
-def launch_workers(config)
-  @upload_worker = UploadWorker.new(config[:upload])
-  @upload_worker.subscribe()
+def stop_workers
+  @upload_worker.stop
+  @solr_worker.stop
+  @sesame_worker.stop
+  @upload_worker.close
+  @solr_worker.close
+  @sesame_worker.close
+end
+
+def start_workers(config)
+  @upload_worker = UploadWorker.new(config[:upload_worker])
   @solr_worker = SolrWorker.new(config[:solr_worker])
-  @solr_worker.subscribe()
+  @sesame_worker = SesameWorker.new(config[:sesame_worker])
+  @upload_worker.connect
+  @solr_worker.connect
+  @sesame_worker.connect
+  @upload_worker.start
+  @solr_worker.start
+  @sesame_worker.start
 end
 
 

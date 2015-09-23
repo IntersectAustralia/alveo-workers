@@ -8,11 +8,14 @@ class UploadWorker < Worker
   include SolrHelper
 
   def initialize(options)
-    rabbitmq_options = options[:rabbitmq]
-    super(rabbitmq_options)
+    @solr_queue_name = options[:solr_queue]
+    super(options[:rabbitmq])
     set_solr_config(options[:solr])
-    # TODO: refactor this to helper method in parent class
-    @producer_queue = add_queue(options[:production_queue])
+  end
+
+  def connect
+    super
+    @solr_queue = add_queue(@solr_queue_name)
   end
 
   def process_message(message)
@@ -27,7 +30,7 @@ class UploadWorker < Worker
     # TODO: Move action type to message header
     # TODO: extract to message builder utility class
     message = "{\"action\": \"add\", \"document\": #{solr_document.to_json}}"
-    @exchange.publish(message, routing_key: @producer_queue.name)
+    @exchange.publish(message, routing_key: @solr_queue.name)
   end
 
 end

@@ -6,15 +6,10 @@ class Worker
   attr_reader :processed
 
   def initialize(options)
-    bunny_client_class = Module.const_get(options[:client_class])
+    @options = options
+    bunny_client_class = Module.const_get(@options[:client_class])
     # TODO: clean the options
-    bunny_client = bunny_client_class.new(options)
-    bunny_client.start
-    @channel = bunny_client.create_channel
-    @exchange = @channel.direct(options[:exchange])
-    @work_queue = add_queue(options[:work_queue])
-    @error_queue = add_queue(options[:error_queue])
-    @processed = 0
+    @bunny_client = bunny_client_class.new(@options)
   end
 
   def add_queue(name)
@@ -23,8 +18,25 @@ class Worker
     queue
   end
 
-  def get_exchange
-    @exchange
+  def connect
+    @bunny_client.start
+    @channel = @bunny_client.create_channel
+    @exchange = @channel.direct(@options[:exchange])
+    @work_queue = add_queue(@options[:work_queue])
+    @error_queue = add_queue(@options[:error_queue])
+  end
+
+  def close
+    @channel.close
+    @bunny_client.close
+  end
+
+  def start
+    @processed = 0
+    subscribe
+  end
+
+  def stop
   end
 
   def subscribe

@@ -4,38 +4,56 @@ require 'json/ld'
 
 class Ingester
 
-
   def initialize(options)
     bunny_client_class = Module.const_get(options[:client_class])
     @bunny_client = bunny_client_class.new(options)
-    @bunny_client.start
-    channel = @bunny_client.create_channel
-    @exchange = channel.direct(options[:exchange])
-    @work_queue = channel.queue(options[:work_queue])
-    @work_queue.bind(@exchange, routing_key: @work_queue.name)
+    @exchange_name = options[:exchange]
+    @upload_queue_name = options[:upload_queue]
+    @sesame_queue_name = options[:sesame_queue]
     @error_logger = Logger.new(options[:error_log])
   end
 
+  def connect
+    @bunny_client.start
+    @channel = @bunny_client.create_channel
+    @exchange = @channel.direct(@exchange_name)
+    @upload_queue = add_queue(@upload_queue_name)
+    @sesame_queue = add_queue(@sesame_queue_name)
+  end
 
-  def get_rdf_file_paths(dir)
+  def close
+    @bunny_client.close
+  end
+
+  def add_queue(name)
+    queue = @channel.queue(name)
+    queue.bind(@exchange, routing_key: name)
+    queue
+  end
+
+  def self.get_rdf_file_paths(dir)
     Dir[File.join(dir, '**', '*')].keep_if { |path|
       (File.file? path) && (File.extname(path) == '.rdf')
     }
   end
 
-  def ingest_rdf(dir)
-    get_rdf_file_paths(dir).each { |file_path|
+  def process_job(collection, file_paths)
+    file_paths.each { |file_path|
       begin
-        if File.basename(file_path, '.rdf').end_with? 'metadata'
+        if is_metadata? file_path
           process_metadata_rdf(file_path)
-        else
-          # TODO: process annotaion rdf
         end
+        add_to_sesame(collection, file_path)
       rescue  Exception => e
         @error_logger.error "#{e.class}: #{e.to_s}"
       end
     }
-    @bunny_client.close
+  end
+
+  def ingest_directory(dir)
+    collection = File.basename(dir)
+    file_paths = self.class.get_rdf_file_paths(dir)
+    process_job(collection, file_paths)
   end
 
   def process_metadata_rdf(rdf_file)
@@ -43,8 +61,17 @@ class Ingester
     json_ld = graph.dump(:jsonld)
     #TODO: Move actions to message headers
     message = "{\"action\": \"add item\", \"metadata\":#{json_ld}}"
-    # TODO: parameterise the routing key
-    @exchange.publish(message, routing_key: 'upload')
+    @exchange.publish(message, routing_key: @upload_queue.name)
+  end
+
+  def add_to_sesame(collection, rdf_file)
+    turtle = File.open(rdf_file).read
+    message = "{\"action\": \"add\",\"collection\": \"#{collection}\", \"payload\": #{turtle.to_json} }"
+    @exchange.publish(message, routing_key: @sesame_queue.name)
+  end
+
+  def is_metadata?(file_path)
+    File.basename(file_path, '.rdf').end_with?('metadata')
   end
 
 end

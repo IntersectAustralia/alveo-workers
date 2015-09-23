@@ -5,7 +5,7 @@ gem 'json'
 gem 'json-ld'
 gem 'rsolr'
 gem 'rdf-turtle'
-
+gem 'net-http-persistent'
 
 group :test do
   gem 'rspec', :require => false
