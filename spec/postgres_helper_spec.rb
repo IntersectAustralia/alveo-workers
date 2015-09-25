@@ -89,18 +89,16 @@ describe PostgresHelper do
 
   end
 
-  describe '#create_pg_statement'  do
+  describe '#extract_item_info'  do
 
-    it '#create_pg_statement' do
-      allow(@postgres_helper).to receive(:separate_graphs).and_return([example_item_graph, {}])
+    it 'builds an item info hash' do
       allow(@postgres_helper).to receive(:get_primary_text_path).and_return(nil)
       allow(@postgres_helper).to receive(:build_json_metadata).and_return('')
       expected = {uri: 'https://app.alveo.edu.au/catalog/ace/E29a',
                   handle: 'ace:E29a',
                   primary_text_path: nil,
-                  documents: [],
                   json_metadata: ''}
-      actual = @postgres_helper.create_pg_statement('')
+      actual = @postgres_helper.extract_item_info(example_item_graph, example_document_graphs)
       expect(actual).to eq(expected)
     end
 

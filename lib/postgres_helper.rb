@@ -30,13 +30,18 @@ module PostgresHelper
 
   def create_pg_statement(expanded_json_ld)
     (item_graph, document_graphs) = separate_graphs(expanded_json_ld)
+    
+    # item[:annotation_path] = nil
+    item = extract_item_info(item_graph, document_graphs)
+    documents = extract_documents_info(document_graphs)
+    {item: item, documents: documents}
+  end
+
+  def extract_item_info(item_graph, document_graphs)
     item = {}
     item[:uri] = generate_uri(item_graph)
     item[:handle] = generate_handle(item_graph)
     item[:primary_text_path] = get_primary_text_path(item_graph, document_graphs)
-    # item[:annotation_path] = nil
-    # item[:collection_id] = nil
-    item[:documents] = extract_documents_info(document_graphs)
     item[:json_metadata] = build_json_metadata(item_graph, document_graphs)
     item
   end

@@ -6,6 +6,8 @@ gem 'json-ld'
 gem 'rsolr'
 gem 'rdf-turtle'
 gem 'net-http-persistent'
+gem 'pg'
+gem 'activerecord'
 
 group :test do
   gem 'rspec', :require => false
