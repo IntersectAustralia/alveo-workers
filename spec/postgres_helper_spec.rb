@@ -13,7 +13,8 @@ describe PostgresHelper do
                 'http://purl.org/dc/terms/type' => [{'@value' => 'Original'}],
                 'http://purl.org/dc/terms/source' => [{'@id' => 'file:///path/to/primary_text.txt'}],
                 'http://purl.org/dc/terms/identifier' => [{'@value' => 'primary_text.txt'}]},
-     'doc2' => {'http://purl.org/dc/terms/type' => [{'@value' => 'Raw'}],
+     'doc2' => {'@id' => 'http://ns.ausnc.org.au/corpora/ace/source/E29a#Raw',
+                'http://purl.org/dc/terms/type' => [{'@value' => 'Raw'}],
                 'http://purl.org/dc/terms/source' => [{'@id' => 'file:///path/to/raw.txt'}],
                 'http://purl.org/dc/terms/identifier' => [{'@value' => 'raw.txt'}]}}
   }
@@ -100,6 +101,17 @@ describe PostgresHelper do
                   documents: [],
                   json_metadata: ''}
       actual = @postgres_helper.create_pg_statement('')
+      expect(actual).to eq(expected)
+    end
+
+  end
+
+  describe '#map_document_locations' do
+
+    it 'maps document names to their file paths' do
+      expected = {'primary_text.txt' => 'file:///path/to/primary_text.txt',
+                  'raw.txt' => 'file:///path/to/raw.txt'}
+      actual = @postgres_helper.map_document_locations(example_document_graphs)
       expect(actual).to eq(expected)
     end
 

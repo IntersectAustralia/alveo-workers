@@ -1,6 +1,7 @@
 require_relative 'worker'
 require_relative 'metadata_helper'
 require_relative 'solr_helper'
+require_relative 'postgres_helper'
 
 class UploadWorker < Worker
 

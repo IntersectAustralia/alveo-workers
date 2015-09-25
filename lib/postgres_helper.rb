@@ -95,10 +95,10 @@ module PostgresHelper
 
   def map_document_locations(document_graphs)
     documentsLocations = {}
-    document_graphs.each { |document_graph|
+    document_graphs.each_value { |document_graph|
       # TODO: duplication of effort here and extract_document_info
       file_name = extract_value(document_graph[@@identifier])
-      file_path = URI.parse(extract_value(document_graph[@@source])).path
+      file_path = extract_value(document_graph[@@source])
       documentsLocations[file_name] = file_path
     }
     documentsLocations
