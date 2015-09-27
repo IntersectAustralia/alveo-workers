@@ -95,9 +95,9 @@ module SolrHelper
   end
 
   def generate_full_text(item_graph, document_graphs)
-    document_uri = extract_value(item_graph[@@MAPPED_FIELDS[:indexable_document]])
+    document_uri = extract_value(item_graph[@@MAPPED_FIELDS['indexable_document']])
     document_graph = document_graphs[document_uri]
-    file_uri = extract_value(document_graph[@@MAPPED_FIELDS[:source]])
+    file_uri = extract_value(document_graph[@@MAPPED_FIELDS['source']])
     file_path = URI.parse(file_uri).path
     full_text = File.open(file_path).read
     normalise_whitespace(full_text)

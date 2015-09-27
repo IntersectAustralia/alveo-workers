@@ -49,8 +49,8 @@ module SolrConstants
     'collection_field' => 'http://purl.org/dc/terms/isPartOf',
     'identifier_field' => '@id',
     'created_field' => 'http://purl.org/dc/terms/created',
-    :indexable_document => 'http://hcsvlab.org/vocabulary/indexable_document',
-    :source => 'http://purl.org/dc/terms/source'
+    'indexable_document' => 'http://hcsvlab.org/vocabulary/indexable_document',
+    'source' => 'http://purl.org/dc/terms/source'
   }.freeze
 
 end

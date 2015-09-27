@@ -17,7 +17,23 @@ module PostgresHelper
       '.mp4' => 'video/mp4',
       '.doc' => 'application/msword',
       '.pdf' => 'application/pdf'
-  })
+  }).freeze
+
+  @@CONTEXT = ["https://app.alveo.edu.au/schema/json-ld",
+              {"ausnc:audience" =>{ "@type"=>"@id"},
+               "ausnc:communication_setting"=>{ "@type"=>"@id" },
+               "ausnc:mode"=>{  "@type"=>"@id" },
+               "ausnc:publication_status"=>{  "@type"=>"@id" },
+               "ausnc:written_mode"=>{  "@type"=>"@id" },
+               "ausnc:itemwordcount"=>{ "@type"=>"xsd:integer"},
+               "dcterms:extent"=>{ "@type"=>"xsd:integer"},
+               "dcterms:source"=>{  "@type"=>"@id" },
+               "hcsvlab" => "http://hcsvlab.org/vocabulary/",
+               "hcsvlab:display_document" => { "@type"=>"@id" },
+               "hcsvlab:indexable_document" => {  "@type"=>"@id" },
+               "ausnc:document" => {"@type" => "@id"},
+               "dc:isPartOf"=>{  "@type"=>"@id" },
+             }].freeze
 
 
   # TODO: Metadata helper?
@@ -89,13 +105,19 @@ module PostgresHelper
   def build_json_metadata(item_graph, document_graphs)
     json_metadata = {
       catalog_url: '',
-      metadata: item_graph,
+      metadata: create_item_metadata(item_graph),
       primary_text_url: get_primary_text_path(item_graph, document_graphs),
       annotations_url: '',
       documents: document_graphs,
       documentsLocations: map_document_locations(document_graphs)
     }
     json_metadata.to_json
+  end
+
+  def create_item_metadata(item_graph)
+    item_metadata = JSON::LD::API.compact(item_graph, @@CONTEXT)
+    item_metadata.delete('@context')
+    item_metadata
   end
 
   def map_document_locations(document_graphs)
