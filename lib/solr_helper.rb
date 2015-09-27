@@ -1,7 +1,9 @@
 require 'json/ld'
+require_relative 'solr_constants'
 
 module SolrHelper
 
+  include SolrConstants
 
   def create_solr_document(expanded_json_ld)
     (item_graph, document_graphs) = separate_graphs(expanded_json_ld)
@@ -54,8 +56,8 @@ module SolrHelper
         uri = extract_value(rdf_value)
         value = get_unqualified_term(uri)
       end
-      if @rdf_relation_to_facet_map.has_key? key
-        result[@rdf_relation_to_facet_map[key]] = value
+      if @@RDF_RELATION_TO_FACET_MAP.has_key? key
+        result[@@RDF_RELATION_TO_FACET_MAP[key]] = value
       else
         result.merge!(generate_item_fields(key, value))
       end
@@ -66,7 +68,7 @@ module SolrHelper
   def map_document_fields(document_graphs)
     result = get_default_document_fields
     document_graphs.each_value { |document|
-      @document_field_to_rdf_relation_map.each { |key, value|
+      @@DOCUMENT_FIELD_TO_RDF_RELATION_MAP.each { |key, value|
         result[key] << extract_value(document[value])
       }
     }
@@ -93,9 +95,9 @@ module SolrHelper
   end
 
   def generate_full_text(item_graph, document_graphs)
-    document_uri = extract_value(item_graph[@mapped_fields[:indexable_document]])
+    document_uri = extract_value(item_graph[@@MAPPED_FIELDS[:indexable_document]])
     document_graph = document_graphs[document_uri]
-    file_uri = extract_value(document_graph[@mapped_fields[:source]])
+    file_uri = extract_value(document_graph[@@MAPPED_FIELDS[:source]])
     file_path = URI.parse(file_uri).path
     full_text = File.open(file_path).read
     normalise_whitespace(full_text)
@@ -124,7 +126,10 @@ module SolrHelper
   # TODO change predicate to 'term'
   def map_rdf_predicate_to_solr_field(uri)
     (namespace, term) = get_qualified_term(uri)
-    solr_prefix = @rdf_ns_to_solr_prefix_map[namespace]
+    solr_prefix = @@RDF_NS_TO_SOLR_PREFIX_MAP[namespace]
+    if solr_prefix.nil?
+      raise "No Solr prefix mapping defined for #{uri}"
+    end
     solr_prefix + term
   end
 
@@ -149,41 +154,9 @@ module SolrHelper
     normalise_whitespace(result)
   end
 
-  # TODO
-  # refactor these config methods
-  def set_solr_config(config)
-    set_mapped_fields(config['mapped_fields'])
-    set_rdf_relation_to_facet_map(config['rdf_relation_to_facet_map'])
-    set_rdf_ns_to_solr_prefix_map(config['rdf_ns_to_solr_prefix_map'])
-    set_document_field_to_rdf_relation_map(config['document_field_to_rdf_relation_map'])
-  end
-
-  # TODO
-  # refactor these config methods
-  def set_mapped_fields(mapped_fields)
-    @mapped_fields = mapped_fields
-  end
-
-  # TODO
-  # refactor these config methods
-  def set_rdf_relation_to_facet_map(rdf_relation_to_facet_map)
-    @rdf_relation_to_facet_map = rdf_relation_to_facet_map
-  end
-
-  # TODO
-  # refactor these config methods
-  def set_document_field_to_rdf_relation_map(document_field_to_rdf_relation_map)
-    @document_field_to_rdf_relation_map = document_field_to_rdf_relation_map
-  end
-
-  # TODO
-  # refactor these config methods
-  def set_rdf_ns_to_solr_prefix_map(rdf_ns_to_solr_prefix_map)
-    @rdf_ns_to_solr_prefix_map = rdf_ns_to_solr_prefix_map
-  end
 
   def generate_date_group(item_graph)
-    created_field = extract_value(item_graph[@mapped_fields['created_field']])
+    created_field = extract_value(item_graph[@@MAPPED_FIELDS['created_field']])
     date_group(created_field)
   end
 
@@ -274,18 +247,18 @@ module SolrHelper
   end
 
   def get_identifier(item_graph)
-    identifier = extract_value(item_graph[@mapped_fields['identifier_field']])
+    identifier = extract_value(item_graph[@@MAPPED_FIELDS['identifier_field']])
     get_unqualified_term(identifier)
   end
 
   def get_collection(item_graph)
-    collection_uri = extract_value(item_graph[@mapped_fields['collection_field']])
+    collection_uri = extract_value(item_graph[@@MAPPED_FIELDS['collection_field']])
     get_unqualified_term(collection_uri)
   end
 
   def get_data_owner(item_graph)
-    data_owner = @mapped_fields['default_data_owner']
-    data_owner_field = @mapped_fields['data_owner_field']
+    data_owner = @@MAPPED_FIELDS['default_data_owner']
+    data_owner_field = @@MAPPED_FIELDS['data_owner_field']
     if item_graph[data_owner_field]
       data_owner = extract_value(item_graph[data_owner_field])
     end
@@ -294,7 +267,7 @@ module SolrHelper
 
   def get_default_item_fields
     default_item_fields = {}
-    @rdf_relation_to_facet_map.each_value { |value|
+    @@RDF_RELATION_TO_FACET_MAP.each_value { |value|
       default_item_fields[value] = 'unspecified'
     }
     default_item_fields
@@ -302,7 +275,7 @@ module SolrHelper
 
   def get_default_document_fields
     default_document_fields = {}
-    @document_field_to_rdf_relation_map.each_key { |key|
+    @@DOCUMENT_FIELD_TO_RDF_RELATION_MAP.each_key { |key|
       default_document_fields[key] = []
     }
     default_document_fields
