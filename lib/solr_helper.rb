@@ -99,7 +99,7 @@ module SolrHelper
     document_graph = document_graphs[document_uri]
     file_uri = extract_value(document_graph[@@MAPPED_FIELDS['source']])
     file_path = URI.parse(file_uri).path
-    full_text = File.open(file_path).read
+    full_text = File.read(file_path)
     normalise_whitespace(full_text)
   end
 
