@@ -312,6 +312,10 @@ describe SolrHelper do
       test_date_group('wutang clan', 'Unknown')
     end
 
+    it 'returns "Unknown" for nil' do
+      test_date_group(nil, 'Unknown')
+    end
+
     def test_date_group(example, expected, resolution=10)
       actual = solr_helper.date_group(example, resolution)
       expect(actual).to eq(expected)

@@ -198,14 +198,16 @@ module SolrHelper
 
   def date_group(created_field, resolution=10)
     result = 'Unknown'
-    begin
-      year = extract_year(created_field)
-      increment = year / resolution
-      range_start = increment * resolution
-      range_end = range_start + resolution - 1
-      result = "#{range_start} - #{range_end}"
-    rescue ArgumentError
-      # TODO: Log error
+    unless created_field.nil?
+      begin
+        year = extract_year(created_field)
+        increment = year / resolution
+        range_start = increment * resolution
+        range_end = range_start + resolution - 1
+        result = "#{range_start} - #{range_end}"
+      rescue ArgumentError
+        # TODO: Log error
+      end
     end
     result
   end
