@@ -17,7 +17,49 @@ module PostgresHelper
       '.mp4' => 'video/mp4',
       '.doc' => 'application/msword',
       '.pdf' => 'application/pdf'
-  })
+  }).freeze
+
+  # TODO: It supposedly possible to supply a cusotm documentLoader to
+  #       JSON::LD::API calls, which can supply cached remote contexts
+  #       to avoid HTTP requests every time
+  @@CONTEXT = {
+      "ace" =>{"@id" =>"http://ns.ausnc.org.au/schemas/ace/"},
+      "alveo" =>{"@id" =>"http://alveo.edu.au/schema/"},
+      "ausnc" =>{"@id" =>"http://ns.ausnc.org.au/schemas/ausnc_md_model/"},
+      "austalk" =>{"@id" =>"http://ns.austalk.edu.au/"},
+      "austlit" =>{"@id" =>"http://ns.ausnc.org.au/schemas/austlit/"},
+      "bibo" =>{"@id" =>"http://purl.org/ontology/bibo/"},
+      "commonProperties" =>{"@id" =>"http://purl.org/dada/schema/0.2#commonProperties"},
+      "cooee" =>{"@id" =>"http://ns.ausnc.org.au/schemas/cooee/"},
+      "dada" =>{"@id" =>"http://purl.org/dada/schema/0.2#"},
+      "dc" =>{"@id" =>"http://purl.org/dc/terms/"},
+      "end" =>{"@id" =>"http://purl.org/dada/schema/0.2#end"},
+      "foaf" =>{"@id" =>"http://xmlns.com/foaf/0.1/"},
+      "gcsause" =>{"@id" =>"http://ns.ausnc.org.au/schemas/gcsause/"},
+      "ice" =>{"@id" =>"http://ns.ausnc.org.au/schemas/ice/"},
+      "label" =>{"@id" =>"http://purl.org/dada/schema/0.2#label"},
+      "olac" =>{"@id" =>"http://www.language-archives.org/OLAC/1.1/"},
+      "purl" =>{"@id" =>"http://purl.org/"},
+      "rdf" =>{"@id" =>"http://www.w3.org/1999/02/22-rdf-syntax-ns#"},
+      "schema" =>{"@id" =>"http://schema.org/"},
+      "start" =>{"@id" =>"http://purl.org/dada/schema/0.2#start"},
+      "type" =>{"@id" =>"http://purl.org/dada/schema/0.2#type"},
+      "xsd" =>{"@id" =>"http://www.w3.org/2001/XMLSchema#"},
+      "ausnc:audience" =>{ "@type"=>"@id"},
+      "ausnc:communication_setting"=>{ "@type"=>"@id" },
+      "ausnc:document" => {"@type" => "@id"},
+      "ausnc:document" => {"@type" => "foaf:Document"},
+      "ausnc:itemwordcount"=>{ "@type"=>"xsd:integer"},
+      "ausnc:mode"=>{  "@type"=>"@id" },
+      "ausnc:publication_status"=>{  "@type"=>"@id" },
+      "ausnc:written_mode"=>{  "@type"=>"@id" },
+      "dc:isPartOf"=>{  "@type"=>"@id" },
+      "dcterms:extent"=>{ "@type"=>"xsd:integer"},
+      "dcterms:source"=>{  "@type"=>"@id" },
+      "hcsvlab" => "http://hcsvlab.org/vocabulary/",
+      "hcsvlab:display_document" => {  "@type"=>"@id" },
+      "hcsvlab:indexable_document" => {  "@type"=>"@id" }
+      }.freeze
 
 
   # TODO: Metadata helper?
@@ -89,13 +131,19 @@ module PostgresHelper
   def build_json_metadata(item_graph, document_graphs)
     json_metadata = {
       catalog_url: '',
-      metadata: item_graph,
+      metadata: create_item_metadata(item_graph),
       primary_text_url: get_primary_text_path(item_graph, document_graphs),
       annotations_url: '',
       documents: document_graphs,
       documentsLocations: map_document_locations(document_graphs)
     }
     json_metadata.to_json
+  end
+
+  def create_item_metadata(item_graph)
+    item_metadata = JSON::LD::API.compact(item_graph, @@CONTEXT)
+    item_metadata.delete('@context')
+    item_metadata
   end
 
   def map_document_locations(document_graphs)

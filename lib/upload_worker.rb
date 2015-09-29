@@ -13,7 +13,6 @@ class UploadWorker < Worker
     @solr_queue_name = options[:solr_queue]
     @postgres_queue_name = options[:postgres_queue]
     super(options[:rabbitmq])
-    set_solr_config(options[:solr])
   end
 
   def connect

@@ -18,18 +18,12 @@ describe PostgresHelper do
                 'http://purl.org/dc/terms/source' => [{'@id' => 'file:///path/to/raw.txt'}],
                 'http://purl.org/dc/terms/identifier' => [{'@value' => 'raw.txt'}]}}
   }
-
-  let(:mapped_fields) {
-    {'identifier_field' => '@id',
-     'collection_field' => 'http://purl.org/dc/terms/isPartOf'}
-  }
   
   before(:each) do
     mock_class = Class.new
     mock_class.include(PostgresHelper)
     mock_class.include(SpecHelper::ExposePrivate)
     @postgres_helper = mock_class.new
-    @postgres_helper.set_mapped_fields(mapped_fields)
   end
 
   describe '#generate_uri' do

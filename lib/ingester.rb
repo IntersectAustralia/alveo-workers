@@ -65,7 +65,7 @@ class Ingester
   end
 
   def add_to_sesame(collection, rdf_file)
-    turtle = File.open(rdf_file).read
+    turtle = File.read(rdf_file)
     message = "{\"action\": \"add\",\"collection\": \"#{collection}\", \"payload\": #{turtle.to_json} }"
     @exchange.publish(message, routing_key: @sesame_queue.name)
   end
