@@ -39,7 +39,7 @@ class Ingester
     process_sesame_message
     process_solr
     process_sesame
-    @input_worker.join
+    @input_workers.each(&:join)
     @solr_message_queue << :END
     @sesame_message_queue << :END
     @solr_message_worker.join
@@ -116,22 +116,24 @@ class Ingester
   end
 
   def process_input(collection)
-    @input_worker = Thread.new do
-      until (file_path = @input_queue.pop) == :END
-        input_job = {collection: collection, payload: File.read(file_path)}
-        if is_metadata? file_path
-          input_job[:type] = 'metadata'
-          @solr_message_queue << input_job
-        else
-          input_job[:type] = 'annotations'
+    @input_workers = 5.times.map do
+        Thread.new do
+          until (file_path = @input_queue.pop) == :END
+            input_job = {collection: collection, payload: File.read(file_path)}
+            if is_metadata? file_path
+              input_job[:type] = 'metadata'
+              @solr_message_queue << input_job
+            else
+              input_job[:type] = 'annotations'
+            end
+            @sesame_message_queue << input_job
+          end
         end
-        @sesame_message_queue << input_job
-      end
     end
     # input_worker.join
     # @solr_message_queue << :END
     # @sesame_message_queue << :END
-    @threads << @input_worker
+    # @threads << @input_worker
     puts 'process_input'
   end
 
