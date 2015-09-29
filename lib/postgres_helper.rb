@@ -47,7 +47,7 @@ module PostgresHelper
       "xsd" =>{"@id" =>"http://www.w3.org/2001/XMLSchema#"},
       "ausnc:audience" =>{ "@type"=>"@id"},
       "ausnc:communication_setting"=>{ "@type"=>"@id" },
-      "ausnc:document" => {"@type" => "@id"},
+      # "ausnc:document" => {"@type" => "@id"},
       "ausnc:document" => {"@type" => "foaf:Document"},
       "ausnc:itemwordcount"=>{ "@type"=>"xsd:integer"},
       "ausnc:mode"=>{  "@type"=>"@id" },
