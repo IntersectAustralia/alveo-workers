@@ -29,7 +29,8 @@ describe SolrHelper do
     {'identifier_field' => '@id',
      'default_data_owner' => 'data_owner@intersect.org.au',
      'data_owner_field' => 'http://id.loc.gov/vocabulary/relators/rpy',
-     'collection_field' => 'http://purl.org/dc/terms/isPartOf'}
+     'collection_field' => 'http://purl.org/dc/terms/isPartOf',
+     'indexable_document' => 'http://hcsvlab.org/vocabulary/indexable_document'}
   }
 
   describe '#get_default_item_fields' do
@@ -104,6 +105,17 @@ describe SolrHelper do
       solr_helper.set_rdf_ns_to_solr_prefix_map(rdf_ns_to_solr_prefix_map)
       expected = {'DC_contributor_sim' => ['Kanye West'], 'DC_contributor_tesim' => ['Kanye West']}
       actual = solr_helper.generate_item_fields('http://purl.org/dc/terms/contributor', 'Kanye West')
+      expect(actual).to eq(expected)
+    end
+
+  end
+
+  describe 'generate_full_text' do
+
+    it 'returns an empty string if there is no indexable document' do
+      solr_helper.set_mapped_fields(mapped_fields)
+      expected = ''
+      actual = solr_helper.generate_full_text({}, [])
       expect(actual).to eq(expected)
     end
 
