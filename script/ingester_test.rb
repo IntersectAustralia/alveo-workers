@@ -20,6 +20,7 @@ class Ingester
     @upload_queue_name = options[:upload_queue]
     @sesame_queue_name = options[:sesame_queue]
     @error_logger = Logger.new(options[:error_log])
+    @threads = []
   end
 
   def connect
@@ -38,10 +39,19 @@ class Ingester
     process_sesame_message
     process_solr
     process_sesame
+    @input_worker.join
+    @solr_message_queue << :END
+    @sesame_message_queue << :END
+    @solr_message_worker.join
+    @solr_queue << :END
+    @sesame_message_worker.join
+    @sesame_queue << :END
+    @solr_worker.join
+    @sesame_worker.join
   end
 
   def process_sesame
-    sesame_worker = Thread.new do
+    @sesame_worker = Thread.new do
       channel = @bunny_client.create_channel
       exchange = channel.direct(@exchange_name)
       sesame_queue = channel.queue(@sesame_queue_name)
@@ -50,12 +60,13 @@ class Ingester
         exchange.publish(message, routing_key: sesame_queue.name)
       end
     end
-    sesame_worker.join
+    @threads << @sesame_worker
+    # sesame_worker.join
     puts 'process_sesame'
   end
 
   def process_solr
-    solr_worker = Thread.new do
+    @solr_worker = Thread.new do
       channel = @bunny_client.create_channel
       exchange = channel.direct(@exchange_name)
       upload_queue = channel.queue(@upload_queue_name)
@@ -64,12 +75,13 @@ class Ingester
         exchange.publish(message, routing_key: upload_queue.name)
       end
     end
-    solr_worker.join
+    @threads << @solr_worker
+    # solr_worker.join
     puts 'process_solr'
   end
 
   def process_solr_message
-    solr_message_worker = Thread.new do
+    @solr_message_worker = Thread.new do
       until (ttl_string = @solr_message_queue.pop) == :END
         graph = RDF::Graph.new
         RDF::Reader.for(:ttl).new(ttl_string[:payload]) { |reader|
@@ -83,26 +95,28 @@ class Ingester
         @solr_queue << message
       end
     end
-    solr_message_worker.join
-    @solr_queue << :END
+    # solr_message_worker.join
+    @threads << @solr_message_worker
+    # @solr_queue << :END
     puts 'process_solr_message'
   end
 
   def process_sesame_message
-    sesame_message_worker = Thread.new do
+    @sesame_message_worker = Thread.new do
       until (turtle = @sesame_message_queue.pop) == :END
         # turtle = File.open(rdf_file[:payload]).read
         message = "{\"action\": \"add\",\"collection\": \"#{turtle[:collection]}\", \"payload\": #{turtle[:payload].to_json} }"
         @sesame_queue << message
       end
     end
-    sesame_message_worker.join
-    @sesame_queue << :END
+    # sesame_message_worker.join
+    # @sesame_queue << :END
+    @threads << @sesame_message_worker
     puts 'process_sesame_message'
   end
 
   def process_input(collection)
-    input_worker = Thread.new do
+    @input_worker = Thread.new do
       until (file_path = @input_queue.pop) == :END
         input_job = {collection: collection, payload: File.read(file_path)}
         if is_metadata? file_path
@@ -114,10 +128,10 @@ class Ingester
         @sesame_message_queue << input_job
       end
     end
-    input_worker.join
-    @solr_message_queue << :END
-    @sesame_message_queue << :END
-
+    # input_worker.join
+    # @solr_message_queue << :END
+    # @sesame_message_queue << :END
+    @threads << @input_worker
     puts 'process_input'
   end
 
