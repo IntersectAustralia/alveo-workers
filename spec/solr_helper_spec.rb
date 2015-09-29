@@ -311,7 +311,7 @@ describe SolrHelper do
     it 'returns "Unknown" for bad input' do
       test_date_group('wutang clan', 'Unknown')
     end
-
+    
     it 'returns "Unknown" for nil' do
       test_date_group(nil, 'Unknown')
     end
