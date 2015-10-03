@@ -130,7 +130,7 @@ module PostgresHelper
 
   def build_json_metadata(item_graph, document_graphs)
     json_metadata = {
-      catalog_url: '',
+      catalog_url: '', #ITEM uri
       metadata: create_item_metadata(item_graph),
       primary_text_url: get_primary_text_path(item_graph, document_graphs),
       annotations_url: '',

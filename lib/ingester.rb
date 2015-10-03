@@ -41,6 +41,7 @@ class Ingester
     file_paths.each { |file_path|
       begin
         if is_metadata? file_path
+          # TODO, file gets read twice, once for metadata, once for sesame
           process_metadata_rdf(file_path)
         end
         add_to_sesame(collection, file_path)

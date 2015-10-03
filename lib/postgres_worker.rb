@@ -31,7 +31,7 @@ class PostgresWorker < Worker
   def create_item(payload)
     item = Item.new(payload['item'])
     item.documents.build(payload['documents'])
-    item.save
+    item.save!
   end
 
 end
