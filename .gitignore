@@ -120,3 +120,4 @@ Temporary Items
 .vagrant/
 
 ingester_errors.log
+spec/files/*.dat
