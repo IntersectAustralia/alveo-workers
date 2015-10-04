@@ -36,6 +36,7 @@ module PostgresHelper
       "end" =>{"@id" =>"http://purl.org/dada/schema/0.2#end"},
       "foaf" =>{"@id" =>"http://xmlns.com/foaf/0.1/"},
       "gcsause" =>{"@id" =>"http://ns.ausnc.org.au/schemas/gcsause/"},
+      "hcsvlab" => {"@id" => "http://hcsvlab.org/vocabulary/"},
       "ice" =>{"@id" =>"http://ns.ausnc.org.au/schemas/ice/"},
       "label" =>{"@id" =>"http://purl.org/dada/schema/0.2#label"},
       "olac" =>{"@id" =>"http://www.language-archives.org/OLAC/1.1/"},
@@ -47,8 +48,7 @@ module PostgresHelper
       "xsd" =>{"@id" =>"http://www.w3.org/2001/XMLSchema#"},
       "ausnc:audience" =>{ "@type"=>"@id"},
       "ausnc:communication_setting"=>{ "@type"=>"@id" },
-      # "ausnc:document" => {"@type" => "@id"},
-      "ausnc:document" => {"@type" => "foaf:Document"},
+      "ausnc:document" => {"@type" => "@id"},
       "ausnc:itemwordcount"=>{ "@type"=>"xsd:integer"},
       "ausnc:mode"=>{  "@type"=>"@id" },
       "ausnc:publication_status"=>{  "@type"=>"@id" },
@@ -56,7 +56,7 @@ module PostgresHelper
       "dc:isPartOf"=>{  "@type"=>"@id" },
       "dcterms:extent"=>{ "@type"=>"xsd:integer"},
       "dcterms:source"=>{  "@type"=>"@id" },
-      "hcsvlab" => "http://hcsvlab.org/vocabulary/",
+      # TOOD: Map the following from hcsvlab to alveo
       "hcsvlab:display_document" => {  "@type"=>"@id" },
       "hcsvlab:indexable_document" => {  "@type"=>"@id" }
       }.freeze
@@ -134,13 +134,16 @@ module PostgresHelper
       metadata: create_item_metadata(item_graph),
       primary_text_url: get_primary_text_path(item_graph, document_graphs),
       annotations_url: '',
-      documents: document_graphs,
+      documents: document_graphs, #compact doc graphs too
       documentsLocations: map_document_locations(document_graphs)
     }
     json_metadata.to_json
   end
 
   def create_item_metadata(item_graph)
+    # TODO: Replace hcsvlab 'ns' to 'alveo'
+    #       this might perhaps best be on by the ingester/upload workers
+    # generate all the require ausnc display fields
     item_metadata = JSON::LD::API.compact(item_graph, @@CONTEXT)
     item_metadata.delete('@context')
     item_metadata
