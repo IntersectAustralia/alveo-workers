@@ -13,10 +13,8 @@ class SesameWorker < Worker
     @sesame_client = sesame_client_class.new(options)
 
     @batch = RDF::Repository.new
-    @batch_size = 5000
-    @threshold = 5
+    @batch_size = 10000
     @batch_mode = true
-    @mutex = Mutex.new
   end
 
   def close
@@ -43,16 +41,11 @@ class SesameWorker < Worker
   end
 
   def batch_create(message)
-    # TODO: is this in turle or json ld?
     @batch << JSON::LD::API.toRdf(message['payload'])
-    # time = Time.now
     if (@batch.size >= @batch_size)
-      # @mutex.synchronize {
-        # require 'pry'
-        # binding.pry
-        @sesame_client.insert_statements(message['collection'], @batch.dump(:ttl))
-        @batch.clear!
-      # }
+      n3_string = RDF::NTriples::Writer.dump(graph, nil, :encoding => Encoding::ASCII)
+      @sesame_client.batch_insert_statements(message['collection'], n3_string)
+      @batch.clear!
     end
   end
 

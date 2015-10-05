@@ -16,9 +16,7 @@ class SolrWorker < Worker
 
     @batch = []
     @batch_size = 500
-    @threshold = 5
     @batch_mode = true
-    @mutex = Mutex.new
   end
 
   def close
@@ -43,17 +41,14 @@ class SolrWorker < Worker
       raise "Solr returned an unexpected status: #{status}"
     end
     @solr_client.commit
-    p 'solr commit'
   end
 
   def batch_create(document)
-    @mutex.synchronize {
-      @batch << document
-      if (@batch.size >= @batch_size)
-        add_documents(@batch)
-        @batch.clear
-      end
-      }
+    @batch << document
+    if (@batch.size >= @batch_size)
+      add_documents(@batch)
+      @batch.clear
+    end
   end
 
 end
