@@ -21,9 +21,9 @@ class UploadWorker < Worker
     @postgres_queue= add_queue(@postgres_queue_name)
   end
 
-  def process_message(message)
+  def process_message(headers, message)
     # TODO change these to CRUD verbs
-    if message['action'] = 'add item'
+    if headers[:action] = 'create'
       add_item(message['metadata'])
     end
   end
@@ -37,18 +37,25 @@ class UploadWorker < Worker
     create_item_postgres(expanded_json_ld)
   end
 
+  def create_item_sesame(expanded_json_ld)
+    # TODO: Sends JSON-LD
+    properties = {routing_key: @sesame_queue.name, headers: {action: 'create'}}
+    message = "{\"payload\": #{turtle.to_json}}"
+    @exchange.publish(message, properties)
+  end
+
   def create_item_solr(expanded_json_ld)
     solr_document = create_solr_document(expanded_json_ld)
-    # TODO: Move action type to message header
-    # TODO: extract to message builder utility class
-    message = "{\"action\": \"add\", \"document\": #{solr_document.to_json}}"
-    @exchange.publish(message, routing_key: @solr_queue.name)
+    properties = {routing_key: @solr_queue.name, headers: {action: 'create'}}
+    message = "{\"document\": #{solr_document.to_json}}"
+    @exchange.publish(message, properties)
   end
 
   def create_item_postgres(expanded_json_ld)
     postgres_data = create_pg_statement(expanded_json_ld)
-    message = "{\"action\": \"create\", \"payload\": #{postgres_data.to_json}}"
-    @exchange.publish(message, routing_key: @postgres_queue.name)
+    properties = {routing_key: @postgres_queue.name, headers: {action: 'create'}}
+    message = "{\"payload\": #{postgres_data.to_json}}"
+    @exchange.publish(message, properties)
   end
 
 end

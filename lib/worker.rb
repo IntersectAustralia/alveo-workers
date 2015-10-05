@@ -42,7 +42,7 @@ class Worker
   def subscribe
     # TODO: rename work_queue to consumer_queue
     @work_queue.subscribe do |delivery_info, metadata, payload|
-      on_message(payload)
+      on_message(metadata.headers, payload)
       @processed += 1
     end
   end
@@ -50,16 +50,16 @@ class Worker
   # TODO
   # - add explicit acknowledgements
   # - add 'prefect' (batch) setting
-  def on_message(payload)
+  def on_message(headers, payload)
     begin
       message = JSON.parse(payload)
-      process_message(message)
+      process_message(headers, message)
     rescue StandardError => e
       send_error_message(e, payload)
     end
   end
 
-  def process_message(message)
+  def process_message(headers, message)
     raise 'Method must be implemented by subclasses'
   end
 

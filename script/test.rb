@@ -9,8 +9,8 @@ require 'postgres_helper'
 require 'trove_ingester'
 
 def main(config)
-  # sesame_client = SesameClient.new(config[:sesame_worker])
-  # turtle = File.open("#{File.dirname(__FILE__)}/../spec/files/turtle_example.rdf").read
+  sesame_client = SesameClient.new(config[:sesame_worker])
+  turtle = File.open("#{File.dirname(__FILE__)}/../spec/files/turtle_example.rdf").read
   # options = {adapter: 'postgresql', database: 'hcsvlab', user: 'hcsvlab', host: 'localhost'}
   # ActiveRecord::Base.establish_connection(options)
   # json_ld_expanded = JSON.parse(File.read("#{File.dirname(__FILE__)}/../spec/files/json-ld_expanded_example.json"))

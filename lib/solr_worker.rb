@@ -20,8 +20,8 @@ class SolrWorker < Worker
     @solr_client.commit
   end
 
-  def process_message(message)
-    if message['action'] = 'add'
+  def process_message(headers, message)
+    if headers[:action] == 'create'
       add_document(message['document'])
     end
   end

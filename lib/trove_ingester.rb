@@ -38,7 +38,8 @@ class TroveIngester
       begin
         trove_fields = JSON.parse(trove_record)
         message = map_to_json_ld(trove_fields)
-        @exchange.publish(message, routing_key: @upload_queue.name)
+        properties = {routing_key: @upload_queue.name, headers: {action: 'create'}}
+        @exchange.publish(message, )
       rescue Exception => e
         # TODO: Error queue instead of log file
         @error_logger.error "#{e.class}: #{e.to_s}"

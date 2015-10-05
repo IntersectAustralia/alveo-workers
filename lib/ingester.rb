@@ -60,15 +60,16 @@ class Ingester
   def process_metadata_rdf(rdf_file)
     graph = RDF::Graph.load(rdf_file, :format => :ttl)
     json_ld = graph.dump(:jsonld)
-    #TODO: Move actions to message headers
-    message = "{\"action\": \"add item\", \"metadata\":#{json_ld}}"
-    @exchange.publish(message, routing_key: @upload_queue.name)
+    properties = {routing_key: @upload_queue.name, headers: {action: 'create'}}
+    message = "{\"metadata\":#{json_ld}}"
+    @exchange.publish(message, properties)
   end
 
   def add_to_sesame(collection, rdf_file)
     turtle = File.read(rdf_file)
-    message = "{\"action\": \"add\",\"collection\": \"#{collection}\", \"payload\": #{turtle.to_json} }"
-    @exchange.publish(message, routing_key: @sesame_queue.name)
+    properties = {routing_key: @sesame_queue.name, headers: {action: 'create'}}
+    message = "{\"payload\": #{turtle.to_json}}"
+    @exchange.publish(message, properties)
   end
 
   def is_metadata?(file_path)

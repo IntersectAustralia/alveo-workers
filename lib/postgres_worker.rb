@@ -22,8 +22,8 @@ class PostgresWorker < Worker
     ActiveRecord::Base.connection.close
   end
 
-  def process_message(message)
-    if message['action'] = 'create item'
+  def process_message(headers, message)
+    if headers[:action] == 'create'
       create_item(message['payload'])
     end
   end
