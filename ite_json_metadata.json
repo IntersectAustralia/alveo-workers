@@ -1,0 +1,54 @@
+{
+   "catalog_url":"http://ic2-hcsvlab-staging1-vm.intersect.org.au/catalog/mitcheldelbridge/S2935n",
+   "metadata":{
+      "alveo:display_document":"S2935n.wav",
+      "ausnc:audience":"individual",
+      "ausnc:communication_context":"face_to_face",
+      "ausnc:date_of_recording":"1960",
+      "ausnc:document":"S2935n.wav",
+      "ausnc:fathers_occupations":"radio technician",
+      "ausnc:fathers_place_of_birth":"Wyong",
+      "ausnc:institute":"Liverpool Girls High School",
+      "ausnc:interactivity":"read",
+      "ausnc:misc":"Colac",
+      "ausnc:mode":"spoken",
+      "ausnc:mothers_place_of_birth":"Colac",
+      "ausnc:place":"Liverpool Sydney",
+      "ausnc:place_of_birth":"Sunshine VIC",
+      "ausnc:sex":"f",
+      "ausnc:speech_style":"scripted",
+      "ausnc:state":"NSW",
+      "ausnc:tsid":"n59-17",
+      "ausnc:uid":"2935",
+      "dc:identifier":"S2935n",
+      "dc:isPartOf":"mitcheldelbridge",
+      "olac:discourse_type":"interactive_discourse",
+      "olac:language":"eng",
+      "olac:speaker":"S2935n",
+      "dc:type":"Audio",
+      "dc:extent":"2304642",
+      "handle":"mitcheldelbridge:S2935n",
+      "date_group":"unspecified",
+      "ausnc:publication_status":"unspecified",
+      "ausnc:written_mode":"unspecified",
+      "ausnc:communication_medium":"unspecified",
+      "ausnc:communication_setting":"unspecified",
+      "alveo:sparqlEndpoint":"http://ic2-hcsvlab-staging1-vm.intersect.org.au/sparql/mitcheldelbridge"
+   },
+   "primary_text_url":"No primary text found",
+   "annotations_url":null,
+   "documents":[
+      {
+         "alveo:url":"http://ic2-hcsvlab-staging1-vm.intersect.org.au/catalog/mitcheldelbridge/S2935n/document/S2935n.wav",
+         "dc:type":"Audio",
+         "alveo:size":"2.3 MB",
+         "rdf:type":"http://xmlns.com/foaf/0.1/Document",
+         "dc:identifier":"S2935n.wav",
+         "dc:extent":"2304642",
+         "dc:title":"S2935n#Audio"
+      }
+   ],
+   "documentsLocations":{
+      "S2935n.wav":"file:///data/production_collections/ausnc/mitcheldelbridge/S2935n.wav"
+   }
+}

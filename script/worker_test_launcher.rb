@@ -42,9 +42,9 @@ def start_workers(config)
   @postgres_worker.connect
   @sesame_worker.connect
   @upload_worker.start
-  @solr_worker.start
+  # @solr_worker.start
   @sesame_worker.start
-  @postgres_worker.start
+  # @postgres_worker.start
 end
 
 

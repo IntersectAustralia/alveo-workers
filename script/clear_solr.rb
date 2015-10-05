@@ -1,4 +1,9 @@
+$LOAD_PATH.unshift("#{File.dirname(__FILE__)}/../lib")
+
 require 'rsolr'
+require 'active_record'
+require 'models/item'
+require 'models/document'
 
 def main
   require 'yaml'
@@ -6,6 +11,8 @@ def main
   solr = RSolr.connect(url: config[:solr][:url])
   solr.delete_by_query '*:*'
   solr.commit
+  ActiveRecord::Base.establish_connection(config[:postgres_worker][:activerecord])
+  Item.delete_all
 end
 
 

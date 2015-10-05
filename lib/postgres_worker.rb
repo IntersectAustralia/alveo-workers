@@ -23,7 +23,7 @@ class PostgresWorker < Worker
   end
 
   def process_message(headers, message)
-    if headers[:action] == 'create'
+    if headers['action'] == 'create'
       create_item(message['payload'])
     end
   end

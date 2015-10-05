@@ -1,0 +1,69 @@
+{
+   "catalog_url":"http://ic2-hcsvlab-staging1-vm.intersect.org.au/catalog/ace/A33c",
+   "metadata":{
+      "alveo:display_document":"A33c-plain.txt",
+      "alveo:indexable_document":"A33c-plain.txt",
+      "ace:genre":"Press Reportage",
+      "ausnc:audience":"mass_market",
+      "ausnc:communication_setting":"popular",
+      "ausnc:document":"A33c-plain.txt, A33c-raw.txt, ace_a.txt",
+      "ausnc:itemwordcount":"595",
+      "ausnc:mode":"written",
+      "ausnc:publication_status":"published",
+      "ausnc:source":"The Norther Territory News 18 November 1986 (2011 words)",
+      "ausnc:written_mode":"print",
+      "dc:created":"18 November 1986",
+      "dc:identifier":"A33c",
+      "dc:isPartOf":"ace",
+      "dc:publisher":"Samples 'Used by Permission of News (NT) Ltd",
+      "dc:title":"Howard's wife stands by him",
+      "olac:language":"eng",
+      "dc:type":"Text, Raw, Original",
+      "dc:extent":"3347, 3641, 579959",
+      "date_group":"1980 - 1989",
+      "full_text":"Howard's wife stands by him CANBERRA. - As the supposed hordes of Peacock supporters close in on the Opposition Leader, Mr John Howard, and the hounds of the media smell a Liberal leadership challenge, you can count on one thing. Janette Howard will be in there, standing right beside her man. There is no other phrase for it: Mrs Howard is an oldfashioned, straightdown-the-line wife to her life mate. And although she sat through the same philosophy lectures as 1960s notable rebel student, Mr Richard Neville, there is no feeling of her ever having been a student radical. When you look at the record of Janette Parker, to give Mrs Howard her maiden name, the feeling gets stronger. She was also a Master of Arts student in Australian literature and she was always a staunch Liberal, with a big \"L\". As Miss Parker, she \"had the experience of being the only person (in that philosophy class) who put my hand up to say that I believed in God\". \"The lecturer talked about `Miss Parker's God' all year,\" Mrs Howard recalls. \"I might add that I have met that lecturer in later years and he has apologised.\" Sitting in her husband's office in Canberra, Mrs Howard is now talking real uppermiddle-class politics as she sips coffee from a heavy china cup stamped with the Australian Coat of Arms. \"John says I am getting more conservative as I get older. \"He and I have some of our biggest arguments over conservative social issues. \"For instance, I would hang people and John would never hang people,\" she says. \"We have argued for hours over that. I think we both know the arguments backwards. \"Oh yes, yes of course. But that's our version of marriage. \"I mean most of the political wives do. They wouldn't be there if they weren't interested. \"I mean the very first thing that attracted me about John was something I heard across the room and I thought, `I have got to go over and talk to that fellow'. \"We first met at a political meeting.\" But as a university-educated, politically-aware person, there must be some regrets she is sitting in her husband's office while he is out on the floor of the chamber running a censure motion on the Hawke Government's handling of the economy. \"No, because ... when I first met John, one of the things that I understood about him was that he was a far better politician than I would ever make.\" Why? \"Because he has an evener keel than I do. I mean I fly up about things then I think about them and change. John has a far evener quality. He has qualities that I couldn't match.\" One pet subject she \"can talk about for hours\" is education. Mrs Howard, with an Arts degree from NSW University, has taught at various high schools. She has also taught at the co-educational school of Killarney Heights in Sydney's northern suburbs. The experience changed her mind about the value of co-educational schools. \"I just feel that girls and boys who are at the age say 12 to 15 are at very, very different stages of development.\" Did she ever dream she would one day be sitting in the Opposition Leader's office? \"Well, for one thing back then, I would have thought that was the Labor Party, because when I was at the university, the Liberal Party was still in Government and I was sufficiently pig-headed enough to think they would never leave.\"",
+      "handle":"ace:A33c",
+      "ausnc:speech_style":"unspecified",
+      "ausnc:interactivity":"unspecified",
+      "ausnc:communication_context":"unspecified",
+      "ausnc:communication_medium":"unspecified",
+      "olac:discourse_type":"unspecified",
+      "alveo:sparqlEndpoint":"http://ic2-hcsvlab-staging1-vm.intersect.org.au/sparql/ace"
+   },
+   "primary_text_url":"http://ic2-hcsvlab-staging1-vm.intersect.org.au/catalog/ace/A33c/primary_text.json",
+   "annotations_url":"http://ic2-hcsvlab-staging1-vm.intersect.org.au/catalog/ace/A33c/annotations.json",
+   "documents":[
+      {
+         "alveo:url":"http://ic2-hcsvlab-staging1-vm.intersect.org.au/catalog/ace/A33c/document/A33c-plain.txt",
+         "dc:type":"Text",
+         "alveo:size":"3.3 kB",
+         "rdf:type":"http://xmlns.com/foaf/0.1/Document",
+         "dc:identifier":"A33c-plain.txt",
+         "dc:title":"A33c#Text",
+         "dc:extent":"3347"
+      },
+      {
+         "alveo:url":"http://ic2-hcsvlab-staging1-vm.intersect.org.au/catalog/ace/A33c/document/A33c-raw.txt",
+         "dc:type":"Raw",
+         "alveo:size":"3.6 kB",
+         "rdf:type":"http://xmlns.com/foaf/0.1/Document",
+         "dc:identifier":"A33c-raw.txt",
+         "dc:title":"A33c#Raw",
+         "dc:extent":"3641"
+      },
+      {
+         "alveo:url":"http://ic2-hcsvlab-staging1-vm.intersect.org.au/catalog/ace/A33c/document/ace_a.txt",
+         "dc:type":"Original",
+         "alveo:size":null,
+         "rdf:type":"http://xmlns.com/foaf/0.1/Document",
+         "dc:identifier":"ace_a.txt",
+         "dc:title":"A33c#Original",
+         "dc:extent":"579959"
+      }
+   ],
+   "documentsLocations":{
+      "A33c-plain.txt":"file:///data/production_collections/ausnc/ace/A33c-plain.txt",
+      "A33c-raw.txt":"file:///data/production_collections/ausnc/ace/A33c-raw.txt",
+      "ace_a.txt":"file:///data/production_collections/ausnc/ace/ace_a.txt"
+   }
+}

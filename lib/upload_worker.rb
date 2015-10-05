@@ -23,7 +23,7 @@ class UploadWorker < Worker
 
   def process_message(headers, message)
     # TODO change these to CRUD verbs
-    if headers[:action] = 'create'
+    if headers['action'] == 'create'
       add_item(message['metadata'])
     end
   end

@@ -65,10 +65,18 @@ class Ingester
     @exchange.publish(message, properties)
   end
 
-  def add_to_sesame(collection, rdf_file)
-    turtle = File.read(rdf_file)
+  # def add_to_sesame(collection, rdf_file)
+  #   turtle = File.read(rdf_file)
+  #   properties = {routing_key: @sesame_queue.name, headers: {action: 'create'}}
+  #   message = "{\"payload\": #{turtle.to_json}, \"collection\": \"#{collection}\"}"
+  #   @exchange.publish(message, properties)
+  # end
+
+    def add_to_sesame(collection, rdf_file)
+    graph = RDF::Graph.load(rdf_file, :format => :ttl)
+    json_ld = graph.dump(:jsonld)
     properties = {routing_key: @sesame_queue.name, headers: {action: 'create'}}
-    message = "{\"payload\": #{turtle.to_json}}"
+    message = "{\"payload\": #{json_ld}, \"collection\": \"#{collection}\"}"
     @exchange.publish(message, properties)
   end
 
