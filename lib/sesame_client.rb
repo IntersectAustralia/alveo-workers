@@ -65,7 +65,7 @@ class SesameClient < PersistentClient
 
     def batch_insert_statements(repository, n3_string)
     uri = get_statements_uri(repository)
-    request(uri, :post, {'Content-Type' => @mime_types[:n3]}, ttl_string)
+    request(uri, :post, {'Content-Type' => @mime_types[:n3]}, n3_string)
   end
 
   def repositories

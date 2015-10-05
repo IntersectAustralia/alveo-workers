@@ -43,7 +43,7 @@ class SesameWorker < Worker
   def batch_create(message)
     @batch << JSON::LD::API.toRdf(message['payload'])
     if (@batch.size >= @batch_size)
-      n3_string = RDF::NTriples::Writer.dump(graph, nil, :encoding => Encoding::ASCII)
+      n3_string = RDF::NTriples::Writer.dump(@batch, nil, :encoding => Encoding::ASCII)
       @sesame_client.batch_insert_statements(message['collection'], n3_string)
       @batch.clear!
     end
