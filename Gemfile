@@ -8,6 +8,7 @@ gem 'rdf-turtle'
 gem 'net-http-persistent'
 gem 'pg'
 gem 'activerecord'
+gem 'activerecord-import'
 
 group :test do
   gem 'rspec', :require => false

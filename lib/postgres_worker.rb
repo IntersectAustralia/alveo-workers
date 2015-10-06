@@ -1,4 +1,5 @@
 require 'active_record'
+require 'activerecord-import'
 
 require_relative 'worker'
 require_relative 'models/item'
@@ -14,6 +15,26 @@ class PostgresWorker < Worker
     @batch = []
     @batch_size = 500
     @batch_mode = true
+    @batch_mutex = Mutex.new
+  end
+
+  def start_batch_monitor(timeout)
+    @batch_monitor = Thread.new {
+      loop {
+        sleep timeout
+        @batch_mutex.synchronize {
+          Item.import(@batch)
+          @batch.clear
+        }
+      }
+    }
+  end
+
+  def start
+    super
+    if @batch_mode
+      start_batch_monitor(15)
+    end
   end
 
   def connect
@@ -37,13 +58,15 @@ class PostgresWorker < Worker
   end
 
   def batch_create(payload)
+    # TODO: Add collection relation
     item = Item.new(payload['item'])
     item.documents.build(payload['documents'])
-    # TODO: use activerecord-import gem
     @batch << item
     if (@batch.size >= @batch_size)
-      Item.import(@batch)
-      @batch.clear
+      @batch_mutex.synchronize {
+        Item.import(@batch)
+        @batch.clear
+      }
     end
   end
 
