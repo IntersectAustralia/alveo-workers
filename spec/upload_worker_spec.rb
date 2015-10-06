@@ -13,7 +13,6 @@ describe UploadWorker do
   describe '#create_item_solr' do
 
     it 'adds a create item job to the Solr Worker queue' do
-      # allow(@upload_worker).to receive(:expand_json_ld)
       example = {key: 'vaule'}
       allow(@upload_worker).to receive(:create_solr_document).and_return(example)
       expected = '{"action": "add", "document": {"key":"vaule"}}'
@@ -27,7 +26,6 @@ describe UploadWorker do
   describe '#create_item_postgres' do
 
     it 'adds a create item job to the Postgres Worker queue' do
-      # allow(@upload_worker).to receive(:expand_json_ld)
       example = {key: 'vaule'}
       allow(@upload_worker).to receive(:create_pg_statement).and_return(example)
       expected = '{"action": "create", "payload": {"key":"vaule"}}'

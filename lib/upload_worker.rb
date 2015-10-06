@@ -29,7 +29,7 @@ class UploadWorker < Worker
   end
 
   def add_item(metadata)
-    # generate catalogue url
+    # TODO: generate catalogue url
     # extract full text if its not there already
     # generate handle?
     expanded_json_ld = expand_json_ld(metadata)

@@ -1,6 +1,5 @@
 $LOAD_PATH.unshift("#{File.dirname(__FILE__)}/../lib")
 
-# require 'ingester'
 require 'yaml'
 require 'optparse'
 require 'ostruct'
@@ -25,8 +24,6 @@ def main(options)
             worker.stop
             worker.close
           }
-    # require 'pry'
-    # binding.pry
           worker.connect
           worker.start
           workers << worker
