@@ -119,3 +119,4 @@ Temporary Items
 ### Vagrant ###
 .vagrant/
 
+ingester_errors.log
