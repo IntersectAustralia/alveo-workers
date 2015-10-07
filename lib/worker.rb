@@ -37,11 +37,12 @@ class Worker
   end
 
   def stop
+    @consumer.cancel
   end
 
   def subscribe
     # TODO: rename work_queue to consumer_queue
-    @work_queue.subscribe do |delivery_info, metadata, payload|
+    @consumer = @work_queue.subscribe do |delivery_info, metadata, payload|
       on_message(metadata.headers, payload)
       @processed += 1
     end

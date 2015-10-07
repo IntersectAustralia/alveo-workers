@@ -11,29 +11,34 @@ class PostgresWorker < Worker
     rabbitmq_options = options[:rabbitmq]
     super(rabbitmq_options)
     @activerecord_options = options[:activerecord]
-
-    @batch = []
-    @batch_size = 500
-    @batch_mode = true
-    @batch_mutex = Mutex.new
+    @batch_options = options[:batch].freeze
+    if @batch_options[:enabled]
+      @batch = []
+      @batch_mutex = Mutex.new
+    end
   end
 
-  def start_batch_monitor(timeout)
+  def start_batch_monitor
     @batch_monitor = Thread.new {
       loop {
-        sleep timeout
-        @batch_mutex.synchronize {
-          Item.import(@batch)
-          @batch.clear
-        }
+        sleep @batch_options[:timeout]
+        commit_batch
       }
     }
   end
 
   def start
     super
-    if @batch_mode
-      start_batch_monitor(15)
+    if @batch_options[:enabled]
+      start_batch_monitor
+    end
+  end
+
+  def stop
+    super
+    if @batch_options[:enabled]
+      @batch_monitor.join
+      commit_batch
     end
   end
 
@@ -47,9 +52,16 @@ class PostgresWorker < Worker
     ActiveRecord::Base.connection.close
   end
 
+  def commit_batch
+    @batch_mutex.synchronize {
+      Item.import(@batch)
+      @batch.clear
+    }
+  end
+
   def process_message(headers, message)
     if headers['action'] == 'create'
-      if @batch_mode
+      if @batch_options[:enabled]
         batch_create(message['payload'])
       else
         create_item(message['payload'])
@@ -62,11 +74,8 @@ class PostgresWorker < Worker
     item = Item.new(payload['item'])
     item.documents.build(payload['documents'])
     @batch << item
-    if (@batch.size >= @batch_size)
-      @batch_mutex.synchronize {
-        Item.import(@batch)
-        @batch.clear
-      }
+    if (@batch.size >= @batch_options[:size])
+      commit_batch
     end
   end
 
