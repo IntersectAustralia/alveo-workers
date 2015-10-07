@@ -21,6 +21,9 @@ The second route is via Alveo's public API. Instead of reading data/metadata off
 
 ### Scaling Ingest
 
+![Scaling Ingest](img/workers3.png)
+
+This architecture affords scalability in each of its individual components. If a particular class of worker is processing slowly, more processes can launched within a Virtual Machine. If the Virtual Machine has its resource maxed out, more Virtual Machines can be launched with more Worker processes running on them. Theses can be transient in the cases where a large ingest task temporarily requires additional resources. If the data store services begin running slowly, they can be scaled into clusters.
 
 ## Worker Overview
 
@@ -28,7 +31,7 @@ The second route is via Alveo's public API. Instead of reading data/metadata off
 
 ### Batching
 
-
+### Launching Workers
 
 
 
