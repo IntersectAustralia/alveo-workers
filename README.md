@@ -27,15 +27,14 @@ This architecture affords scalability in each of its individual components. If a
 
 ## Worker Overview
 
-The workers have some common functionality: they consume messages off a work queue, perform some sort of processing on this message then send the results off to server, either a data store or back on another work queue.
-
-
+The workers have some common functionality: they consume messages off a work queue, perform some sort of processing on this message then send the results off to server, either a data store or back on another work queue. The workers are designed with an interface for managing their lifecycle. Once they are created, the `connect` method connects to external service, `start` then causes the worker to subcribe to its work queue and begin processing messages, `stop` discontinues message processing and unsubscribes the worker, and `close` causes the worker to close its connections to external services.
 
 ### Launching Workers
 
-Groups of workers are started via a worker launcher (see `script/launch_workers.rb` for options) which spawns a number of workers in separate processes. This is meant to be run as a daemon that endlessly awaits new messages to process.
+Groups of workers are started via a worker launcher (see `script/launch_workers.rb` for options) which spawns a number of workers in separate processes and manages their lifecycle. These are meant to be run as daemons that endlessly await new messages to process.
 
 ### Batching
 
+The workers can also perform operations in batches to speed up inseration into the data stores. The data stores typically accept some data before commiting this data and flushing it to disk. Batching reduces the number of disk flushes and the amount of network communication, but can consume more memory on the worker system. There are three parameters which control the batching process, `:enabled` specifies whether to use batching or not, `:size` controls the size of the batch to build before committing (number of items in Postgres, documents in Solr, or statements in Sesame), and `:timeout` specifies how long to wait in seconds before committing the batch. The `:timeout` parameter ensures that if a small number of items are left in the batch queue (i.e. smaller than what has been set for `:size`), that they will be committed instead of left to sit there indefinitely.
 
 ## Ingesters
