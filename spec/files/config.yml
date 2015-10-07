@@ -1,19 +1,16 @@
 ---
 :solr: &solr_common
-  # :url: http://alveo-qa-solr.intersect.org.au:8080/solr/hcsvlab # Duplicate field, refactor
-  :url: http://127.0.0.1:8080/solr/hcsvlab # Duplicate field, refactor
+  :url: http://alveo-qa-solr.intersect.org.au:8080/solr/hcsvlab
 
 :rabbitmq: &rabbitmq_common
   :client_class: Bunny
   :error_queue: error
-  # :host: alveo-qa-mq.intersect.org.au
-  # :host: 127.0.0.1
+  :host: alveo-qa-mq.intersect.org.au
   :vhost: /alveo
   :exchange: 'alveo.workers'
 
 :sesame_worker:
-  # :base_url: http://alveo-qa-sesame.intersect.org.au:8080/openrdf-sesame/
-  :base_url: http://localhost:8080/openrdf-sesame/
+  :base_url: http://alveo-qa-sesame.intersect.org.au:8080/openrdf-sesame/
   :client_class: SesameClient
   :work_queue: sesame
   :paths:
@@ -26,8 +23,7 @@
         :pass: sesame
 
 :solr_worker:
-  # :url: http://alveo-qa-solr.intersect.org.au:8080/solr/hcsvlab
-  :url: http://localhost:8080/solr/hcsvlab
+  :url: http://alveo-qa-solr.intersect.org.au:8080/solr/hcsvlab
   :client_class: RSolr
   :rabbitmq:
     <<: *rabbitmq_common
@@ -57,7 +53,7 @@
     :adapter: postgresql
     :database: hcsvlab
     :user: hcsvlab
-    :host: localhost
+    :host: alveo-qa-pg.intersect.org.au
 
 :ingester:
   <<: *rabbitmq_common
