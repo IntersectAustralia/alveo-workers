@@ -37,7 +37,7 @@ class PostgresWorker < Worker
   def stop
     super
     if @batch_options[:enabled]
-      @batch_monitor.join
+      @batch_monitor.kill
       commit_batch
     end
   end
