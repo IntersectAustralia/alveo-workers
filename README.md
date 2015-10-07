@@ -27,11 +27,15 @@ This architecture affords scalability in each of its individual components. If a
 
 ## Worker Overview
 
-### life cycle
+The workers have some common functionality: they consume messages off a work queue, perform some sort of processing on this message then send the results off to server, either a data store or back on another work queue.
 
-### Batching
+
 
 ### Launching Workers
 
+Groups of workers are started via a worker launcher (see `script/launch_workers.rb` for options) which spawns a number of workers in separate processes. This is meant to be run as a daemon that endlessly awaits new messages to process.
+
+### Batching
 
 
+## Ingesters
