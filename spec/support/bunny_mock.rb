@@ -1,3 +1,5 @@
+require 'ostruct'
+
 class BunnyMock
 
   def initialize(options)
@@ -65,9 +67,11 @@ class BunnyMock
 
     # Note that this doesn't block waiting for messages like the real world.
     def subscribe(*args, &block)
+      metadata = OpenStruct.new
+      metadata.headers = {'action' => 'create'}
       while message = messages.shift
         self.delivery_count += 1
-        yield(nil, nil, message)
+        yield(nil, metadata, message)
       end
     end
 

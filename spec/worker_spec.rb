@@ -13,15 +13,15 @@ describe Worker do
 
     it 'should receive messages' do
       message = 'Message 1'
-      expect(@worker).to receive(:on_message).with(message)
+      expect(@worker).to receive(:on_message).with(anything(), message)
       @exchange.publish(message, routing_key: 'work')
       @worker.start
     end
 
     it 'should parse json messages' do
-      message = '{"action": "do something"}'
-      expected = {'action' => 'do something'}
-      expect(@worker).to receive(:process_message).with(expected)
+      message = '{"message": "some message"}'
+      expected = {'message' => 'some message'}
+      expect(@worker).to receive(:process_message).with(anything(), expected)
       @exchange.publish(message, routing_key: 'work')
       @worker.start
     end

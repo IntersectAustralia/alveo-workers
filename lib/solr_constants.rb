@@ -26,7 +26,7 @@ module SolrConstants
     'http://purl.org/dc/terms/' => 'DC_',
     'http://purl.org/dc/elements/1.1/' => 'DC_',
     'http://purl.org/ontology/bibo/' => 'PURL_BIBO_',
-    'http://purl.org/vocab/bio/0.1/' => ' PURL_VOCAB_',
+    'http://purl.org/vocab/bio/0.1/' => 'PURL_VOCAB_',
     'http://www.language-archives.org/OLAC/1.1/' => 'OLAC_',
     'http://xmlns.com/foaf/0.1/' => 'FOAF_',
     'http://www.loc.gov/loc.terms/relators/' => 'LoC_',
