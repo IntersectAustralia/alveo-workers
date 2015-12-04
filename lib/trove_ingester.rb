@@ -58,12 +58,10 @@ class TroveIngester
             "ausnc:publication_status": {  "@type": "@id" },
             "ausnc:written_mode": {  "@type": "@id" },
             "ausnc:itemwordcount": { "@type": "xsd:integer"},
-            "dcterms:extent": { "@type": "xsd:integer"},
-            "dcterms:source": {  "@type": "@id" }
+            "dc:extent": { "@type": "xsd:integer"},
+            "dc:source": {  "@type": "@id" }
          }],
         "@graph": {
-          "@id": "#{trove_fields['@id']}", # TODO: Generated, this should probably be mapped to dc:identifier
-          "@type": "ausnc:AusNCObject",
           "ausnc:audience": "ausnc:mass_market",
           "ausnc:communication_medium": "ausnc:newspaper",
           "ausnc:communication_setting": "ausnc:popular",
@@ -76,18 +74,18 @@ class TroveIngester
           "dc:identifier": "#{trove_fields['id']}",
           "dc:source": "#{trove_fields['titleName']}",
           "dc:title": "#{trove_fields['heading']}",
-          "fulltext": "#{trove_fields['fulltext']}", # TODO: Perhaps this fields goes outside the graph?
+          "alveo:fulltext": "#{trove_fields['fulltext']}", # TODO
           "trove:category": "#{trove_fields['category']}",
           "trove:firstPageId": "#{trove_fields['firstPageId']}",
           "trove:firstPageSeq": "#{trove_fields['firstPageSeq']}",
           "olac:language": "eng",
           "ausnc:document": [
             {
-              "@type": "foaf:Document",
-              "dcterms:extent": "#{trove_fields['fulltext'].size}",
-              "dcterms:identifier": "", TODO: Generated
-              "dcterms:source": "", TODO: Generated, linking to Steve's index
-              "dcterms:type": "Text"
+              "dc:extent": #{trove_fields['fulltext'].size},
+              "dc:identifier": "", TODO: Generated
+              "dc:source": "http://trove.alveo.edu.au/document/#{trove_fields['id']}", TODO: Generated, linking to Steve's index
+              "dc:type": "Text"
+              "alveo:size": #{trove_fields['fulltext'].bytesize}
             },
         }
       }

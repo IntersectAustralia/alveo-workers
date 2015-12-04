@@ -35,6 +35,24 @@ module MetadataHelper
     JSON::LD::API.frame(json_ld, frame).to_json
   end
   
+  # "@context":{
+  # "ausnc":"http://ns.ausnc.org.au/schemas/ausnc_md_model/",
+  # "hcsvlab":"http://hcsvlab.org/vocabulary/",
+  # "dc":"http://purl.org/dc/terms/",
+  # "alveo":"https://app.alveo.edu.au/schema/json-ld/",
+  # "dc:identifier": {"@type": "@id"}
+  # },
+  def adapt_alveo_format_json(alveo_json)
+    alveo_json['@graph'] = []
+    if alveo_json.has_key? 'alveo:metadata'
+      alveo_json['@graph'] << alveo_json.delete('alveo:metadata')
+    end
+    if alveo_json.has_key? 'ausnc:document'
+      alveo_json['@graph'].concat(alveo_json.delete('ausnc:document'))
+    end
+    alveo_json
+  end
+
 
   def expand_json_ld(metadata)
     if metadata.instance_of? String

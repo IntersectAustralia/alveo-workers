@@ -8,7 +8,7 @@ describe MetadataHelper do
   describe '#expand_json_ld' do
 
     it 'expands shortened JSON-LD from a file URL' do
-      url = URI.join('file://',File.expand_path('./spec/files/json-ld_short_example.json'))
+      url = URI.join('file://', File.expand_path('./spec/files/json-ld_short_example.json'))
       example = url.to_s
       expected = [{'@id' => 'http://ns.ausnc.org.au/corpora/ace/items/E29a',
                    '@type' => ['http://ns.ausnc.org.au/schemas/ausnc_md_model/AusNCObject']}]
@@ -18,10 +18,21 @@ describe MetadataHelper do
 
   end
 
+  describe '#adapt_alveo_format_json' do
+
+    it 'adapts the alveo JSON-LD to a format that the json-ld library can understand' do
+      example = JSON.parse(File.read("#{File.dirname(__FILE__)}/files/json-ld_unadapted_example.json"))
+      expected = JSON.parse(File.read("#{File.dirname(__FILE__)}/files/json-ld_adapted_example.json"))
+      actual = metadata_helper.adapt_alveo_format_json(example)
+      expect(actual).to eq(expected)
+    end
+
+  end
+
   describe '#load_json_from_file_uri' do
 
     it 'loads JSON-LD given a file URL' do
-      url = URI.join('file://',File.expand_path('./spec/files/json-ld_expanded_short_example.json'))
+      url = URI.join('file://', File.expand_path('./spec/files/json-ld_expanded_short_example.json'))
       example = url.to_s
       expected = {'@id' => 'http://ns.ausnc.org.au/corpora/ace/items/E29a',
       '@type' => ['http://ns.ausnc.org.au/schemas/ausnc_md_model/AusNCObject']}
