@@ -88,10 +88,13 @@ describe PostgresHelper do
     it 'builds an item info hash' do
       allow(@postgres_helper).to receive(:get_primary_text_path).and_return(nil)
       allow(@postgres_helper).to receive(:build_json_metadata).and_return('')
+      time = Time.new(1997)
       expected = {uri: 'https://app.alveo.edu.au/catalog/ace/E29a',
                   handle: 'ace:E29a',
                   primary_text_path: nil,
-                  json_metadata: ''}
+                  json_metadata: '',
+                  indexed_at: time}
+      expect(Time).to receive(:now).and_return(time)
       actual = @postgres_helper.extract_item_info(example_item_graph, example_document_graphs)
       expect(actual).to eq(expected)
     end

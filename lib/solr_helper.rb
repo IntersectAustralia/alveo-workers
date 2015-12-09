@@ -30,7 +30,9 @@ module SolrHelper
   def generate_fields(item_graph, document_graphs)
     generated_fields = generate_access_rights(item_graph)
     generated_fields[:date_group_facet] = generate_date_group(item_graph)
-    generated_fields[:handle] = generate_handle(item_graph)
+    handle = generate_handle(item_graph)
+    generated_fields[:handle] = handle
+    generated_fields[:id] = handle
     generated_fields[:full_text] = generate_full_text(item_graph, document_graphs)
     generated_fields
   end

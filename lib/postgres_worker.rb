@@ -70,8 +70,9 @@ class PostgresWorker < Worker
   end
 
   def batch_create(payload)
-    # TODO: Add collection relation
+    collection.find_by_name(payload['name'])
     item = Item.new(payload['item'])
+    item.collection = collection
     item.documents.build(payload['documents'])
     @batch << item
     if (@batch.size >= @batch_options[:size])

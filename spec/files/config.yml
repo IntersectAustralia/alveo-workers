@@ -11,6 +11,7 @@
 
 :sesame_worker:
   :base_url: http://alveo-qa-sesame.intersect.org.au:8080/openrdf-sesame/
+  # :base_url: http://127.0.0.1:8080/openrdf-sesame/
   :client_class: SesameClient
   :work_queue: sesame
   :paths:
@@ -28,6 +29,7 @@
 
 :solr_worker:
   :url: http://alveo-qa-solr.intersect.org.au:8080/solr/hcsvlab
+  # :url: http://127.0.0.1:8080/solr/hcsvlab
   :client_class: RSolr
   :rabbitmq:
     <<: *rabbitmq_common

@@ -1,6 +1,7 @@
 {
   "@context":"https://app.alveo.edu.au/schema/json-ld/",
   "alveo:metadata":{
+    "dc:isPartOf":"some_collection",
     "dc:identifier":"J68",
     "ausnc:speech_style":"unspecified",
     "ausnc:interactivity":"unspecified",

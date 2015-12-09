@@ -76,7 +76,8 @@ module PostgresHelper
     # item[:annotation_path] = nil
     item = extract_item_info(item_graph, document_graphs)
     documents = extract_documents_info(document_graphs)
-    {item: item, documents: documents}
+    collection = get_collection(item_graph)
+    {collection: collecion, item: item, documents: documents}
   end
 
   def extract_item_info(item_graph, document_graphs)
@@ -85,6 +86,11 @@ module PostgresHelper
     item[:handle] = generate_handle(item_graph)
     item[:primary_text_path] = get_primary_text_path(item_graph, document_graphs)
     item[:json_metadata] = build_json_metadata(item_graph, document_graphs)
+    # TODO, This is a temporary hack, what should happen is that this remains blank
+    # until the Item is indexed  by the Solr worker, which should add update messages
+    # to the Postgres queue. This could run into issues if it is indexed in Solr before
+    # it is added to Postgres
+    item[:indexed_at] = Time.now
     item
   end
 
