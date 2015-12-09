@@ -1,3 +1,4 @@
+#encoding: utf-8
 require 'bunny'
 
 class TroveIngester
@@ -34,12 +35,16 @@ class TroveIngester
   end
 
   def process_chunk(trove_chunk)
-    File.open(trove_chunk, 'r').each { |trove_record|
+    limit = 20
+    count = 0
+    File.open(trove_chunk, 'r:ascii-8bit').each { |trove_record|
       begin
-        trove_fields = JSON.parse(trove_record)
+        trove_fields = JSON.parse(trove_record.encode('utf-8'))
         message = map_to_json_ld(trove_fields)
         properties = {routing_key: @upload_queue.name, headers: {action: 'create'}}
-        @exchange.publish(message, )
+        @exchange.publish(message, properties)
+        count += 1
+        break if count >= limit
       rescue Exception => e
         # TODO: Error queue instead of log file
         @error_logger.error "#{e.class}: #{e.to_s}"
@@ -68,29 +73,31 @@ class TroveIngester
           "ausnc:itemwordcount": "#{trove_fields['wordCount']}",
           "ausnc:mode": "ausnc:written",
           "ausnc:publication_status": "ausnc:published",
-          "ausnc:state": "#{trove_fields['state']}",
+          "ausnc:state": "#{trove_fields['state'].first}",
           "ausnc:written_mode": "ausnc:print",
           "dc:date": "#{trove_fields['date']}",
           "dc:identifier": "#{trove_fields['id']}",
           "dc:source": "#{trove_fields['titleName']}",
           "dc:title": "#{trove_fields['heading']}",
-          "alveo:fulltext": "#{trove_fields['fulltext']}", # TODO
-          "trove:category": "#{trove_fields['category']}",
-          "trove:firstPageId": "#{trove_fields['firstPageId']}",
-          "trove:firstPageSeq": "#{trove_fields['firstPageSeq']}",
+          "dc:isPartOf": "trove",
+          "alveo:fulltext": #{trove_fields['fulltext'].to_json},
           "olac:language": "eng",
           "ausnc:document": [
             {
               "dc:extent": #{trove_fields['fulltext'].size},
-              "dc:identifier": "", TODO: Generated
-              "dc:source": "http://trove.alveo.edu.au/document/#{trove_fields['id']}", TODO: Generated, linking to Steve's index
-              "dc:type": "Text"
+              "dc:identifier": "",
+              "dc:source": "http://trove.alveo.edu.au/document/#{trove_fields['id']}",
+              "dc:type": "Text",
               "alveo:size": #{trove_fields['fulltext'].bytesize}
-            },
+            }
+          ]
         }
       }
     )
   end
 
+  #"trove:category": "#{trove_fields['category']}",
+  #"trove:firstPageId": "#{trove_fields['firstPageId']}",
+  #"trove:firstPageSeq": "#{trove_fields['firstPageSeq']}",
 
 end

@@ -72,7 +72,7 @@ class PostgresWorker < Worker
 
   def batch_create(payload)
     # TODO: Cache collection IDs to minimize lookups
-    collection = Collection.find_by_name(payload['name'])
+    collection = Collection.find_by_name(payload['collection'])
     item = Item.new(payload['item'])
     item.collection = collection
     item.documents.build(payload['documents'])

@@ -5,6 +5,7 @@ require 'sesame_client'
 require 'active_record'
 require 'models/item'
 require 'models/document'
+require 'models/collection'
 require 'postgres_helper'
 require 'trove_ingester'
 require 'sesame_worker'
@@ -12,7 +13,8 @@ require 'sesame_worker'
 def main(config)
   # sesame_client = SesameClient.new(config[:sesame_worker])
   turtle = File.open("#{File.dirname(__FILE__)}/../spec/files/turtle_example.rdf").read
-  options = {adapter: 'postgresql', database: 'hcsvlab', user: 'hcsvlab', host: 'localhost'}
+  # options = {adapter: 'postgresql', database: 'hcsvlab', user: 'hcsvlab', host: 'localhost'}
+  options = {adapter: 'postgresql', database: 'hcsvlab', user: 'hcsvlab', host: 'alveo-qa-pg.intersect.org.au'}
   ActiveRecord::Base.establish_connection(options)
   json_ld_expanded = JSON.parse(File.read("#{File.dirname(__FILE__)}/../spec/files/json-ld_expanded_example.json"))
 
@@ -59,11 +61,14 @@ def main(config)
   # item = json_ld_expanded[0]
   # compacted = JSON::LD::API.compact(item, context)
 
-  # ingester = TroveIngester.new(config[:ingester])
+  ingester = TroveIngester.new(config[:ingester])
+  ingester.connect
   # trove_chunk = "#{File.dirname(__FILE__)}/../spec/files/data-1.dat"
-  # ingester.connect
+  trove_chunk = "/Users/ilya/workspace/corpora/trove/data-1.dat"
+  ingester.process_chunk(trove_chunk)
+
   # trove_example = JSON.parse(File.read("#{File.dirname(__FILE__)}/../spec/files/trove_example.json"))
-  sesame_worker = SesameWorker.new(config[:sesame_worker])
+  # sesame_worker = SesameWorker.new(config[:sesame_worker])
   # sesame_worker.connect
 
   require 'pry'
