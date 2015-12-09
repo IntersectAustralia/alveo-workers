@@ -14,7 +14,7 @@ def main
   solr.commit
   ActiveRecord::Base.establish_connection(config[:postgres_worker][:activerecord])
   Item.delete_all
-  Collection.delete_all
+  #Collection.delete_all
 end
 
 

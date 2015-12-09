@@ -4,6 +4,7 @@ require 'activerecord-import'
 require_relative 'worker'
 require_relative 'models/item'
 require_relative 'models/document'
+require_relative 'models/collection'
 
 class PostgresWorker < Worker
 
@@ -70,7 +71,8 @@ class PostgresWorker < Worker
   end
 
   def batch_create(payload)
-    collection.find_by_name(payload['name'])
+    # TODO: Cache collection IDs to minimize lookups
+    collection = Collection.find_by_name(payload['name'])
     item = Item.new(payload['item'])
     item.collection = collection
     item.documents.build(payload['documents'])

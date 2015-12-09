@@ -77,7 +77,7 @@ module PostgresHelper
     item = extract_item_info(item_graph, document_graphs)
     documents = extract_documents_info(document_graphs)
     collection = get_collection(item_graph)
-    {collection: collecion, item: item, documents: documents}
+    {collection: collection, item: item, documents: documents}
   end
 
   def extract_item_info(item_graph, document_graphs)
