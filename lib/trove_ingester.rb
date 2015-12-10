@@ -53,47 +53,45 @@ class TroveIngester
   end
 
   def map_to_json_ld(trove_fields)
-    %Q(
-      {
-        "@context": ["https://app.alveo.edu.au/schema/json-ld",
+    # TODO: see if qualified values can be removed, e.g. ausnc:popular
+    %Q({"metadata": {
+        "@context": [
           {
-            "ausnc:audience" : { "@type": "@id"},
-            "ausnc:communication_setting": { "@type": "@id" },
-            "ausnc:mode": {  "@type": "@id" },
-            "ausnc:publication_status": {  "@type": "@id" },
-            "ausnc:written_mode": {  "@type": "@id" },
-            "ausnc:itemwordcount": { "@type": "xsd:integer"},
-            "dc:extent": { "@type": "xsd:integer"},
-            "dc:source": {  "@type": "@id" }
+            "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/",
+            "dc": "http://purl.org/dc/terms/",
+            "alveo": "http://alveo.edu.au/vocabulary/",
+            "olac": "http://www.language-archives.org/OLAC/1.1/"
          }],
-        "@graph": {
-          "ausnc:audience": "ausnc:mass_market",
-          "ausnc:communication_medium": "ausnc:newspaper",
-          "ausnc:communication_setting": "ausnc:popular",
-          "ausnc:itemwordcount": "#{trove_fields['wordCount']}",
-          "ausnc:mode": "ausnc:written",
-          "ausnc:publication_status": "ausnc:published",
-          "ausnc:state": "#{trove_fields['state'].first}",
-          "ausnc:written_mode": "ausnc:print",
-          "dc:date": "#{trove_fields['date']}",
-          "dc:identifier": "#{trove_fields['id']}",
-          "dc:source": "#{trove_fields['titleName']}",
-          "dc:title": "#{trove_fields['heading']}",
-          "dc:isPartOf": "trove",
-          "alveo:fulltext": #{trove_fields['fulltext'].to_json},
-          "olac:language": "eng",
-          "ausnc:document": [
-            {
-              "dc:extent": #{trove_fields['fulltext'].size},
-              "dc:identifier": "",
-              "dc:source": "http://trove.alveo.edu.au/document/#{trove_fields['id']}",
-              "dc:type": "Text",
-              "alveo:size": #{trove_fields['fulltext'].bytesize}
-            }
-          ]
-        }
+        "@graph": [
+          {
+            "ausnc:audience": "mass_market",
+            "ausnc:communication_medium": "newspaper",
+            "ausnc:communication_setting": "popular",
+            "ausnc:itemwordcount": "#{trove_fields['wordCount']}",
+            "ausnc:mode": "written",
+            "ausnc:publication_status": "published",
+            "ausnc:state": "#{trove_fields['state'].first}",
+            "ausnc:written_mode": "print",
+            "dc:created": "#{trove_fields['date']}",
+            "dc:identifier": "#{trove_fields['id']}",
+            "dc:source": #{trove_fields['titleName'].to_json},
+            "dc:title": #{trove_fields['heading'].to_json},
+            "dc:isPartOf": "trove",
+            "alveo:fulltext": #{trove_fields['fulltext'].to_json},
+            "alveo:display_document": "http://trove.alveo.edu.au/document/#{trove_fields['id']}",
+            "alveo:indexable_document": "http://trove.alveo.edu.au/document/#{trove_fields['id']}",
+            "olac:language": "eng"
+          },
+          {
+            "dc:extent": #{trove_fields['fulltext'].size},
+            "dc:identifier": "#{trove_fields['id']}",
+            "dc:source": "http://trove.alveo.edu.au/document/#{trove_fields['id']}",
+            "dc:type": "Text",
+            "alveo:size": #{trove_fields['fulltext'].bytesize}
+          }
+        ]
       }
-    )
+    })
   end
 
   #"trove:category": "#{trove_fields['category']}",

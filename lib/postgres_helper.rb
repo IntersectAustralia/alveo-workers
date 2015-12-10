@@ -72,7 +72,8 @@ module PostgresHelper
 
   def create_pg_statement(expanded_json_ld)
     (item_graph, document_graphs) = separate_graphs(expanded_json_ld)
-    
+    # require 'pry'
+    # binding.pry
     # item[:annotation_path] = nil
     item = extract_item_info(item_graph, document_graphs)
     documents = extract_documents_info(document_graphs)
@@ -86,10 +87,10 @@ module PostgresHelper
     item[:handle] = generate_handle(item_graph)
     item[:primary_text_path] = get_primary_text_path(item_graph, document_graphs)
     item[:json_metadata] = build_json_metadata(item_graph, document_graphs)
-    # TODO, This is a temporary hack, what should happen is that this remains blank
+    # TODO: This is a temporary hack, what should happen is that this remains blank
     # until the Item is indexed  by the Solr worker, which should add update messages
     # to the Postgres queue. This could run into issues if it is indexed in Solr before
-    # it is added to Postgres
+    # it is added to Postgres. Perhaps just keep requeueing until it's created?
     item[:indexed_at] = Time.now
     item
   end

@@ -47,10 +47,12 @@ module SolrConstants
     'default_data_owner'=> 'data_owner@intersect.org.au', ## TODO, this should be configurable
     'data_owner_field' => 'http://id.loc.gov/vocabulary/relators/rpy',
     'collection_field' => 'http://purl.org/dc/terms/isPartOf',
-    'identifier_field' => '@id',
+    # 'identifier_field' => '@id',
+    'identifier_field' => 'http://purl.org/dc/terms/identifier',
     'created_field' => 'http://purl.org/dc/terms/created',
     'indexable_document' => 'http://hcsvlab.org/vocabulary/indexable_document',
-    'source' => 'http://purl.org/dc/terms/source'
+    'source' => 'http://purl.org/dc/terms/source',
+    'fulltext' => 'http://alveo.edu.au/vocabulary/fulltext'
   }.freeze
 
 end

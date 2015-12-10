@@ -66,8 +66,22 @@ def main(config)
   # trove_chunk = "#{File.dirname(__FILE__)}/../spec/files/data-1.dat"
   trove_chunk = "/Users/ilya/workspace/corpora/trove/data-1.dat"
   ingester.process_chunk(trove_chunk)
+  
+  # example = File.open(trove_chunk, 'r:ascii-8bit').first
+  # example = example.encode('utf-8')
+  # json = JSON.parse(example)
+  # jld_string = ingester.map_to_json_ld(json)
+  # jld = JSON.parse(jld_string)
+  # expanded = JSON::LD::API.expand(jld["metadata"])
 
-  # trove_example = JSON.parse(File.read("#{File.dirname(__FILE__)}/../spec/files/trove_example.json"))
+  # solr_helper = Class.new
+  # solr_helper.include(SolrHelper)
+  # solr_helper = solr_helper.new
+  
+  # postgres_helper = Class.new
+  # postgres_helper.include(PostgresHelper)
+  # postgres_helper = postgres_helper.new
+
   # sesame_worker = SesameWorker.new(config[:sesame_worker])
   # sesame_worker.connect
 

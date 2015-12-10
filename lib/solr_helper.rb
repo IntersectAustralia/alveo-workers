@@ -97,12 +97,17 @@ module SolrHelper
   end
 
   def generate_full_text(item_graph, document_graphs)
-    document_uri = extract_value(item_graph[@@MAPPED_FIELDS['indexable_document']])
-    document_graph = document_graphs[document_uri]
-    file_uri = extract_value(document_graph[@@MAPPED_FIELDS['source']])
-    file_path = URI.parse(file_uri).path
-    full_text = File.read(file_path)
-    normalise_whitespace(full_text)
+    if item_graph.has_key? @@MAPPED_FIELDS['fulltext']
+      fulltext = item_graph[@@MAPPED_FIELDS['fulltext']]
+    else
+      document_uri = extract_value(item_graph[@@MAPPED_FIELDS['indexable_document']])
+      document_graph = document_graphs[document_uri]
+      file_uri = extract_value(document_graph[@@MAPPED_FIELDS['source']])
+      file_path = URI.parse(file_uri).path
+      fulltext = File.read(file_path)
+      #normalise_whitespace(full_text)
+    end
+    fulltext
   end
 
   def generate_access_rights(item_graph)
@@ -285,12 +290,22 @@ module SolrHelper
     default_document_fields
   end
 
+  # def is_document?(graph_hash)
+  #   graph_type(graph_hash) == 'Document'
+  # end
+
+  # def is_item?(graph_hash)
+  #   graph_type(graph_hash) == 'AusNCObject'
+  # end
+
+  # TODO: need better ways of distinguishing between items and documents
+  # hopefully this will not be an issue with the new proposed JSON-LD format
   def is_document?(graph_hash)
-    graph_type(graph_hash) == 'Document'
+    (graph_hash.has_key? 'http://purl.org/dc/terms/isPartOf') == false
   end
 
   def is_item?(graph_hash)
-    graph_type(graph_hash) == 'AusNCObject'
+    graph_hash.has_key? 'http://purl.org/dc/terms/isPartOf'
   end
 
 end
