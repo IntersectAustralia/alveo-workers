@@ -6,8 +6,6 @@ require_relative 'postgres_helper'
 class UploadWorker < Worker
 
   include MetadataHelper
-  include SolrHelper
-  include PostgresHelper
 
   def initialize(options)
     @solr_queue_name = options[:solr_queue]
@@ -24,45 +22,38 @@ class UploadWorker < Worker
   end
 
   def process_message(headers, message)
-    # TODO change these to CRUD verbs
     if headers['action'] == 'create'
-      add_item(message['metadata'])
+      message['items'].each { |item|
+        add_item(item)
+      }
     end
   end
 
-  def add_item(metadata)
+  def add_item(item)
     # generate catalogue url
     # extract full text if its not there already
     # generate handle?
-    expanded_json_ld = expand_json_ld(metadata)
-    create_item_solr(expanded_json_ld)
-    create_item_postgres(expanded_json_ld)
-    # NOTE: comment below if uploading directly to the sesame queue
-    create_item_sesame(expanded_json_ld)
-  end
-
-  def create_item_sesame(expanded_json_ld)
-    # TODO: push all these calls to the add_item method since they
-    # are nearly identical
-    (item_graph, document_graphs) = separate_graphs(expanded_json_ld)
-    collection = extract_value(item_graph[@@MAPPED_FIELDS['collection_field']])
-    properties = {routing_key: @sesame_queue.name, headers: {action: 'create'}}
-    message = "{\"collection\": \"#{collection}\", \"payload\": #{expanded_json_ld.to_json}}"
-    @exchange.publish(message, properties)
-  end
-
-  def create_item_solr(expanded_json_ld)
-    solr_document = create_solr_document(expanded_json_ld)
+    item['generated'] = generate_fields(item)
+    message = item.to_json
+    # properties = {routing_key: @postgres_queue.name, headers: {action: 'create'}}
+    # @exchange.publish(message, properties)
     properties = {routing_key: @solr_queue.name, headers: {action: 'create'}}
-    message = "{\"document\": #{solr_document.to_json}}"
     @exchange.publish(message, properties)
+    # properties = {routing_key: @sesame_queue.name, headers: {action: 'create'}}
+    # @exchange.publish(message, properties)
   end
 
-  def create_item_postgres(expanded_json_ld)
-    postgres_data = create_pg_statement(expanded_json_ld)
-    properties = {routing_key: @postgres_queue.name, headers: {action: 'create'}}
-    message = "{\"payload\": #{postgres_data.to_json}}"
-    @exchange.publish(message, properties)
+  def generate_fields(item)
+    generated = {}
+    generated['date_group'] = get_date_group(item)
+    generated['types'] = get_types(item)
+    collection = get_collection(item)
+    puts collection.inspect
+    generated['owner'] = collection[:owner]
+    generated['collection_id'] = collection[:id]
+    generated['handle'] = get_handle(item)
+    puts generated
+    generated
   end
 
 end

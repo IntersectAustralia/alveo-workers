@@ -1,0 +1,95 @@
+## create collection
+
+{ "@context": "https://app.alveo.edu.au/schema/json-ld",
+  "alveo:metadata": {
+         "@type": "dcmitype:Collection",   #  remove == redundant
+         "dc:identifier" : "mycollection",  ## == 'name'
+         "dc:creator": "Data Owner",
+         "dc:rights": "All rights reserved to Data Owner",
+         "dc:subject": "English Language",
+         "dc:title": "Test Collection"
+     }
+}
+
+
+# document
+
+# by URI
+{ "@context": "https://app.alveo.edu.au/schema/json-ld",
+  "alveo:metadata": {
+        "dc:source": "https://app.alveo.edu.au/catalog/ace/J68/document/J68-plain.txt",
+        "dc:type": "Text",
+        "alveo:size": null,  ## what's this?
+        "rdf:type": "http://xmlns.com/foaf/0.1/Document",  # remove == redundant
+        "dc:identifier": "J68-plain.txt",
+        "dc:title": "J68#Text",
+        "dc:extent": "11911"   ## calculate
+        }
+}
+
+# included in json
+{ "@context": "https://app.alveo.edu.au/schema/json-ld",
+  "alveo:metadata": {
+        "dc:type": "Text",
+        "dc:identifier": "J68-plain.txt",
+        "dc:title": "J68#Text",
+        "alveo:fulltext": "this is the text of the document"
+        }
+}
+
+# uploaded
+{ "@context": "https://app.alveo.edu.au/schema/json-ld",
+  "alveo:metadata": {
+        "dc:type": "Text",
+        "alveo:size": null,  ## what's this?
+        "rdf:type": "http://xmlns.com/foaf/0.1/Document",  # remove == redundant
+        "dc:identifier": "J68-plain.txt",
+        "dc:title": "J68#Text",
+        "dc:extent": "11911",   ## calculate
+        }
+}
+
+
+# item
+
+[
+{ "@context": "https://alveo-staging1.intersect.org.au/schema/json-ld",
+
+    "alveo:metadata": {
+                        "dc:identifier": "J68",
+                        "ausnc:speech_style": "unspecified",
+                         "ausnc:interactivity": "unspecified",
+                         "ausnc:communication_context": "unspecified",
+                         "hcsvlab:display_document" : "J68-plain.txt",
+                         "hcsvlab:indexable_document":  "J68-plain.txt"
+                     }
+    "ausnc:document": [ {
+                    "dc:type": "Text",
+                    "dc:identifier": "J68-plain.txt",
+                    "dc:title": "J68#Text",
+                    "alveo:fulltext": "this is the text of the document"
+                    },
+                    {
+                        "dc:type": "Text",
+                        "dc:identifier": "J68-plain.txt",
+                        "dc:title": "J68#Text",
+                        "alveo:fulltext": "this is the text of the document"
+                     }
+                 ],
+    # TODO:
+    "olac:speaker": [
+        "dc:identifier": "D",
+        "ausnc:education": "BEng",
+        "ausnc:occupation": "Engineer",
+        "ausnc:role": "speaker",
+        "foaf:age": "25-35",
+        "foaf:gender": "male"
+}
+    ]
+}
+,
+{ another item }
+]
+
+
+http://trove.nla.gov.au/ndp/del/article/145569778

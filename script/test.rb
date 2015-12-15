@@ -6,17 +6,18 @@ require 'active_record'
 require 'models/item'
 require 'models/document'
 require 'models/collection'
+require 'models/user'
 require 'postgres_helper'
 require 'trove_ingester'
 require 'sesame_worker'
 
 def main(config)
   # sesame_client = SesameClient.new(config[:sesame_worker])
-  turtle = File.open("#{File.dirname(__FILE__)}/../spec/files/turtle_example.rdf").read
-  # options = {adapter: 'postgresql', database: 'hcsvlab', user: 'hcsvlab', host: 'localhost'}
-  options = {adapter: 'postgresql', database: 'hcsvlab', user: 'hcsvlab', host: 'alveo-qa-pg.intersect.org.au'}
+  # turtle = File.open("#{File.dirname(__FILE__)}/../spec/files/turtle_example.rdf").read
+  options = {adapter: 'postgresql', database: 'hcsvlab', user: 'hcsvlab', host: 'localhost'}
+  #options = {adapter: 'postgresql', database: 'hcsvlab', user: 'hcsvlab', host: 'alveo-qa-pg.intersect.org.au'}
   ActiveRecord::Base.establish_connection(options)
-  json_ld_expanded = JSON.parse(File.read("#{File.dirname(__FILE__)}/../spec/files/json-ld_expanded_example.json"))
+  # json_ld_expanded = JSON.parse(File.read("#{File.dirname(__FILE__)}/../spec/files/json-ld_expanded_example.json"))
 
   # context = {
   #     "ace" =>{"@id" =>"http://ns.ausnc.org.au/schemas/ace/"},
@@ -64,7 +65,8 @@ def main(config)
   ingester = TroveIngester.new(config[:ingester])
   ingester.connect
   # trove_chunk = "#{File.dirname(__FILE__)}/../spec/files/data-1.dat"
-  trove_chunk = "/Users/ilya/workspace/corpora/trove/data-1.dat"
+  # trove_chunk = "/Users/ilya/workspace/corpora/trove/data-1.dat"
+  trove_chunk = "/home/ilya/workspace/alveo-workers/spec/files/data-1.dat"
   ingester.process_chunk(trove_chunk)
   
   # example = File.open(trove_chunk, 'r:ascii-8bit').first
@@ -73,6 +75,10 @@ def main(config)
   # jld_string = ingester.map_to_json_ld(json)
   # jld = JSON.parse(jld_string)
   # expanded = JSON::LD::API.expand(jld["metadata"])
+
+  # File.open('trove.json', 'w') { |f|
+  #   f.write(jld_string)
+  # }
 
   # solr_helper = Class.new
   # solr_helper.include(SolrHelper)

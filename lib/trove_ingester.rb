@@ -35,7 +35,7 @@ class TroveIngester
   end
 
   def process_chunk(trove_chunk)
-    limit = 20
+    limit = 1
     count = 0
     File.open(trove_chunk, 'r:ascii-8bit').each { |trove_record|
       begin
@@ -54,7 +54,8 @@ class TroveIngester
 
   def map_to_json_ld(trove_fields)
     # TODO: see if qualified values can be removed, e.g. ausnc:popular
-    %Q({"metadata": {
+    %Q({
+        "items":[{
         "@context": [
           {
             "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/",
@@ -62,8 +63,7 @@ class TroveIngester
             "alveo": "http://alveo.edu.au/vocabulary/",
             "olac": "http://www.language-archives.org/OLAC/1.1/"
          }],
-        "@graph": [
-          {
+        "alveo:metadata": {
             "ausnc:audience": "mass_market",
             "ausnc:communication_medium": "newspaper",
             "ausnc:communication_setting": "popular",
@@ -82,16 +82,15 @@ class TroveIngester
             "alveo:indexable_document": "http://trove.alveo.edu.au/document/#{trove_fields['id']}",
             "olac:language": "eng"
           },
-          {
+          "ausnc:document": [{
             "dc:extent": #{trove_fields['fulltext'].size},
             "dc:identifier": "#{trove_fields['id']}",
             "dc:source": "http://trove.alveo.edu.au/document/#{trove_fields['id']}",
             "dc:type": "Text",
             "alveo:size": #{trove_fields['fulltext'].bytesize}
-          }
-        ]
-      }
-    })
+          }]
+        }
+    ]})
   end
 
   #"trove:category": "#{trove_fields['category']}",

@@ -1,5 +1,6 @@
 require 'rsolr'
 require_relative 'worker'
+require_relative 'new_solr_helper'
 
 class SolrWorker < Worker
 
@@ -7,6 +8,8 @@ class SolrWorker < Worker
   #   - MonkeyPatch persistent HTTP connections
   #   - Implement commit strategy
   #   - Implement batching
+
+  include NewSolrHelper
 
   def initialize(options)
     rabbitmq_options = options[:rabbitmq]
@@ -52,10 +55,11 @@ class SolrWorker < Worker
 
   def process_message(headers, message)
     if headers['action'] == 'create'
+      document = create_solr_document(message)
       if @batch_options[:enabled]
-        batch_create(message['document'])        
+        batch_create(document)
       else
-        add_documents(message['document'])
+        add_documents(document)
       end
     end
   end
