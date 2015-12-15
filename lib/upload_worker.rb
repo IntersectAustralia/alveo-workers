@@ -24,22 +24,23 @@ class UploadWorker < Worker
   def process_message(headers, message)
     if headers['action'] == 'create'
       message['items'].each { |item|
-        add_item(item)
+        create_item(item)
       }
     end
   end
 
-  def add_item(item)
+  def creat_item(item)
     # generate catalogue url
     # extract full text if its not there already
     # generate handle?
     item['generated'] = generate_fields(item)
     message = item.to_json
-    # properties = {routing_key: @postgres_queue.name, headers: {action: 'create'}}
-    # @exchange.publish(message, properties)
-    properties = {routing_key: @solr_queue.name, headers: {action: 'create'}}
+    headers = {action: 'create'}
+    properties = {routing_key: @postgres_queue.name, headers: headers}
     @exchange.publish(message, properties)
-    # properties = {routing_key: @sesame_queue.name, headers: {action: 'create'}}
+    properties = {routing_key: @solr_queue.name, headers: headers}
+    @exchange.publish(message, properties)
+    # properties = {routing_key: @sesame_queue.name, headers: headers}
     # @exchange.publish(message, properties)
   end
 
@@ -48,11 +49,9 @@ class UploadWorker < Worker
     generated['date_group'] = get_date_group(item)
     generated['types'] = get_types(item)
     collection = get_collection(item)
-    puts collection.inspect
     generated['owner'] = collection[:owner]
     generated['collection_id'] = collection[:id]
     generated['handle'] = get_handle(item)
-    puts generated
     generated
   end
 

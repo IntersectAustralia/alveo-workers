@@ -5,6 +5,7 @@ require_relative 'worker'
 require_relative 'models/item'
 require_relative 'models/document'
 require_relative 'models/collection'
+require_relative 'new_postgres_helper'
 
 class PostgresWorker < Worker
 
@@ -45,6 +46,7 @@ class PostgresWorker < Worker
 
   def connect
     super
+    # TODO: change this to a connection pool perhaps
     ActiveRecord::Base.establish_connection(@activerecord_options)
   end
 
@@ -63,14 +65,14 @@ class PostgresWorker < Worker
   def process_message(headers, message)
     if headers['action'] == 'create'
       if @batch_options[:enabled]
-        batch_create(message['payload'])
+        batch_create(message)
       else
-        create_item(message['payload'])
+        create_item(message)
       end
     end
   end
 
-  def batch_create(payload)
+  def batch_create(message)
     # TODO: Cache collection IDs to minimize lookups
     collection = Collection.find_by_name(payload['collection'])
     item = Item.new(payload['item'])
