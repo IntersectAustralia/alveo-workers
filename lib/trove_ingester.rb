@@ -73,7 +73,7 @@ class TroveIngester
             "ausnc:state": "#{trove_fields['state'].first}",
             "ausnc:written_mode": "print",
             "dc:created": "#{trove_fields['date']}",
-            "dc:identifier": "#{trove_fields['id']}",
+            "dc:identifier": "https://app.alveo.edu.au/catalog/trove/#{trove_fields['id']}",
             "dc:source": #{trove_fields['titleName'].to_json},
             "dc:title": #{trove_fields['heading'].to_json},
             "dc:isPartOf": "trove",

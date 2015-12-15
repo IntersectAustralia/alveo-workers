@@ -46,8 +46,11 @@ class UploadWorker < Worker
     # are nearly identical
     (item_graph, document_graphs) = separate_graphs(expanded_json_ld)
     collection = extract_value(item_graph[@@MAPPED_FIELDS['collection_field']])
+    item_graph.delete(@@MAPPED_FIELDS['fulltext'])
+    new_graph = [item_graph]
+    new_graph.concat(document_graphs.values)
     properties = {routing_key: @sesame_queue.name, headers: {action: 'create'}}
-    message = "{\"collection\": \"#{collection}\", \"payload\": #{expanded_json_ld.to_json}}"
+    message = "{\"collection\": \"#{collection}\", \"payload\": #{item_graph.to_json}}"
     @exchange.publish(message, properties)
   end
 

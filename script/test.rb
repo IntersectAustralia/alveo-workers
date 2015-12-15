@@ -65,14 +65,14 @@ def main(config)
   ingester.connect
   # trove_chunk = "#{File.dirname(__FILE__)}/../spec/files/data-1.dat"
   trove_chunk = "/Users/ilya/workspace/corpora/trove/data-1.dat"
-  ingester.process_chunk(trove_chunk)
+  # ingester.process_chunk(trove_chunk)
   
-  # example = File.open(trove_chunk, 'r:ascii-8bit').first
-  # example = example.encode('utf-8')
-  # json = JSON.parse(example)
-  # jld_string = ingester.map_to_json_ld(json)
-  # jld = JSON.parse(jld_string)
-  # expanded = JSON::LD::API.expand(jld["metadata"])
+  example = File.open(trove_chunk, 'r:ascii-8bit').first
+  example = example.encode('utf-8')
+  json = JSON.parse(example)
+  jld_string = ingester.map_to_json_ld(json)
+  jld = JSON.parse(jld_string)
+  expanded = JSON::LD::API.expand(jld["metadata"])
 
   # solr_helper = Class.new
   # solr_helper.include(SolrHelper)

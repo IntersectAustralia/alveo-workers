@@ -5,6 +5,7 @@ require 'active_record'
 require 'models/item'
 require 'models/document'
 require 'models/collection'
+require 'sesame_client'
 
 def main
   require 'yaml'
@@ -15,6 +16,13 @@ def main
   ActiveRecord::Base.establish_connection(config[:postgres_worker][:activerecord])
   Item.delete_all
   #Collection.delete_all
+  sesame = SesameClient.new(config[:sesame_worker])
+  repositories = sesame.repositories
+  repositories.each { |repository|
+    sesame.clear_repository(repository)
+  }
+  sesame.close
+  # TODO: purge error queue
 end
 
 

@@ -13,3 +13,11 @@ class Net::HTTP::Post
   end
 
 end
+
+class Net::HTTP::Delete
+
+  def method_missing(method, *args)
+    @uri.send(method, *args)
+  end
+
+end
