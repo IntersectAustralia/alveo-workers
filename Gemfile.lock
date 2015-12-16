@@ -53,6 +53,7 @@ GEM
       method_source (~> 0.8.1)
       slop (~> 3.4)
       spoon (~> 0.0)
+    rack (1.6.4)
     rainbow (2.0.0)
     rdf (1.1.15)
       link_header (~> 0.0, >= 0.0.8)
@@ -108,6 +109,7 @@ DEPENDENCIES
   net-http-persistent
   pg
   pry
+  rack
   rdf-turtle
   rsolr
   rspec

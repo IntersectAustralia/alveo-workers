@@ -14,8 +14,8 @@ require 'sesame_worker'
 def main(config)
   # sesame_client = SesameClient.new(config[:sesame_worker])
   # turtle = File.open("#{File.dirname(__FILE__)}/../spec/files/turtle_example.rdf").read
-  options = {adapter: 'postgresql', database: 'hcsvlab', user: 'hcsvlab', host: 'localhost'}
-  #options = {adapter: 'postgresql', database: 'hcsvlab', user: 'hcsvlab', host: 'alveo-qa-pg.intersect.org.au'}
+  # options = {adapter: 'postgresql', database: 'hcsvlab', user: 'hcsvlab', host: 'localhost'}
+  options = {adapter: 'postgresql', database: 'hcsvlab', user: 'hcsvlab', host: 'alveo-qa-pg.intersect.org.au'}
   ActiveRecord::Base.establish_connection(options)
   # json_ld_expanded = JSON.parse(File.read("#{File.dirname(__FILE__)}/../spec/files/json-ld_expanded_example.json"))
 

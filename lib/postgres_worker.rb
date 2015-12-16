@@ -4,10 +4,12 @@ require 'activerecord-import'
 require_relative 'worker'
 require_relative 'models/item'
 require_relative 'models/document'
-require_relative 'models/collection'
+# require_relative 'models/collection'
 require_relative 'new_postgres_helper'
 
 class PostgresWorker < Worker
+
+  include NewPostgresHelper
 
   def initialize(options)
     rabbitmq_options = options[:rabbitmq]
@@ -64,29 +66,32 @@ class PostgresWorker < Worker
 
   def process_message(headers, message)
     if headers['action'] == 'create'
+      pg_statement = create_pg_statement(message)
       if @batch_options[:enabled]
-        batch_create(message)
+        batch_create(pg_statement)
       else
-        create_item(message)
+        create_item(pg_statement)
       end
     end
   end
 
-  def batch_create(message)
+  def batch_create(pg_statement)
     # TODO: Cache collection IDs to minimize lookups
-    collection = Collection.find_by_name(payload['collection'])
-    item = Item.new(payload['item'])
-    item.collection = collection
-    item.documents.build(payload['documents'])
+    # collection = Collection.find_by_name(payload['collection'])
+    # require 'pry'
+    # binding.pry
+    item = Item.new(pg_statement[:item])
+    # item.collection = collection
+    item.documents.build(pg_statement[:documents])
     @batch << item
     if (@batch.size >= @batch_options[:size])
       commit_batch
     end
   end
 
-  def create_item(payload)
-    item = Item.new(payload['item'])
-    item.documents.build(payload['documents'])
+  def create_item(pg_statement)
+    item = Item.new(pg_statement[:item])
+    item.documents.build(pg_statement[:documents])
     item.save!
   end
 

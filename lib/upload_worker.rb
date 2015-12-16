@@ -1,7 +1,7 @@
 require_relative 'worker'
 require_relative 'metadata_helper'
-require_relative 'solr_helper'
-require_relative 'postgres_helper'
+# require_relative 'solr_helper'
+# require_relative 'postgres_helper'
 
 class UploadWorker < Worker
 
@@ -36,8 +36,8 @@ class UploadWorker < Worker
     item['generated'] = generate_fields(item)
     message = item.to_json
     headers = {action: 'create'}
-    # properties = {routing_key: @postgres_queue.name, headers: headers}
-    # @exchange.publish(message, properties)
+    properties = {routing_key: @postgres_queue.name, headers: headers}
+    @exchange.publish(message, properties)
     properties = {routing_key: @solr_queue.name, headers: headers}
     @exchange.publish(message, properties)
     # properties = {routing_key: @sesame_queue.name, headers: headers}

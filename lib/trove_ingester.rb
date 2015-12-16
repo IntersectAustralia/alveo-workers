@@ -35,7 +35,7 @@ class TroveIngester
   end
 
   def process_chunk(trove_chunk)
-    limit = 10
+    limit = 10000
     count = 0
     File.open(trove_chunk, 'r:ascii-8bit').each { |trove_record|
       begin
@@ -64,6 +64,7 @@ class TroveIngester
             "olac": "http://www.language-archives.org/OLAC/1.1/"
          }],
         "alveo:metadata": {
+            "@id": "https://app.alveo.edu.au/catalog/trove/#{trove_fields['id']}",
             "ausnc:audience": "mass_market",
             "ausnc:communication_medium": "newspaper",
             "ausnc:communication_setting": "popular",
