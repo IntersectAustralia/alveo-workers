@@ -65,8 +65,8 @@ def main(config)
   ingester = TroveIngester.new(config[:ingester])
   ingester.connect
   # trove_chunk = "#{File.dirname(__FILE__)}/../spec/files/data-1.dat"
-  # trove_chunk = "/Users/ilya/workspace/corpora/trove/data-1.dat"
-  trove_chunk = "/home/ilya/workspace/alveo-workers/spec/files/data-1.dat"
+  trove_chunk = "/Users/ilya/workspace/corpora/trove/data-1.dat"
+  # trove_chunk = "/home/ilya/workspace/alveo-workers/spec/files/data-1.dat"
   ingester.process_chunk(trove_chunk)
   
   # example = File.open(trove_chunk, 'r:ascii-8bit').first

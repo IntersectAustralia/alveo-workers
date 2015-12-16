@@ -29,15 +29,15 @@ class UploadWorker < Worker
     end
   end
 
-  def creat_item(item)
+  def create_item(item)
     # generate catalogue url
     # extract full text if its not there already
     # generate handle?
     item['generated'] = generate_fields(item)
     message = item.to_json
     headers = {action: 'create'}
-    properties = {routing_key: @postgres_queue.name, headers: headers}
-    @exchange.publish(message, properties)
+    # properties = {routing_key: @postgres_queue.name, headers: headers}
+    # @exchange.publish(message, properties)
     properties = {routing_key: @solr_queue.name, headers: headers}
     @exchange.publish(message, properties)
     # properties = {routing_key: @sesame_queue.name, headers: headers}

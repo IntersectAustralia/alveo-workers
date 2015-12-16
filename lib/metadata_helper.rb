@@ -39,6 +39,7 @@ module MetadataHelper
     types = []
     item_metadata['ausnc:document'].each { |document|
       type = document.has_key?('dc:type') ? document['dc:type'] : 'unspecified'
+      types << type
     }
     types
   end

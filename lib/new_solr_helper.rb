@@ -48,7 +48,7 @@ module NewSolrHelper
       AUSNC_publication_status_facet: item_metadata['ausnc:publication_status'],
       AUSNC_communication_medium_facet: item_metadata['ausnc:communication_medium'],
       handle: item_json_ld['generated']['handle'],
-      id: item_metadata['generated']['handle'],
+      id: item_json_ld['generated']['handle'],
       full_text: item_metadata['alveo:fulltext'], #TODO: fulltext should be a property of a document
       discover_access_group_ssim: "#{item_metadata['dc:isPartOf']}-discover",
       read_access_group_ssim: "#{item_metadata['dc:isPartOf']}-read",
