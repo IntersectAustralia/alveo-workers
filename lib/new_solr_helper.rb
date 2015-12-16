@@ -55,7 +55,11 @@ module NewSolrHelper
       edit_access_group_ssim: "#{item_metadata['dc:isPartOf']}-edit",
       discover_access_person_ssim: item_json_ld['generated']['owner'],
       read_access_person_ssim: item_json_ld['generated']['owner'],
-      edit_access_person_ssim: item_json_ld['generated']['owner']
+      edit_access_person_ssim: item_json_ld['generated']['owner'],
+      DC_created_sim: item_metadata['dc:created'],
+      DC_created_tesim: item_metadata['dc:created'],
+      DC_title_sim: item_metadata['dc:title'],
+      DC_title_tesim: item_metadata['dc:title']
     }
   end
 
