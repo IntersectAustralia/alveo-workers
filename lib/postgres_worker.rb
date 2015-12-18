@@ -19,6 +19,12 @@ class PostgresWorker < Worker
     if @batch_options[:enabled]
       @batch = []
 
+      @item_headers = [:uri, :handle, :collection_id, :primary_text_path, :json_metadata, :indexed_at]
+      @item_batch = []
+
+      @documents_headers = [:file_name, :file_path, :doc_type, :mime_type, :item_id]
+      @documents_batch = []
+
       @batch_mutex = Mutex.new
     end
   end
@@ -58,10 +64,31 @@ class PostgresWorker < Worker
     ActiveRecord::Base.connection.close
   end
 
+  # def commit_batch
+  #   @batch_mutex.synchronize {
+  #     Item.import(@batch)
+  #     @batch.clear
+  #   }
+  # end
+
   def commit_batch
     @batch_mutex.synchronize {
-      Item.import(@batch)
-      @batch.clear
+      
+
+      item_imports = Item.import @item_headers, @item_batch, valideate: false
+      item_ids = item_imports.ids
+
+      documents = []
+      item_ids.each_with_index { |id, i|
+        @documents_batch[i].each { |document|
+          document << id
+          documents << document
+        }
+      }
+
+      Document.import @documents_headers, documents, valideate: false
+      @item_batch.clear
+      @documents_batch.clear
     }
   end
 
@@ -76,6 +103,8 @@ class PostgresWorker < Worker
     end
   end
 
+
+
   def batch_create(pg_statement)
     # TODO: change it array import method and turn off validations to
     # maximise import speed, see:
@@ -87,13 +116,18 @@ class PostgresWorker < Worker
     # will have to mass import items first, then assign the returned
     # ids to the documents
     #
-    item = Item.new(pg_statement[:item])
-    item.documents.build(pg_statement[:documents])
-    item.save
-    # @batch << item
-    # if (@batch.size >= @batch_options[:size])
-    #   commit_batch
-    # end
+
+    @item_batch << pg_statement[:item].values
+    @documents_batch << [pg_statement[:documents].first.values]
+
+    # require 'pry'
+    # binding.pry 
+
+    if (@item_batch.size >= @batch_options[:size])
+      commit_batch
+    end
+
+    commit_batch
   end
 
   def create_item(pg_statement)
