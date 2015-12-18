@@ -3,8 +3,11 @@ require 'rdf/turtle'
 
 require_relative 'worker'
 require_relative 'sesame_client'
+require_relative 'sesame_helper'
 
 class SesameWorker < Worker
+
+  include SesameHelper
 
   def initialize(options)
     rabbitmq_options = options[:rabbitmq]
@@ -53,10 +56,12 @@ class SesameWorker < Worker
 
   def process_message(headers, message)
     if headers['action'] == 'create'
+      collection = message['alveo:metadata']['dc:isPartOf']
+      rdf_graph = create_rdf_graph(message)
       if @batch_options[:enabled]
-        batch_create(message)
+        batch_create(collection, rdf_graph)
       else
-        insert_statements(message)
+        insert_statements(collection, rdf_graph)
       end
     end
   end
@@ -69,17 +74,18 @@ class SesameWorker < Worker
     }
   end
 
-  def insert_statements(message)
+  def insert_statements(collection, rdf_graph)
+    # TODO: this is inconsistant with the batch interface
     @sesame_client.insert_statements(@collection, message['payload'])
   end
 
-  def batch_create(message)
+  def batch_create(collection, rdf_graph)
     # TODO: This is flawed - if multiple collections are processed
     # at the same time, it can result in statements being inserted
     # into the wrong collection. It may be better to maintain a hash
     # of batches keyed on collections, e.g. {'collection' => []}
-    @collection = message['collection']
-    @batch << JSON::LD::API.toRdf(message['payload'])
+    @collection = collection
+    @batch << rdf_graph
     if (@batch.size >= @batch_options[:size])
       commit_batch
     end

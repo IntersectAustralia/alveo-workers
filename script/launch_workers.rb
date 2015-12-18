@@ -1,6 +1,5 @@
 $LOAD_PATH.unshift("#{File.dirname(__FILE__)}/../lib")
 
-# require 'ingester'
 require 'yaml'
 require 'optparse'
 require 'ostruct'
@@ -20,13 +19,12 @@ def main(options)
       processes.times {
         fork {
           config_key = worker_class.name.underscore.to_sym
+          Process.setproctitle(worker_class.name)
           worker = worker_class.new(config[config_key])
           Signal.trap('INT') {
             worker.stop
             worker.close
           }
-    # require 'pry'
-    # binding.pry
           worker.connect
           worker.start
           workers << worker

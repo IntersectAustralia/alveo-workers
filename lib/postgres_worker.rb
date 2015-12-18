@@ -18,6 +18,7 @@ class PostgresWorker < Worker
     @batch_options = options[:batch].freeze
     if @batch_options[:enabled]
       @batch = []
+
       @batch_mutex = Mutex.new
     end
   end
@@ -76,17 +77,23 @@ class PostgresWorker < Worker
   end
 
   def batch_create(pg_statement)
-    # TODO: Cache collection IDs to minimize lookups
-    # collection = Collection.find_by_name(payload['collection'])
+    # TODO: change it array import method and turn off validations to
+    # maximise import speed, see:
+    #
+    # https://github.com/zdennis/activerecord-import/wiki/Examples
     # require 'pry'
     # binding.pry
+    # TODO: Not currently hanndling associations on mass import
+    # will have to mass import items first, then assign the returned
+    # ids to the documents
+    #
     item = Item.new(pg_statement[:item])
-    # item.collection = collection
     item.documents.build(pg_statement[:documents])
-    @batch << item
-    if (@batch.size >= @batch_options[:size])
-      commit_batch
-    end
+    item.save
+    # @batch << item
+    # if (@batch.size >= @batch_options[:size])
+    #   commit_batch
+    # end
   end
 
   def create_item(pg_statement)

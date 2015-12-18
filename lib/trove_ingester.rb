@@ -37,7 +37,8 @@ class TroveIngester
   def process_chunk(trove_chunk)
     limit = 10000
     count = 0
-    File.open(trove_chunk, 'r:ascii-8bit').each { |trove_record|
+    # File.open(trove_chunk, 'r:ascii-8bit').each { |trove_record|
+    File.open(trove_chunk, 'r:iso-8859-1').each { |trove_record|
       begin
         trove_fields = JSON.parse(trove_record.encode('utf-8'))
         message = map_to_json_ld(trove_fields)
@@ -47,13 +48,15 @@ class TroveIngester
         break if count >= limit
       rescue Exception => e
         # TODO: Error queue instead of log file
-        @error_logger.error "#{e.class}: #{e.to_s}"
+        @error_logger.error "#{e.class}: #{e.to_s}\ninput: #{trove_record}"
       end
     }
   end
 
   def map_to_json_ld(trove_fields)
     # TODO: see if qualified values can be removed, e.g. ausnc:popular
+    # TODO: Possibly use type coercion in the context if the generated RDF isn't correct
+    #       e.g. "ausnc:audience":{"@type":"http://ns.ausnc.org.au/schemas/ausnc_md_model/audience"},
     %Q({
         "items":[{
         "@context": [
@@ -61,18 +64,22 @@ class TroveIngester
             "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/",
             "dc": "http://purl.org/dc/terms/",
             "alveo": "http://alveo.edu.au/vocabulary/",
-            "olac": "http://www.language-archives.org/OLAC/1.1/"
+            "olac": "http://www.language-archives.org/OLAC/1.1/",
+            "ausnc:document": {"@type": "@id"},
+            "alveo:display_document": {"@type": "@id"},
+            "alveo:indexable_document": {"@type": "@id"}
          }],
         "alveo:metadata": {
             "@id": "https://app.alveo.edu.au/catalog/trove/#{trove_fields['id']}",
             "ausnc:audience": "mass_market",
             "ausnc:communication_medium": "newspaper",
             "ausnc:communication_setting": "popular",
-            "ausnc:itemwordcount": "#{trove_fields['wordCount']}",
+            "ausnc:itemwordcount": #{trove_fields['wordCount']},
             "ausnc:mode": "written",
             "ausnc:publication_status": "published",
             "ausnc:state": "#{trove_fields['state'].first}",
             "ausnc:written_mode": "print",
+            "ausnc:document": ["http://trove.alveo.edu.au/document/#{trove_fields['id']}"],
             "dc:created": "#{trove_fields['date']}",
             "dc:identifier": "#{trove_fields['id']}",
             "dc:source": #{trove_fields['titleName'].to_json},
@@ -84,6 +91,7 @@ class TroveIngester
             "olac:language": "eng"
           },
           "ausnc:document": [{
+            "@id":"http://trove.alveo.edu.au/document/#{trove_fields['id']}",
             "dc:extent": #{trove_fields['fulltext'].size},
             "dc:identifier": "#{trove_fields['id']}",
             "dc:source": "http://trove.alveo.edu.au/document/#{trove_fields['id']}",

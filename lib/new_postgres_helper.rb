@@ -28,6 +28,9 @@ module NewPostgresHelper
     item[:handle] = item_json_ld['generated']['handle']
     item[:collection_id] = item_json_ld['generated']['collection_id']
     item[:primary_text_path] = item_json_ld['alveo:metadata']['alveo:display_document']
+    # TODO: gets rid of the fulltext, may not be what we want to do
+    item_json_ld['alveo:metadata'].delete('alveo:fulltext')
+    item_json_ld.delete('generated')
     item[:json_metadata] = item_json_ld
     # TODO: This is a temporary hack, what should happen is that this remains blank
     # until the Item is indexed  by the Solr worker, which should add update messages

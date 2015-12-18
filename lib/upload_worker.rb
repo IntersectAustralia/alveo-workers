@@ -40,8 +40,8 @@ class UploadWorker < Worker
     @exchange.publish(message, properties)
     properties = {routing_key: @solr_queue.name, headers: headers}
     @exchange.publish(message, properties)
-    # properties = {routing_key: @sesame_queue.name, headers: headers}
-    # @exchange.publish(message, properties)
+    properties = {routing_key: @sesame_queue.name, headers: headers}
+    @exchange.publish(message, properties)
   end
 
   def generate_fields(item)
