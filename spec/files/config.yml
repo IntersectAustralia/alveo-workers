@@ -39,7 +39,7 @@
     :pass: solr
   :batch:
     :enabled: true
-    :size: 500
+    :size: 5000
     :timeout: 15
 
 :upload_worker:

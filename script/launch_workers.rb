@@ -63,7 +63,7 @@ def parse_options(args)
     options.banner = "Usage: launch_workers.rb [options]"
     options.separator ""
     options.separator "Specific options:"
-    options.on('-p', '--processes [INT]', 'Number of processes per worker (default=1)') do |processes|
+    options.on('-p', '--processes [INT]', Integer, 'Number of processes per worker (default=1)') do |processes|
       parsed_options.processes = processes
     end
     options.on('-w', '--workers (upload|solr|sesame|postgres)+', 'Comma separated list of workers to launch (default=all)') do |workers|

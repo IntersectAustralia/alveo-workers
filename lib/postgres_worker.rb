@@ -116,8 +116,9 @@ class PostgresWorker < Worker
     # will have to mass import items first, then assign the returned
     # ids to the documents
     #
-
-    @item_batch << pg_statement[:item].values
+    @batch_mutex.synchronize {
+      @item_batch << pg_statement[:item].values
+    }
     @documents_batch << [pg_statement[:documents].first.values]
     if (@item_batch.size >= @batch_options[:size])
       commit_batch

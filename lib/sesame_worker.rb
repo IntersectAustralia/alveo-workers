@@ -85,7 +85,9 @@ class SesameWorker < Worker
     # into the wrong collection. It may be better to maintain a hash
     # of batches keyed on collections, e.g. {'collection' => []}
     @collection = collection
-    @batch << rdf_graph
+    @batch_mutex.synchronize {
+      @batch << rdf_graph
+    }
     if (@batch.size >= @batch_options[:size])
       commit_batch
     end

@@ -82,7 +82,9 @@ class SolrWorker < Worker
   end
 
   def batch_create(document)
-    @batch << document
+    @batch_mutex.synchronize {
+      @batch << document
+    }
     if (@batch.size >= @batch_options[:size])
       commit_batch
     end

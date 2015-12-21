@@ -10,6 +10,7 @@ require 'models/user'
 require 'postgres_helper'
 require 'trove_ingester'
 require 'sesame_worker'
+require 'rsolr'
 
 def main(config)
   # sesame_client = SesameClient.new(config[:sesame_worker])
@@ -93,6 +94,22 @@ def main(config)
 
   require 'pry'
   binding.pry
+end
+
+def get_uniq_count(trove_chunk, limit)
+  count = 0
+  ids = []
+  File.open(trove_chunk, 'r:iso-8859-1').each { |trove_record|
+    trove_fields = JSON.parse(trove_record.encode('utf-8'))
+    if trove_fields['id'].nil?
+      puts trove_fields.to_json
+    else
+      ids << trove_fields['id']
+    end
+    count += 1
+    break if count >= limit
+  }
+  ids.uniq.length
 end
 
 if __FILE__ == $PROGRAM_NAME
