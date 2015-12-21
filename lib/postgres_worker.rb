@@ -75,7 +75,7 @@ class PostgresWorker < Worker
     @batch_mutex.synchronize {
       
 
-      item_imports = Item.import @item_headers, @item_batch, valideate: false
+      item_imports = Item.import @item_headers, @item_batch, validate: false
       item_ids = item_imports.ids
 
       documents = []
@@ -86,7 +86,7 @@ class PostgresWorker < Worker
         }
       }
 
-      Document.import @documents_headers, documents, valideate: false
+      Document.import @documents_headers, documents, validate: false
       @item_batch.clear
       @documents_batch.clear
     }
@@ -119,15 +119,10 @@ class PostgresWorker < Worker
 
     @item_batch << pg_statement[:item].values
     @documents_batch << [pg_statement[:documents].first.values]
-
-    # require 'pry'
-    # binding.pry 
-
     if (@item_batch.size >= @batch_options[:size])
       commit_batch
     end
 
-    commit_batch
   end
 
   def create_item(pg_statement)
