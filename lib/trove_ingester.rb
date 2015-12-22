@@ -28,11 +28,6 @@ class TroveIngester
     queue
   end
 
-  def self.get_rdf_file_paths(dir)
-    Dir[File.join(dir, '**', '*')].keep_if { |path|
-      (File.file? path) && (File.extname(path) == '.rdf')
-    }
-  end
 
   def process_chunk(trove_chunk)
     limit = 10000
@@ -102,8 +97,5 @@ class TroveIngester
     ]})
   end
 
-  #"trove:category": "#{trove_fields['category']}",
-  #"trove:firstPageId": "#{trove_fields['firstPageId']}",
-  #"trove:firstPageSeq": "#{trove_fields['firstPageSeq']}",
 
 end

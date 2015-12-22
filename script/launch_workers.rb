@@ -13,32 +13,38 @@ def main(options)
   worker_classes = options.worker_classes
   config = options.config
   workers = []
+  pids = []
   begin
     p 'Starting workers...'
+    if options.daemonize
+      Process.daemon(nochdir=true)
+    end
     worker_classes.each { |worker_class|
       processes.times {
-        fork {
+        pids << fork {
           config_key = worker_class.name.underscore.to_sym
           Process.setproctitle(worker_class.name)
           worker = worker_class.new(config[config_key])
-          Signal.trap('INT') {
-            worker.stop
-            worker.close
-          }
+          running = true
           worker.connect
           worker.start
           workers << worker
-          loop {
-            sleep 1
+          Signal.trap('TERM') {
+           running = false
           }
+          while running do
+            sleep 1
+          end
+          worker.stop
+          worker.close
         }
       }
     }
-  p Process.waitall
+  Process.waitall
   rescue SignalException
     p 'Stopping workers...'
-    workers.each { |worker|
-      Process.kill('INT', Worker)
+    pids.each { |pid|
+      Process.kill('TERM', pid)
     }
   end
 end
@@ -55,6 +61,7 @@ end
 
 def parse_options(args)
   parsed_options = OpenStruct.new
+  parsed_options.daemonize = false
   parsed_options.processes = 1
   parsed_options.worker_classes = [UploadWorker, SolrWorker, SesameWorker, PostgresWorker]
   parsed_options.config = YAML.load_file("#{File.dirname(__FILE__)}/../spec/files/config.yml")
@@ -72,6 +79,9 @@ def parse_options(args)
         worker_classes << Module.const_get("#{worker.capitalize}Worker")
       }
       parsed_options.worker_classes = worker_classes
+    end
+    options.on('-d', '--daemon', 'Run as background daemon') do
+      parsed_options.daemonize = true
     end
     options.on('-h', '--help', 'Show this help message') do
       puts option_parser  
