@@ -2,7 +2,6 @@ $LOAD_PATH.unshift("#{File.dirname(__FILE__)}/../lib")
 
 require 'ingester'
 require 'yaml'
-# require 'process'
 
 def main(directory)
   collection = File.basename(directory)
@@ -14,8 +13,6 @@ def main(directory)
     jobs.first.concat(jobs.last)
     jobs.delete(jobs.last)
   end
-  # require 'pry'
-  # binding.pry
   jobs.each { |job|
     fork {
       config = YAML.load_file("#{File.dirname(__FILE__)}/../spec/files/config.yml")

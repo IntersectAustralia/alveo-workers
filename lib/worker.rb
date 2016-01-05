@@ -48,9 +48,9 @@ class Worker
     end
   end
 
-  # TODO
-  # - add explicit acknowledgements
-  # - add 'prefect' (batch) setting
+  # TODO: Investigate:
+  # - explicit acknowledgements
+  # - 'prefetch' (batch) setting
   def on_message(headers, payload)
     begin
       message = JSON.parse(payload)

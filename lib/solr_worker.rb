@@ -6,8 +6,6 @@ class SolrWorker < Worker
 
   # TODO:
   #   - MonkeyPatch persistent HTTP connections
-  #   - Implement commit strategy
-  #   - Implement batching
 
   include NewSolrHelper
 
@@ -16,7 +14,6 @@ class SolrWorker < Worker
     super(rabbitmq_options)
     solr_client_class = Module.const_get(options[:client_class])
     @solr_client = solr_client_class.connect(url: options[:url])
-
     @batch_options = options[:batch].freeze
     if @batch_options[:enabled]
       @batch = []

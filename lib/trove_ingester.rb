@@ -30,7 +30,7 @@ class TroveIngester
 
 
   def process_chunk(trove_chunk)
-    limit = 10000
+    limit = 150000000
     count = 0
     # File.open(trove_chunk, 'r:ascii-8bit').each { |trove_record|
     File.open(trove_chunk, 'r:iso-8859-1').each { |trove_record|

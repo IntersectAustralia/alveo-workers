@@ -2,20 +2,6 @@ require 'rack'
 
 module NewPostgresHelper
 
-  # @@MIME_TYPE = Hash.new('application/octet-stream').merge({
-  #   '.txt' => 'text/plain',
-  #   '.xml' => 'text/xml',
-  #   '.jpg' => 'image/jpeg',
-  #   '.tif' => 'image/tif',
-  #   '.mp3' => 'audio/mpeg',
-  #   '.wav' => 'audio/wav',
-  #   '.avi' => 'video/x-msvideo',
-  #   '.mov' => 'video/quicktime',
-  #   '.mp4' => 'video/mp4',
-  #   '.doc' => 'application/msword',
-  #   '.pdf' => 'application/pdf'
-  # }).freeze
-
   def create_pg_statement(item_json_ld)
     item = extract_item_info(item_json_ld)
     documents = extract_documents_info(item_json_ld)

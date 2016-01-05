@@ -1,7 +1,5 @@
 require_relative 'worker'
 require_relative 'metadata_helper'
-# require_relative 'solr_helper'
-# require_relative 'postgres_helper'
 
 class UploadWorker < Worker
 
@@ -30,9 +28,6 @@ class UploadWorker < Worker
   end
 
   def create_item(item)
-    # generate catalogue url
-    # extract full text if its not there already
-    # generate handle?
     item['generated'] = generate_fields(item)
     message = item.to_json
     headers = {action: 'create'}

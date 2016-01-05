@@ -4,7 +4,6 @@ require 'activerecord-import'
 require_relative 'worker'
 require_relative 'models/item'
 require_relative 'models/document'
-# require_relative 'models/collection'
 require_relative 'new_postgres_helper'
 
 class PostgresWorker < Worker
@@ -18,13 +17,10 @@ class PostgresWorker < Worker
     @batch_options = options[:batch].freeze
     if @batch_options[:enabled]
       @batch = []
-
       @item_headers = [:uri, :handle, :collection_id, :primary_text_path, :json_metadata, :indexed_at]
       @item_batch = []
-
       @documents_headers = [:file_name, :file_path, :doc_type, :mime_type, :item_id]
       @documents_batch = []
-
       @batch_mutex = Mutex.new
     end
   end
@@ -64,20 +60,10 @@ class PostgresWorker < Worker
     ActiveRecord::Base.connection.close
   end
 
-  # def commit_batch
-  #   @batch_mutex.synchronize {
-  #     Item.import(@batch)
-  #     @batch.clear
-  #   }
-  # end
-
   def commit_batch
     @batch_mutex.synchronize {
-      
-
       item_imports = Item.import @item_headers, @item_batch, validate: false
       item_ids = item_imports.ids
-
       documents = []
       item_ids.each_with_index { |id, i|
         @documents_batch[i].each { |document|
@@ -85,7 +71,6 @@ class PostgresWorker < Worker
           documents << document
         }
       }
-
       Document.import @documents_headers, documents, validate: false
       @item_batch.clear
       @documents_batch.clear

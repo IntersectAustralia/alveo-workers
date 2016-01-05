@@ -1,6 +1,3 @@
-# require 'open-uri'
-# require 'rdf/turtle'
-# require 'json/ld'
 require 'active_record'
 require 'models/item'
 require 'models/document'
