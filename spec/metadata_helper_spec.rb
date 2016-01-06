@@ -5,72 +5,117 @@ describe MetadataHelper do
   let(:metadata_helper) { Class.new.include(MetadataHelper).new }
 
 
-  describe '#expand_json_ld' do
+  describe '#get_handle' do
 
-    it 'expands shortened JSON-LD from a file URL' do
-      url = URI.join('file://', File.expand_path('./spec/files/json-ld_short_example.json'))
-      example = url.to_s
-      expected = [{'@id' => 'http://ns.ausnc.org.au/corpora/ace/items/E29a',
-                   '@type' => ['http://ns.ausnc.org.au/schemas/ausnc_md_model/AusNCObject']}]
-      actual = metadata_helper.expand_json_ld(example)
+    it 'Generates a handle from the collection and identifier metadata' do
+      example = {'alveo:metadata' => {'dc:isPartOf' => 'collection',
+                'dc:identifier' => 'identifier'}}
+      expected = 'collection:identifier'
+      actual = metadata_helper.get_handle(example)
+      expect(actual).to eq(expected)
+    end
+    
+
+  end
+
+
+  describe '#get_types' do
+
+    it 'returns the documents types in the dc:type field' do
+      example = {'ausnc:document' => [{'dc:type' => 'Text'}, {'dc:type' => 'Audio'}]}
+      expected = ['Text', 'Audio']
+      actual = metadata_helper.get_types(example)
+      expect(actual).to eq(expected)
+    end
+
+    it 'returns the "unspecified" types if the dc:type field is not present' do
+      example = {'ausnc:document' => [{}]}
+      expected = ['unspecified']
+      actual = metadata_helper.get_types(example)
       expect(actual).to eq(expected)
     end
 
   end
 
-  describe '#adapt_alveo_format_json' do
 
-    it 'adapts the alveo JSON-LD to a format that the json-ld library can understand' do
-      example = JSON.parse(File.read("#{File.dirname(__FILE__)}/files/json-ld_unadapted_example.json"))
-      expected = JSON.parse(File.read("#{File.dirname(__FILE__)}/files/json-ld_adapted_example.json"))
-      actual = metadata_helper.adapt_alveo_format_json(example)
+  describe '#get_date_group' do
+
+    it 'returns a default range of 10' do
+      example = {'alveo:metadata' => {'dc:created' => '1994'}}
+      test_get_date_group(example, '1990 - 1999')
+    end
+
+    it 'returns an arbitrary range' do
+      example = {'alveo:metadata' => {'dc:created' => '1994'}}
+      test_get_date_group(example, '1988 - 1994', 7)
+    end
+
+    it 'returns "Unknown" for bad input' do
+      example = {'alveo:metadata' => {'dc:created' => 'wutang clan'}}
+      test_get_date_group(example, 'Unknown')
+    end
+    
+    it 'returns "Unknown" for nil' do
+      example = {'alveo:metadata' => {'dc:created' => nil}}
+      test_get_date_group(example, 'Unknown')
+    end
+
+    def test_get_date_group(example, expected, resolution=10)
+      actual = metadata_helper.get_date_group(example, resolution)
       expect(actual).to eq(expected)
     end
 
   end
 
-  describe '#load_json_from_file_uri' do
 
-    it 'loads JSON-LD given a file URL' do
-      url = URI.join('file://', File.expand_path('./spec/files/json-ld_expanded_short_example.json'))
-      example = url.to_s
-      expected = {'@id' => 'http://ns.ausnc.org.au/corpora/ace/items/E29a',
-      '@type' => ['http://ns.ausnc.org.au/schemas/ausnc_md_model/AusNCObject']}
-      actual = metadata_helper.load_json_from_file_url(example)
+  describe '#extract_year' do
+
+    it 'parses "YYYY?"' do
+      test_extract_year('1913?', 1913)
+    end
+
+    it 'parses "DD/MM/YY"' do
+      test_extract_year('30/10/93', 1993)
+    end
+
+    it 'parses "YY/MM/DD"' do
+      test_extract_year('96/05/17', 1996)
+    end
+
+    it 'parses "DD-DD/MM/YY"' do
+      test_extract_year('7-11/11/94', 1994)
+    end
+
+    it 'parses "DD&DD/MM/YY"' do
+      test_extract_year('17&19/8/93', 1993)
+    end
+
+    it 'parses "YYYY-MM-DD"' do
+      test_extract_year('2012-03-07', 2012)
+    end
+
+    it 'parses "Month YYYY"' do
+      test_extract_year('August 2000', 2000)
+    end
+
+    it 'parses "DD Month YYYY"' do
+      test_extract_year('6 September 1986', 1986)
+    end
+
+    it 'parses "DD Season YYYY"' do
+      test_extract_year('4 Spring 1986', 1986)
+    end
+
+    it 'throws an exception when parsing "Phase N season"' do
+      example = 'Phase I fall'
+      expect {
+        metadata_helper.extract_year(example)
+      }.to raise_error(ArgumentError)
+    end
+
+    def test_extract_year(example, expected)
+      actual = metadata_helper.extract_year(example)
       expect(actual).to eq(expected)
-    end
-
-    it 'raises an error if the file does not exist' do
-      expect{
-        metadata_helper.load_json_from_file_url('file:///noexistant.file')
-      }.to raise_error(StandardError)
-    end
-
-    it 'raises an error if the input is not valid JSON' do
-      expect{
-        url = URI.join('file://', File.expand_path('./files/json-ld_invalid_example.json'))
-        example = url.to_s
-        metadata_helper.load_json_from_file_url(example)
-      }.to raise_error(StandardError)
-    end
-
-  end
-
-  describe '#get_file_path_from_uri' do
-
-    it 'returns the path from a URL' do
-      example = 'file:///cat/mouse'
-      expected  = '/cat/mouse'
-      actual = metadata_helper.get_file_path_from_url(example)
-      expect(actual).to eq(expected)
-    end
-
-    it 'raises and error if the scheme is not "file"' do
-      example = 'http://example.org/cat/mouse'
-      expect{
-        metadata_helper.get_file_path_from_url(example)
-      }.to raise_error(StandardError).with_message('Metadata must be in a file URI')
-
     end
 
   end
