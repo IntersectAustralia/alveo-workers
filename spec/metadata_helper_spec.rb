@@ -29,7 +29,6 @@ describe MetadataHelper do
       actual = metadata_helper.get_handle(example)
       expect(actual).to eq(expected)
     end
-    
 
   end
 
