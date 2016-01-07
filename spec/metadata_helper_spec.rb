@@ -5,6 +5,21 @@ describe MetadataHelper do
   let(:metadata_helper) { Class.new.include(MetadataHelper).new }
 
 
+  describe '#get_collection' do
+
+    it 'retrieves the collection id and owner email if not cached' do
+      pending('Implement me')
+      fail
+    end
+
+    it 'returns the cached version if previous retrieved' do
+      pending('Implement me')
+      fail
+    end
+
+  end
+
+
   describe '#get_handle' do
 
     it 'Generates a handle from the collection and identifier metadata' do
