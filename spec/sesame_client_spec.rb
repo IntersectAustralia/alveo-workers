@@ -43,12 +43,12 @@ describe SesameClient do
 
   describe '#respositories' do
 
-    it 'returns a list of repositories in Sesame' do
+    it 'returns a list of repositories in Sesame (excluding SYSTEM)' do
       response = {'results' => {'bindings' => [{'id' => {'value' => 'SYSTEM'}},
                                                {'id' => {'value' => 'existing'}}]}}
       allow(@sesame_client).to receive(:request)
       allow(@sesame_client).to receive(:parse_json_response).and_return(response)
-      expected = ['SYSTEM', 'existing']
+      expected = ['existing']
       actual = @sesame_client.repositories
       expect(actual).to eq(expected)
     end
