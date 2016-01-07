@@ -4,11 +4,11 @@ require 'activerecord-import'
 require_relative 'worker'
 require_relative 'models/item'
 require_relative 'models/document'
-require_relative 'new_postgres_helper'
+require_relative 'postgres_helper'
 
 class PostgresWorker < Worker
 
-  include NewPostgresHelper
+  include PostgresHelper
 
   def initialize(options)
     rabbitmq_options = options[:rabbitmq]

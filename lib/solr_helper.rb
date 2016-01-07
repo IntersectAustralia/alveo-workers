@@ -1,4 +1,4 @@
-module NewSolrHelper
+module SolrHelper
 
   def create_solr_document(item_json_ld)
     item_metadata = item_json_ld['alveo:metadata']

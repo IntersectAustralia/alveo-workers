@@ -1,6 +1,6 @@
 require 'rack'
 
-module NewPostgresHelper
+module PostgresHelper
 
   def create_pg_statement(item_json_ld)
     item = extract_item_info(item_json_ld)
@@ -40,7 +40,7 @@ module NewPostgresHelper
     document[:file_name] = document_json_ld['dc:identifier']
     document[:file_path] = document_json_ld['dc:source']
     document[:doc_type] = document_json_ld['dc:type']
-    document[:mime_type] = Rack::Mime.mime_type(document_json_ld['dc:identifier'])
+    document[:mime_type] = Rack::Mime.mime_type(File.extname(document[:file_name]))
     document
   end
 

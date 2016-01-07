@@ -1,13 +1,13 @@
 require 'rsolr'
 require_relative 'worker'
-require_relative 'new_solr_helper'
+require_relative 'solr_helper'
 
 class SolrWorker < Worker
 
   # TODO:
   #   - MonkeyPatch persistent HTTP connections
 
-  include NewSolrHelper
+  include SolrHelper
 
   def initialize(options)
     rabbitmq_options = options[:rabbitmq]
