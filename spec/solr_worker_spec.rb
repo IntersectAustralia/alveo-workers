@@ -17,18 +17,18 @@ describe SolrWorker do
     @exchange = @solr_worker.instance_variable_get(:@exchange)
   end
 
-  describe '#process_message' do
+  # describe '#process_message' do
 
-    it 'invokes #index_item when the action is "index"' do
-      message = '{"document": {"field": "value"}}'
-      expected_params = {'field' => 'value'}
-      expect(@solr_worker).to receive(:add_documents).with(expected_params)
-      # TODO make routing_key reference options hash
-      @exchange.publish(message, routing_key: 'solr')
-      @solr_worker.start
-    end
+  #   it 'invokes #index_item when the action is "index"' do
+  #     message = '{"document": {"field": "value"}}'
+  #     expected_params = {'field' => 'value'}
+  #     expect(@solr_worker).to receive(:add_documents).with(expected_params)
+  #     # TODO make routing_key reference options hash
+  #     @exchange.publish(message, routing_key: 'solr')
+  #     @solr_worker.start
+  #   end
 
-  end
+  # end
 
   describe '#add_document' do
 

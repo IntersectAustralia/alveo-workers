@@ -42,8 +42,16 @@ describe MetadataHelper do
     end
 
     it 'returns the cached version if previous retrieved' do
-      pending('Implement me')
-      fail
+      collection = {id: 3, owner: 'data_owner@intersect.org.au'}
+      MetadataHelper.class_variable_set(:@@COLLECTIONS, {'collection' => collection})
+      example = {
+        'alveo:metadata' => {
+          'dc:isPartOf' => 'collection',
+        }
+      }
+      expected = collection
+      actual = metadata_helper.get_collection(example)
+      expect(actual).to eq(expected)
     end
 
   end
