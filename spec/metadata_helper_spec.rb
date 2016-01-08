@@ -5,6 +5,35 @@ describe MetadataHelper do
   let(:metadata_helper) { Class.new.include(MetadataHelper).new }
 
 
+  describe '#generate_fields' do
+
+    it 'generates additional fields used by other workers' do
+      example = {
+        'alveo:metadata' => {
+          'dc:created' => '1994',
+          'dc:isPartOf' => 'collection',
+          'dc:identifier' => 'identifier',
+        },
+        'ausnc:document' => [
+          {'dc:type' => 'Text'},
+          {'dc:type' => 'Audio'}
+        ]
+      }
+      allow(metadata_helper).to receive(:get_collection).and_return({owner: 'data_owner@intersect.org.au', id: 3})
+      expected = {
+        'date_group' => '1990 - 1999',
+        'types' => ['Text', 'Audio'],
+        'owner' => 'data_owner@intersect.org.au',
+        'collection_id' => 3,
+        'handle' => 'collection:identifier'
+      } 
+      actual = metadata_helper.generate_fields(example)
+      expect(actual).to eq(expected)
+    end
+
+  end
+
+
   describe '#get_collection' do
 
     it 'retrieves the collection id and owner email if not cached' do

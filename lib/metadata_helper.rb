@@ -10,6 +10,17 @@ module MetadataHelper
 
   # TODO: be consistent in referring to 'item' or 'item_metadata'
 
+  def generate_fields(item)
+    generated = {}
+    generated['date_group'] = get_date_group(item)
+    generated['types'] = get_types(item)
+    collection = get_collection(item)
+    generated['owner'] = collection[:owner]
+    generated['collection_id'] = collection[:id]
+    generated['handle'] = get_handle(item)
+    generated
+  end
+
   def get_collection(item)
     name = item['alveo:metadata']['dc:isPartOf']
     if @@COLLECTIONS.has_key? name
