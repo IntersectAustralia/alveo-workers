@@ -79,3 +79,20 @@
   :upload_queue: upload
   :sesame_queue: sesame
 
+:trove_ingester:
+  <<: *rabbitmq_common
+  :error_log: trove_ingester_errors.log
+  :user: ingester
+  :pass: ingester
+  :upload_queue: upload
+  :processes: 4
+
+:worker_launcher:
+  :upload_worker:
+    :processes: 4
+  :solr_worker:
+    :processes: 1
+  :sesame_worker:
+    :processes: 1
+  :postgres_worker:
+    :processes: 1

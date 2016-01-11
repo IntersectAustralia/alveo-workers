@@ -28,11 +28,17 @@ class TroveIngester
     queue
   end
 
+  def set_work(work)
+    @work = work
+  end
+
+  def process()
+    @work.each { |trove_chunk|
+      process_chunk(trove_chunk)
+    }
+  end
 
   def process_chunk(trove_chunk)
-    limit = 150000000
-    count = 0
-    # File.open(trove_chunk, 'r:ascii-8bit').each { |trove_record|
     File.open(trove_chunk, 'r:iso-8859-1').each { |trove_record|
       begin
         trove_fields = JSON.parse(trove_record.encode('utf-8'))
