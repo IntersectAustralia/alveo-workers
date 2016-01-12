@@ -5,7 +5,7 @@ require 'yaml'
 
 def main(directory)
   config = YAML.load_file("#{File.dirname(__FILE__)}/../spec/files/config.yml")
-  work = Dir[File.join(directory, '*.dat']
+  work = Dir[File.join(directory, '*.dat')]
   processes = config[:trove_ingester][:processes]
   job_size = work.size / processes
   jobs = work.each_slice(job_size).to_a
