@@ -16,6 +16,7 @@ require_relative '../lib/metadata_helper'
 require_relative '../lib/postgres_helper'
 
 require_relative '../lib/ingester'
+require_relative '../lib/trove_ingester'
 
 require_relative '../lib/worker'
 require_relative '../lib/solr_worker'

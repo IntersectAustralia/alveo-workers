@@ -45,8 +45,8 @@ class TroveIngester
         message = map_to_json_ld(trove_fields)
         properties = {routing_key: @upload_queue.name, headers: {action: 'create'}}
         @exchange.publish(message, properties)
-        count += 1
-        break if count >= limit
+        # count += 1
+        # break if count >= limit
       rescue Exception => e
         # TODO: Error queue instead of log file
         @error_logger.error "#{e.class}: #{e.to_s}\ninput: #{trove_record}"

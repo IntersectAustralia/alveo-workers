@@ -85,7 +85,7 @@
   :user: ingester
   :pass: ingester
   :upload_queue: upload
-  :processes: 4
+  :processes: 1
 
 :worker_launcher:
   :upload_worker:
