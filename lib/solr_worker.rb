@@ -64,8 +64,10 @@ class SolrWorker < Worker
 
   def commit_batch
     @batch_mutex.synchronize {
-      add_documents(@batch)
-      @batch.clear
+      if !@batch.empty?
+        add_documents(@batch)
+        @batch.clear
+      end
     }
   end
 
