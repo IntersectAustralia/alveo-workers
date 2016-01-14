@@ -71,7 +71,7 @@ class SesameWorker < Worker
     @batch_mutex.synchronize {
       if !@batch.empty?
         # n3_string = RDF::NTriples::Writer.dump(@batch, nil, :encoding => Encoding::ASCII)
-        @sesame_client.batch_insert_statements(@collection, n3_string)
+        @sesame_client.batch_insert_statements(@collection, @batch)
         @batch.clear!
       end
     }
