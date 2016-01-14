@@ -72,7 +72,7 @@ class SesameWorker < Worker
       if !@batch.empty?
         # n3_string = RDF::NTriples::Writer.dump(@batch, nil, :encoding => Encoding::ASCII)
         @sesame_client.batch_insert_statements(@collection, @batch)
-        @batch.clear!
+        @batch = ''
       end
     }
   end
