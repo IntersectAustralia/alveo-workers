@@ -25,8 +25,8 @@
     :pass: sesame
   :batch:
     :enabled: true
-    :size: 10000
-    :timeout: 15
+    :size: 10000000
+    :timeout: 180
 
 :solr_worker:
   :url: http://alveo-qa-solr.intersect.org.au:8080/solr/hcsvlab
@@ -40,7 +40,7 @@
   :batch:
     :enabled: true
     :size: 5000
-    :timeout: 15
+    :timeout: 180
 
 :upload_worker:
   :rabbitmq:
@@ -68,8 +68,8 @@
     :host: alveo-qa-pg.intersect.org.au
   :batch:
     :enabled: true
-    :size: 500
-    :timeout: 15
+    :size: 5000
+    :timeout: 180
 
 :ingester:
   <<: *rabbitmq_common
@@ -89,10 +89,10 @@
 
 :worker_launcher:
   :upload_worker:
-    :processes: 4
+    :processes: 2
   :solr_worker:
-    :processes: 1
+    :processes: 2
   :sesame_worker:
-    :processes: 1
+    :processes: 2
   :postgres_worker:
-    :processes: 1
+    :processes: 2
