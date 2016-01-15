@@ -25,7 +25,7 @@
     :pass: sesame
   :batch:
     :enabled: true
-    :size: 500000000
+    :size: 50000000
     :timeout: 300
 
 :solr_worker:
@@ -39,7 +39,7 @@
     :pass: solr
   :batch:
     :enabled: true
-    :size: 500000
+    :size: 10000
     :timeout: 300
 
 :upload_worker:
@@ -68,7 +68,7 @@
     :host: alveo-qa-pg.intersect.org.au
   :batch:
     :enabled: true
-    :size: 50000
+    :size: 5000
     :timeout: 300
 
 :ingester:
