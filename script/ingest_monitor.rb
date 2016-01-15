@@ -29,7 +29,7 @@ def main(config)
         prev_pg_count = pg_count
         prev_solr_count = solr_count
         prev_sesame_count = sesame_count
-        sleep 6
+        sleep 60
       end
       close
     }
