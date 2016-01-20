@@ -20,15 +20,10 @@ def main(config)
         pg_count = get_pg_count
         solr_count = get_solr_count
         sesame_count = get_sesame_count
-        pg_diff = prev_pg_count - pg_count
-        solr_diff = prev_solr_count - solr_count
-        sesame_diff = prev_sesame_count - sesame_count
+        time = Time.now
         File.open('ingest_count.log', 'a') { |f|
-          f.write "#{pg_count}\t#{solr_count}\t#{sesame_count}\t#{pg_diff}\t#{solr_diff}\t#{sesame_diff}\n"
+          f.write "#{time}\t#{pg_count}\t#{solr_count}\t#{sesame_count}\n"
         }
-        prev_pg_count = pg_count
-        prev_solr_count = solr_count
-        prev_sesame_count = sesame_count
         sleep 60
       end
       close
