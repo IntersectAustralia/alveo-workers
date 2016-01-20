@@ -1,5 +1,6 @@
 $LOAD_PATH.unshift("#{File.dirname(__FILE__)}/../lib")
 
+require 'yaml'
 require 'sesame_client'
 
 def main(rdf_file)
