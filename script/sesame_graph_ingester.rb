@@ -14,7 +14,7 @@ def main(config, rdf_file)
     count += 1
     if count >= batch_size
       uri = sesame_client.get_statements_uri('trove')
-      request(uri, :post, {'Content-Type' => 'text/rdf+n3', batch)
+      request(uri, :post, {'Content-Type' => 'text/rdf+n3'}, batch)
       batch = ''
       count = 0
     end
