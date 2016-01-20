@@ -2,13 +2,13 @@ $LOAD_PATH.unshift("#{File.dirname(__FILE__)}/../lib")
 
 require 'sesame_client'
 
-def main(config, rdf_file)
+def main(rdf_file)
   config = YAML.load_file("#{File.dirname(__FILE__)}/../spec/files/config.yml")
   sesame_client = SesameClient.new(config[:sesame_worker])
   batch_size = 250000
   count = 0
   batch = ''
-  File.foreach('rdf_file') { |line|
+  File.foreach(rdf_file) { |line|
     batch << line
     batch << "\n"
     count += 1
