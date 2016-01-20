@@ -121,3 +121,5 @@ Temporary Items
 
 ingester_errors.log
 spec/files/*.dat
+*.dat
+*.rdf
