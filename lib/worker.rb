@@ -45,7 +45,7 @@ class Worker
     # @consumer = @work_queue.subscribe do |delivery_info, metadata, payload|
     @consumer = @work_queue.subscribe(manual_ack: true) do |delivery_info, metadata, payload|
       on_message(metadata.headers, payload)
-      @channel.ack(delivery_info.deliver_tag)
+      @channel.ack(delivery_info.delivery_tag)
       @processed += 1
     end
   end

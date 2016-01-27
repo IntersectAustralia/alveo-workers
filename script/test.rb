@@ -33,8 +33,15 @@ def main(config)
   # graph = sesame_helper.create_rdf_graph(jld['items'].first)
   # n3_string = RDF::NTriples::Writer.dump(graph, nil, :encoding => Encoding::ASCII)
 
-  trove_chunk = "/Users/ilya/workspace/corpora/trove/data-1.dat"
+  # trove_chunk = "/Users/ilya/workspace/corpora/trove/data-1.dat"
 
+  options = {host: 'alveo-qa-mq.intersect.org.au', vhost: '/alveo', exchange: 'alveo.workers', user: 'sesame', pass: 'sesame'}
+  conn = Bunny.new(options)
+  conn.start
+  ch = conn.create_channel
+  x = ch.direct('alveo.workers')
+  q = ch.queue('sesame')
+  q.bind(x, routing_key: 'sesame')
   require 'pry'
   binding.pry
 
