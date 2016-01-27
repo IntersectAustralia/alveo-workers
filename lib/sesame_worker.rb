@@ -16,8 +16,8 @@ class SesameWorker < Worker
     @sesame_client = sesame_client_class.new(options)
     @batch_options = options[:batch].freeze
     if @batch_options[:enabled]
-      # @batch = RDF::Repository.new
-      @batch = ''
+      # @batch = ''
+      @batch = RDF::Repository.new
       @batch_mutex = Mutex.new
     end
   end
@@ -70,9 +70,11 @@ class SesameWorker < Worker
   def commit_batch
     @batch_mutex.synchronize {
       if !@batch.empty?
-        # n3_string = RDF::NTriples::Writer.dump(@batch, nil, :encoding => Encoding::ASCII)
-        @sesame_client.batch_insert_statements(@collection, @batch)
-        @batch = ''
+        # @sesame_client.batch_insert_statements(@collection, @batch)
+        # @batch = ''
+        n3_string = RDF::NTriples::Writer.dump(@batch, nil, :encoding => Encoding::ASCII)
+        @sesame_client.batch_insert_statements(@collection, n3_string)
+        @batch.clear!
       end
     }
   end
@@ -88,10 +90,13 @@ class SesameWorker < Worker
     # into the wrong collection. It may be better to maintain a hash
     # of batches keyed on collections, e.g. {'collection' => []}
     @collection = collection
+    # @batch_mutex.synchronize {
+    #   n3_string = RDF::NTriples::Writer.dump(rdf_graph, nil, :encoding => Encoding::ASCII)
+    #   @batch << n3_string
+    #   @batch << "\n"
+    # }
     @batch_mutex.synchronize {
-      n3_string = RDF::NTriples::Writer.dump(rdf_graph, nil, :encoding => Encoding::ASCII)
-      @batch << n3_string
-      @batch << "\n"
+      @batch << rdf_graph
     }
     # if (@batch.size >= @batch_options[:size])
     if (@batch.bytesize >= @batch_options[:size])

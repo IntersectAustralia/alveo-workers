@@ -11,7 +11,8 @@
   :exchange: 'alveo.workers'
 
 :sesame_worker:
-  :base_url: http://alveo-qa-sesame.intersect.org.au:8080/openrdf-sesame/
+  :base_url: http://43.240.99.103/openrdf-sesame/
+  # :base_url: http://alveo-qa-sesame.intersect.org.au:8080/openrdf-sesame/
   # :base_url: http://127.0.0.1:8080/openrdf-sesame/
   :client_class: SesameClient
   :work_queue: sesame
@@ -25,7 +26,7 @@
     :pass: sesame
   :batch:
     :enabled: true
-    :size: 50000000
+    :size: 5000
     :timeout: 300
 
 :solr_worker:
