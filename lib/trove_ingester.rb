@@ -1,5 +1,5 @@
-#encoding: utf-8
 require 'bunny'
+require 'json'
 
 class TroveIngester
 
