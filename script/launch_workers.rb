@@ -9,7 +9,6 @@ require 'sesame_worker'
 require 'postgres_worker'
 
 def main(options)
-  # processes = options.processes
   worker_classes = options.worker_classes
   config = options.config
   workers = []
@@ -23,7 +22,6 @@ def main(options)
       config_key = worker_class.name.underscore.to_sym
       config[:worker_launcher][config_key][:processes].times {
         pids << fork {
-          # config_key = worker_class.name.underscore.to_sym
           Process.setproctitle(worker_class.name)
           worker = worker_class.new(config[config_key])
           running = true
@@ -71,9 +69,6 @@ def parse_options(args)
     options.banner = "Usage: launch_workers.rb [options]"
     options.separator ""
     options.separator "Specific options:"
-    # options.on('-p', '--processes [INT]', Integer, 'Number of processes per worker (default=1)') do |processes|
-    #   parsed_options.processes = processes
-    # end
     options.on('-w', '--workers (upload|solr|sesame|postgres)+', 'Comma separated list of workers to launch (default=all)') do |workers|
       worker_classes = []
       workers.split(',').each { |worker|

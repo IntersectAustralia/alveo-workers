@@ -18,8 +18,6 @@ def process_chunk(trove_chunk, config)
   outfile = File.open('n3_chunk3.dat', 'a')
   File.open(trove_chunk, 'r:iso-8859-1').each { |trove_record|
     begin
-      # require 'pry'
-      # binding.pry
       trove_fields = JSON.parse(trove_record.encode('utf-8'))
       trove_message = ingester.map_to_json_ld(trove_fields)
       trove_item = JSON.parse(trove_message)['items'].first

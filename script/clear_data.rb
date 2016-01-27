@@ -17,7 +17,6 @@ def main
   ActiveRecord::Base.establish_connection(config[:postgres_worker][:activerecord])
   Item.delete_all
   Document.delete_all
-  #Collection.delete_all
   sesame = SesameClient.new(config[:sesame_worker])
   repositories = sesame.repositories
   repositories.each { |repository|
