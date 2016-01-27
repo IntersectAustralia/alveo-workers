@@ -98,8 +98,8 @@ class SesameWorker < Worker
     @batch_mutex.synchronize {
       @batch << rdf_graph
     }
-    # if (@batch.size >= @batch_options[:size])
-    if (@batch.bytesize >= @batch_options[:size])
+    # if (@batch.bytesize >= @batch_options[:size])
+    if (@batch.size >= @batch_options[:size])
       commit_batch
     end
   end
