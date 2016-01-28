@@ -21,6 +21,7 @@ class Worker
   def connect
     @bunny_client.start
     @channel = @bunny_client.create_channel
+    @channel.prefetch(@options[:prefetch])
     @exchange = @channel.direct(@options[:exchange])
     @work_queue = add_queue(@options[:work_queue])
     @error_queue = add_queue(@options[:error_queue])

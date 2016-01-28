@@ -9,6 +9,7 @@
   :host: alveo-qa-mq.intersect.org.au
   :vhost: /alveo
   :exchange: 'alveo.workers'
+  :prefetch: 1000
 
 :sesame_worker:
   :base_url: http://43.240.99.103/openrdf-sesame/
