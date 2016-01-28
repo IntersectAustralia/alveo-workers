@@ -26,8 +26,8 @@ if __FILE__ == $PROGRAM_NAME
   config = YAML.load_file("#{File.dirname(__FILE__)}/../spec/files/config.yml")
   if ARGV.count == 2
     main(config, ARGV[0], ARGV[1])
-  else
-    process_file
+  elsif ARGV.count == 1
+    process_file(config, ARGV[0])
   end  
 end
 
