@@ -4,20 +4,30 @@ require 'yaml'
 require 'json'
 require 'trove_ingester'
 
-def main(config, start, stop)
-  Process.setproctitle('Trove Ingester')
-  Process.daemon(nochdir=true)
+def main(config, start=0, stop=0)
   ingester = TroveIngester.new(config[:ingester])
   ingester.connect
   (start..stop).each{ |n|
     ingester.process_chunk("/data/production_collections/trove/data-#{n}.dat")
-    sleep(60*60*3)
   }
+  ingester.close
+end
+
+def process_file(config, file)
+  ingester = TroveIngester.new(config[:ingester])
+  ingester.connect
+  ingester.process_chunk(file)
+  ingester.close
 end
 
 if __FILE__ == $PROGRAM_NAME
-  # TODO: use an argument parser
+  Process.setproctitle('Trove Ingester')
+  Process.daemon(nochdir=true)
   config = YAML.load_file("#{File.dirname(__FILE__)}/../spec/files/config.yml")
-  main(config, ARGV[0], ARGV[1])
+  if ARGV.count == 2
+    main(config, ARGV[0], ARGV[1])
+  else
+    process_file
+  end  
 end
 

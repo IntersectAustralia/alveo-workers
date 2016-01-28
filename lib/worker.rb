@@ -1,6 +1,8 @@
 require 'bunny'
 require 'json'
 
+require 'ruby-prof'
+
 class Worker
 
   attr_reader :processed
@@ -33,12 +35,19 @@ class Worker
   end
 
   def start
+    RubyProf.start
     @processed = 0
     subscribe
   end
 
   def stop
     @consumer.cancel
+    result = RubyProf.stop
+    time = Time.localtime
+    prof_file = File.open("pro_#{time}.html")
+    printer = RubyProf::CallStackPrinter.new(result)
+    printer.print(prof_file)
+    prof_file.close
   end
 
   def subscribe

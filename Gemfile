@@ -22,4 +22,5 @@ end
 
 group :development do
   gem 'rubocop'
+  gem 'ruby-prof'
 end
