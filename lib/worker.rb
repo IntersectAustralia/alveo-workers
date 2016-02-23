@@ -35,24 +35,27 @@ class Worker
   end
 
   def start
-    RubyProf.start
+    if @options[:profile]
+      RubyProf.start
+    end
     @processed = 0
     subscribe
   end
 
   def stop
     @consumer.cancel
-    result = RubyProf.stop
-    time = Time.localtime
-    prof_file = File.open("pro_#{time}.html")
-    printer = RubyProf::CallStackPrinter.new(result)
-    printer.print(prof_file)
-    prof_file.close
+    if @options[:profile]
+      result = RubyProf.stop
+      time = Time.localtime
+      prof_file = File.open("pro_#{time}.html")
+      printer = RubyProf::CallStackPrinter.new(result)
+      printer.print(prof_file)
+      prof_file.close
+    end
   end
 
   def subscribe
     # TODO: rename work_queue to consumer_queue
-    # @consumer = @work_queue.subscribe do |delivery_info, metadata, payload|
     @consumer = @work_queue.subscribe(manual_ack: true) do |delivery_info, metadata, payload|
       on_message(metadata.headers, payload)
       @channel.ack(delivery_info.delivery_tag)
@@ -60,9 +63,6 @@ class Worker
     end
   end
 
-  # TODO: Investigate:
-  # - explicit acknowledgements
-  # - 'prefetch' (batch) setting
   def on_message(headers, payload)
     begin
       message = JSON.parse(payload)
