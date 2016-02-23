@@ -11,7 +11,7 @@ require 'sesame_client'
 def main
   require 'yaml'
   config = YAML.load_file("#{File.dirname(__FILE__)}/../spec/files/config.yml")
-  solr = RSolr.connect(url: config[:solr][:url])
+  solr = RSolr.connect(url: config[:solr_worker][:url])
   solr.delete_by_query '*:*'
   solr.commit
   ActiveRecord::Base.establish_connection(config[:postgres_worker][:activerecord])
