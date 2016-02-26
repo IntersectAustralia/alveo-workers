@@ -44,7 +44,7 @@ def main(config, directory)
       }
     else
       File.open(@resume, 'w') { |processed|
-        processed.write("#{file_path}\t{ingester.record_count}\n")
+        processed.write("#{file_path}\t#{ingester.record_count}\n")
       }
       break
     end
