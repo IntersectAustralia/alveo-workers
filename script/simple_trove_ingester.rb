@@ -11,7 +11,10 @@ require 'trove_ingester'
 
 def get_file_paths(directory)
   file_paths = Dir[File.join(directory, '*.dat')]
-  processed = File.read(@processed)
+  processed = []
+  if File.exists? @processed
+    processed = File.read(@processed).split    
+  end
   file_paths.select! { |file|
     !processed.include? file
   }
