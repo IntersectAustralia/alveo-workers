@@ -3,7 +3,12 @@ require 'json'
 
 class TroveIngester
 
+
+  attr_accessor :ingesting
+  attr_reader :record_count
+
   def initialize(options)
+    @ingesting = true
     bunny_client_class = Module.const_get(options[:client_class])
     @bunny_client = bunny_client_class.new(options)
     @exchange_name = options[:exchange]
@@ -38,15 +43,20 @@ class TroveIngester
     }
   end
 
-  def process_chunk(trove_chunk)
+  def process_chunk(trove_chunk, resume_point=-1)
+    @record_count = 0
     File.open(trove_chunk, 'r:iso-8859-1').each { |trove_record|
       begin
+        if resume_point < record_count
+          record_count += 1
+          next
+        end
         trove_fields = JSON.parse(trove_record.encode('utf-8'))
         message = map_to_json_ld(trove_fields)
         properties = {routing_key: @upload_queue.name, headers: {action: 'create'}}
         @exchange.publish(message, properties)
-        # count += 1
-        # break if count >= limit
+        @record_count += 1
+        break if !@ingesting
       rescue Exception => e
         # TODO: Error queue instead of log file
         @error_logger.error "#{e.class}: #{e.to_s}\ninput: #{trove_record}"

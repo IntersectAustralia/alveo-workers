@@ -13,6 +13,7 @@ def main(options)
   config = options.config
   workers = []
   pids = []
+  Process.setproctitle('WorkerMaster')
   begin
     p 'Starting workers...'
     if options.daemonize
