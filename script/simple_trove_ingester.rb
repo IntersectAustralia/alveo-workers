@@ -24,7 +24,7 @@ def get_file_paths(directory)
     file_paths.delete_if { |path|
       path = resume_file
     }
-    @resume_point = resume_data.last
+    @resume_point = resume_data.last.to_i
     file_paths.unshift(resume_file)
   end
   file_paths
