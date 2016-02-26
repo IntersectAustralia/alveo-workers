@@ -19,9 +19,13 @@ def get_file_paths(directory)
     !processed.include? file
   }
   if File.exists? @resume
-    resume_file = File.read(@resume).split
-    file_paths.unshift(resume_file.first)
-    @resume_point = resume_file.last
+    resume_data = File.read(@resume).split
+    resume_file = resume_data.first
+    file_paths.delete_if { |path|
+      path = resume_file
+    }
+    @resume_point = resume_data.last
+    file_paths.unshift(resume_file)
   end
   file_paths
 end
