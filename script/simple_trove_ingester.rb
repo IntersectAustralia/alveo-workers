@@ -23,6 +23,7 @@ def get_file_paths(directory)
     file_paths.unshift(resume_file.first)
     @resume_point = resume_file.last
   end
+  file_paths
 end
 
 def main(config, directory)
