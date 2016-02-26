@@ -43,12 +43,12 @@ class TroveIngester
     }
   end
 
-  def process_chunk(trove_chunk, resume_point=-1)
+  def process_chunk(trove_chunk, resume_point=0)
     @record_count = 0
     File.open(trove_chunk, 'r:iso-8859-1').each { |trove_record|
       begin
-        if resume_point < record_count
-          record_count += 1
+        if @record_count < resume_point
+          @record_count += 1
           next
         end
         trove_fields = JSON.parse(trove_record.encode('utf-8'))
