@@ -24,6 +24,7 @@ class TroveIngester
   end
 
   def close
+    @channel.close
     @bunny_client.close
   end
 
