@@ -31,6 +31,14 @@ class BunnyMock
 
   class Channel
 
+    def prefetch(count)
+      nil
+    end
+
+    def ack(delivery_tag)
+      nil
+    end
+
     def queue(*attrs)
       BunnyMock::Queue.new(*attrs)
     end
@@ -69,9 +77,11 @@ class BunnyMock
     def subscribe(*args, &block)
       metadata = OpenStruct.new
       metadata.headers = {'action' => 'create'}
+      delivery_info = OpenStruct.new
+      delivery_info.delivery_tag = nil
       while message = messages.shift
         self.delivery_count += 1
-        yield(nil, metadata, message)
+        yield(delivery_info, metadata, message)
       end
     end
 
