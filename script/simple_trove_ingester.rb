@@ -30,9 +30,9 @@ def get_file_paths(directory)
   file_paths
 end
 
-def main(config, directory)
+def main(options, directory)
   file_paths = get_file_paths(directory)
-  ingester = TroveIngester.new(config[:ingester])
+  ingester = TroveIngester.new(options)
   ingesting = true
   Signal.trap('TERM') {
     ingesting = false
@@ -52,6 +52,9 @@ def main(config, directory)
       }
       break
     end
+    while ingester.monitor_queues_message_count > 0
+      sleep options[:monitor_poll]
+    end
   }
   ingester.close
 end
@@ -61,6 +64,7 @@ if __FILE__ == $PROGRAM_NAME
   Process.setproctitle('TroveIngester')
   Process.daemon(nochdir=true)
   config = YAML.load_file("#{File.dirname(__FILE__)}/../spec/files/config.yml")
-  main(config, ARGV[0])
+  options = config[:ingester]
+  main(options, ARGV[0])
 end
 

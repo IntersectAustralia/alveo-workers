@@ -21,6 +21,22 @@ class TroveIngester
     @channel = @bunny_client.create_channel
     @exchange = @channel.direct(@exchange_name)
     @upload_queue = add_queue(@upload_queue_name)
+    monitor_queues
+  end
+
+  def monitor_queues
+    @monitor_queues = []
+    @options[:monitor].each { |queue|
+      @monitor_queues << add_queue(queue)
+    }
+  end
+
+  def monitor_queues_message_count
+    message_count = 0
+    @monitor_queues.each { |queue|
+      message_count += queue.message_count
+    }
+    message_count
   end
 
   def close

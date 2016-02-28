@@ -23,7 +23,6 @@ def get_message_count
   message_count = 0
   @queues.each { |queue|
     message_count += queue.message_count
-    p queue
   }
   message_count
 end
