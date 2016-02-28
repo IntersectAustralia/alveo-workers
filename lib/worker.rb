@@ -15,7 +15,7 @@ class Worker
   end
 
   def add_queue(name)
-    queue = @channel.queue(name)
+    queue = @channel.queue(name, durable: true)
     queue.bind(@exchange, routing_key: name)
     queue
   end
@@ -24,7 +24,7 @@ class Worker
     @bunny_client.start
     @channel = @bunny_client.create_channel
     @channel.prefetch(@options[:prefetch])
-    @exchange = @channel.direct(@options[:exchange])
+    @exchange = @channel.direct(@options[:exchange], durable: true)
     @work_queue = add_queue(@options[:work_queue])
     @error_queue = add_queue(@options[:error_queue])
   end
@@ -82,7 +82,7 @@ class Worker
                      backtrace: exception.backtrace}
     error_message = JSON.pretty_generate(error_message)
     error_message = "[#{error_message},\n{\"input\": #{payload}}]"
-    @exchange.publish(error_message, routing_key: @error_queue.name)
+    @exchange.publish(error_message, routing_key: @error_queue.name, persistent: true)
   end
 
 end

@@ -31,11 +31,11 @@ class UploadWorker < Worker
     item['generated'] = generate_fields(item)
     message = item.to_json
     headers = {action: 'create'}
-    properties = {routing_key: @postgres_queue.name, headers: headers}
+    properties = {routing_key: @postgres_queue.name, headers: headers, persistent: true}
     @exchange.publish(message, properties)
-    properties = {routing_key: @solr_queue.name, headers: headers}
+    properties = {routing_key: @solr_queue.name, headers: headers, persistent: true}
     @exchange.publish(message, properties)
-    properties = {routing_key: @sesame_queue.name, headers: headers}
+    properties = {routing_key: @sesame_queue.name, headers: headers, persistent: true}
     @exchange.publish(message, properties)
   end
 

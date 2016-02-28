@@ -9,6 +9,7 @@ class TroveIngester
 
   def initialize(options)
     @ingesting = true
+    @options = options
     bunny_client_class = Module.const_get(options[:client_class])
     @bunny_client = bunny_client_class.new(options)
     @exchange_name = options[:exchange]
@@ -19,7 +20,7 @@ class TroveIngester
   def connect
     @bunny_client.start
     @channel = @bunny_client.create_channel
-    @exchange = @channel.direct(@exchange_name)
+    @exchange = @channel.direct(@exchange_name, durable: true)
     @upload_queue = add_queue(@upload_queue_name)
     monitor_queues
   end
@@ -45,7 +46,7 @@ class TroveIngester
   end
 
   def add_queue(name)
-    queue = @channel.queue(name)
+    queue = @channel.queue(name, durable: true)
     queue.bind(@exchange, routing_key: name)
     queue
   end
