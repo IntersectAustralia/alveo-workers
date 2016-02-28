@@ -62,7 +62,7 @@ end
 
 if __FILE__ == $PROGRAM_NAME
   Process.setproctitle('TroveIngester')
-  # Process.daemon(nochdir=true)
+  Process.daemon(nochdir=true)
   config = YAML.load_file("#{File.dirname(__FILE__)}/../spec/files/config.yml")
   options = config[:ingester]
   main(options, ARGV[0])
