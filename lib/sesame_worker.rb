@@ -75,7 +75,7 @@ class SesameWorker < Worker
           filename = "trove_#{Time.now.strftime('%Y%m%d_%H%M%S_%6N')}.rdf"
           path = File.join(@file_output_dir, filename)
           File.open(path, 'w') { |output_file|
-            output_file.write(path)
+            output_file.write(n3_string)
           }
         else
           @sesame_client.batch_insert_statements(@collection, n3_string)
