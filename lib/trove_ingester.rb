@@ -70,7 +70,7 @@ class TroveIngester
           next
         end
         trove_fields = JSON.parse(trove_record.encode('utf-8'))
-        message = map_to_json_ld(trove_fields)
+        message = map_to_json_ld(trove_fields, trove_record)
         properties = {routing_key: @upload_queue.name, headers: {action: 'create'}}
         @exchange.publish(message, properties)
         @record_count += 1
@@ -82,7 +82,7 @@ class TroveIngester
     }
   end
 
-  def map_to_json_ld(trove_fields)
+  def map_to_json_ld(trove_fields, trove_record)
     # TODO: see if qualified values can be removed, e.g. ausnc:popular
     # TODO: Possibly use type coercion in the context if the generated RDF isn't correct
     #       e.g. "ausnc:audience":{"@type":"http://ns.ausnc.org.au/schemas/ausnc_md_model/audience"},
@@ -115,18 +115,29 @@ class TroveIngester
             "dc:title": #{trove_fields['heading'].to_json},
             "dc:isPartOf": "trove",
             "alveo:fulltext": #{trove_fields['fulltext'].to_json},
-            "alveo:display_document": "http://trove.alveo.edu.au/document/#{trove_fields['id']}",
-            "alveo:indexable_document": "http://trove.alveo.edu.au/document/#{trove_fields['id']}",
+            "alveo:display_document": "http://trove.alveo.edu.au/document/#{trove_fields['id']}.txt",
+            "alveo:indexable_document": "http://trove.alveo.edu.au/document/#{trove_fields['id']}.txt",
             "olac:language": "eng"
           },
           "ausnc:document": [{
-            "@id":"http://trove.alveo.edu.au/document/#{trove_fields['id']}",
+            "@id":"http://trove.alveo.edu.au/document/#{trove_fields['id']}#Text",
             "dc:extent": #{trove_fields['fulltext'].size},
-            "dc:identifier": "#{trove_fields['id']}",
-            "dc:source": "http://trove.alveo.edu.au/document/#{trove_fields['id']}",
+            "dc:identifier": "#{trove_fields['id']}.txt",
+            "dc:title": "#{trove_fields['id']}#Text",
+            "dc:source": "http://trove.alveo.edu.au/document/#{trove_fields['id']}.txt",
             "dc:type": "Text",
             "alveo:size": #{trove_fields['fulltext'].bytesize}
-          }]
+          },
+          {
+            "@id":"http://trove.alveo.edu.au/document/#{trove_fields['id']}#Original",
+            "dc:extent": #{trove_record.size},
+            "dc:identifier": "#{trove_fields['id']}",
+            "dc:title": "#{trove_fields['id']}#Original",
+            "dc:source": "http://trove.alveo.edu.au/document/#{trove_fields['id']}",
+            "dc:type": "Original",
+            "alveo:size": #{trove_record.bytesize}
+          }
+        ]
         }
     ]})
   end
