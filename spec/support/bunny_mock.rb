@@ -47,7 +47,7 @@ class BunnyMock
       @exchange ||= BunnyMock::Exchange.new('default_exchange')
     end
 
-    def direct(name)
+    def direct(name, opts = {})
       @exchange = BunnyMock::Exchange.new(name)
     end
 

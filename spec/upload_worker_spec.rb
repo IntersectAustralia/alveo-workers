@@ -24,9 +24,9 @@ describe UploadWorker do
       allow(@upload_worker).to receive(:generate_fields).and_return({})
       expected = example.to_json
       headers = {action: 'create'}
-      expect(@exchange).to receive(:publish).with(expected, {routing_key: 'postgres_queue', headers: headers})
-      expect(@exchange).to receive(:publish).with(expected, {routing_key: 'solr_queue', headers: headers})
-      expect(@exchange).to receive(:publish).with(expected, {routing_key: 'sesane_queue', headers: headers})
+      expect(@exchange).to receive(:publish).with(expected, {routing_key: 'postgres_queue', headers: headers, persistent: true})
+      expect(@exchange).to receive(:publish).with(expected, {routing_key: 'solr_queue', headers: headers, persistent: true})
+      expect(@exchange).to receive(:publish).with(expected, {routing_key: 'sesane_queue', headers: headers, persistent: true})
       @upload_worker.create_item(example)
     end
 

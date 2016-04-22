@@ -3,7 +3,7 @@ require 'spec_helper'
 describe TroveIngester do
 
   before(:all) do
-    @ingester_options = {upload_queue: 'upload', error_queue: 'error', client_class: 'BunnyMock'}
+    @ingester_options = {upload_queue: 'upload', error_queue: 'error', client_class: 'BunnyMock', monitor: []}
     @trove_ingester = TroveIngester.new(@ingester_options)
     @trove_ingester.connect
     @exchange = @trove_ingester.instance_variable_get(:@exchange)
