@@ -4,6 +4,9 @@ class RSolrMock
     @responses = []
   end
 
+  def commit
+  end
+
   def set_responses(response)
     @responses += response
   end

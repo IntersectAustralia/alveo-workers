@@ -119,4 +119,7 @@ Temporary Items
 ### Vagrant ###
 .vagrant/
 
-ingester_errors.log
+*.log
+spec/files/*.dat
+*.dat
+*.rdf

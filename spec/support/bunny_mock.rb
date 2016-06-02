@@ -1,3 +1,5 @@
+require 'ostruct'
+
 class BunnyMock
 
   def initialize(options)
@@ -29,6 +31,14 @@ class BunnyMock
 
   class Channel
 
+    def prefetch(count)
+      nil
+    end
+
+    def ack(delivery_tag)
+      nil
+    end
+
     def queue(*attrs)
       BunnyMock::Queue.new(*attrs)
     end
@@ -37,7 +47,7 @@ class BunnyMock
       @exchange ||= BunnyMock::Exchange.new('default_exchange')
     end
 
-    def direct(name)
+    def direct(name, opts = {})
       @exchange = BunnyMock::Exchange.new(name)
     end
 
@@ -65,9 +75,13 @@ class BunnyMock
 
     # Note that this doesn't block waiting for messages like the real world.
     def subscribe(*args, &block)
+      metadata = OpenStruct.new
+      metadata.headers = {'action' => 'create'}
+      delivery_info = OpenStruct.new
+      delivery_info.delivery_tag = nil
       while message = messages.shift
         self.delivery_count += 1
-        yield(nil, nil, message)
+        yield(delivery_info, metadata, message)
       end
     end
 

@@ -5,58 +5,88 @@ require 'sesame_client'
 require 'active_record'
 require 'models/item'
 require 'models/document'
+require 'models/collection'
+require 'models/user'
 require 'postgres_helper'
+require 'trove_ingester'
+require 'sesame_worker'
+require 'sesame_helper'
+require 'metadata_helper'
+require 'rsolr'
 
 def main(config)
-  sesame_client = SesameClient.new(config[:sesame_worker])
-  turtle = File.open("#{File.dirname(__FILE__)}/../spec/files/turtle_example.rdf").read
-  options = {adapter: 'postgresql', database: 'hcsvlab', user: 'hcsvlab', host: 'localhost'}
-  ActiveRecord::Base.establish_connection(options)
-  json_ld_expanded = JSON.parse(File.read("#{File.dirname(__FILE__)}/../spec/files/json-ld_expanded_example.json"))
 
-  context = {
-      "ace" =>{"@id" =>"http://ns.ausnc.org.au/schemas/ace/"},
-      "alveo" =>{"@id" =>"http://alveo.edu.au/schema/"},
-      "ausnc" =>{"@id" =>"http://ns.ausnc.org.au/schemas/ausnc_md_model/"},
-      "austalk" =>{"@id" =>"http://ns.austalk.edu.au/"},
-      "austlit" =>{"@id" =>"http://ns.ausnc.org.au/schemas/austlit/"},
-      "bibo" =>{"@id" =>"http://purl.org/ontology/bibo/"},
-      "commonProperties" =>{"@id" =>"http://purl.org/dada/schema/0.2#commonProperties"},
-      "cooee" =>{"@id" =>"http://ns.ausnc.org.au/schemas/cooee/"},
-      "dada" =>{"@id" =>"http://purl.org/dada/schema/0.2#"},
-      "dc" =>{"@id" =>"http://purl.org/dc/terms/"},
-      "end" =>{"@id" =>"http://purl.org/dada/schema/0.2#end"},
-      "foaf" =>{"@id" =>"http://xmlns.com/foaf/0.1/"},
-      "gcsause" =>{"@id" =>"http://ns.ausnc.org.au/schemas/gcsause/"},
-      "ice" =>{"@id" =>"http://ns.ausnc.org.au/schemas/ice/"},
-      "label" =>{"@id" =>"http://purl.org/dada/schema/0.2#label"},
-      "olac" =>{"@id" =>"http://www.language-archives.org/OLAC/1.1/"},
-      "purl" =>{"@id" =>"http://purl.org/"},
-      "rdf" =>{"@id" =>"http://www.w3.org/1999/02/22-rdf-syntax-ns#"},
-      "schema" =>{"@id" =>"http://schema.org/"},
-      "start" =>{"@id" =>"http://purl.org/dada/schema/0.2#start"},
-      "type" =>{"@id" =>"http://purl.org/dada/schema/0.2#type"},
-      "xsd" =>{"@id" =>"http://www.w3.org/2001/XMLSchema#"},
-      "hcsvlab" =>{"@id" => "http://hcsvlab.org/vocabulary/"},
-      "hcsvlab" => {"@id" => "http://hcsvlab.org/vocabulary/"},
-      "ausnc:audience" =>{ "@type"=>"@id"},
-      "ausnc:communication_setting"=>{ "@type"=>"@id" },
-      "ausnc:document" => {"@type" => "@id"},
-      "ausnc:itemwordcount"=>{ "@type"=>"xsd:integer"},
-      "ausnc:mode"=>{  "@type"=>"@id" },
-      "ausnc:publication_status"=>{  "@type"=>"@id" },
-      "ausnc:written_mode"=>{  "@type"=>"@id" },
-      "dc:isPartOf"=>{  "@type"=>"@id" },
-      "dcterms:extent"=>{ "@type"=>"xsd:integer"},
-      "dcterms:source"=>{  "@type"=>"@id" },
-      "hcsvlab:display_document" => {  "@type"=>"@id" },
-      "hcsvlab:indexable_document" => {  "@type"=>"@id" }
-      }.freeze
+  # options = {adapter: 'postgresql', database: 'hcsvlab', user: 'hcsvlab', host: 'alveo-qa-pg.intersect.org.au'}
+  # ActiveRecord::Base.establish_connection(options)
 
-  item = json_ld_expanded[0]
-  compacted = JSON::LD::API.compact(item, context)
+  ingester = TroveIngester.new(config[:ingester])
+  # ingester.connect
+  # trove_chunk = "/data/production_collections/trove-test/data-1.dat"
+  # ingester.process_chunk(trove_chunk)
+  
+  # trove_example = './spec/files/trove_chunk_example.dat'
+  # trove_json_string = File.read(trove_example, encoding: 'iso-8859-1')
+  # trove_json = JSON.parse(trove_json_string)
+  # jld_string = ingester.map_to_json_ld(trove_json)
+  # sesame_helper = Class.new().include(SesameHelper).new
+  # jld = JSON.parse(jld_string)
+  # graph = sesame_helper.create_rdf_graph(jld['items'].first)
+  # n3_string = RDF::NTriples::Writer.dump(graph, nil, :encoding => Encoding::ASCII)
+
+  # trove_chunk = "/Users/ilya/workspace/corpora/trove/data-1.dat"
+
+  options = {host: 'alveo-qa-mq.intersect.org.au', vhost: '/alveo', exchange: 'alveo.workers', user: 'sesame', pass: 'sesame'}
+  conn = Bunny.new(options)
+  conn.start
+  ch = conn.create_channel
+  x = ch.direct('alveo.workers')
+  q = ch.queue('sesame')
+  q.bind(x, routing_key: 'sesame')
   require 'pry'
   binding.pry
+
+end
+
+def process_chunk(trove_chunk, config)
+  ingester = TroveIngester.new(config[:ingester])
+  metadata_helper = Class.new.include(MetadataHelper).new
+  File.open(trove_chunk, 'r:iso-8859-1').each { |trove_record|
+    begin
+      trove_fields = JSON.parse(trove_record.encode('utf-8'))
+      trove_message = ingester.map_to_json_ld(trove_fields)
+      trove_item = JSON.parse(trove_message)['items'].first
+      trove_item['generated'] = metadata_helper.generate_fields(trove_item)
+      json_ld_to_n3(trove_item)
+    rescue Exception => e
+    end
+  }
+end
+
+def json_ld_to_n3(json_ld)
+  require 'pry'
+  binding.pry
+  sesame_helper = Class.new().include(SesameHelper).new
+  graph = sesame_helper.create_rdf_graph(json_ld)
+  n3_string = RDF::NTriples::Writer.dump(graph, nil, :encoding => Encoding::ASCII)
+  File.open('n3_chunk.dat', 'a') { |f|
+    f.write(n3_string)
+  }
+end
+
+def get_uniq_count(trove_chunk, limit)
+  count = 0
+  ids = []
+  File.open(trove_chunk, 'r:iso-8859-1').each { |trove_record|
+    trove_fields = JSON.parse(trove_record.encode('utf-8'))
+    if trove_fields['id'].nil?
+      puts trove_fields.to_json
+    else
+      ids << trove_fields['id']
+    end
+    count += 1
+    break if count >= limit
+  }
+  ids.uniq.length
 end
 
 if __FILE__ == $PROGRAM_NAME

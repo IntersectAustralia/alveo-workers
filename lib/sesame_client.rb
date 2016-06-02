@@ -13,7 +13,8 @@ class SesameClient < PersistentClient
     @config = config
     @mime_types = {sparql_json: 'application/sparql-results+json',
                    trig: 'application/x-trig',
-                   turtle: 'text/turtle'
+                   turtle: 'text/turtle',
+                   n3: 'text/rdf+n3'
                   }
     super('SesameClient')
   end
@@ -62,12 +63,23 @@ class SesameClient < PersistentClient
     request(uri, :post, {'Content-Type' => @mime_types[:turtle]}, ttl_string)
   end
 
+  def batch_insert_statements(repository, n3_string)
+    uri = get_statements_uri(repository)
+    request(uri, :post, {'Content-Type' => @mime_types[:n3]}, n3_string)
+  end
+
+  def clear_repository(repository)
+    uri = get_statements_uri(repository)
+    request(uri, :delete)
+  end
+
   def repositories
     uri = get_repositories_uri
     repositories = []
     query_results = parse_json_response(request(uri, :get, {'Accept' => @mime_types[:sparql_json]}))
     query_results['results']['bindings'].each { |repository|
-      repositories << repository['id']['value']
+      repository_name = repository['id']['value']
+      repositories << repository_name unless repository_name == 'SYSTEM'
     }
     repositories
   end

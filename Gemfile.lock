@@ -8,20 +8,22 @@ GEM
       activemodel (= 4.2.4)
       activesupport (= 4.2.4)
       arel (~> 6.0)
+    activerecord-import (0.10.0)
+      activerecord (>= 3.0)
     activesupport (4.2.4)
       i18n (~> 0.7)
       json (~> 1.7, >= 1.7.7)
       minitest (~> 5.1)
       thread_safe (~> 0.3, >= 0.3.4)
       tzinfo (~> 1.1)
-    amq-protocol (1.9.2)
+    amq-protocol (2.0.1)
     arel (6.0.3)
     ast (2.1.0)
     astrolabe (1.3.1)
       parser (~> 2.2)
     builder (3.2.2)
-    bunny (2.0.1)
-      amq-protocol (>= 1.9.2)
+    bunny (2.2.2)
+      amq-protocol (>= 2.0.1)
     coderay (1.1.0)
     diff-lcs (1.2.5)
     docile (1.1.5)
@@ -51,6 +53,7 @@ GEM
       method_source (~> 0.8.1)
       slop (~> 3.4)
       spoon (~> 0.0)
+    rack (1.6.4)
     rainbow (2.0.0)
     rdf (1.1.15)
       link_header (~> 0.0, >= 0.0.8)
@@ -78,6 +81,7 @@ GEM
       powerpack (~> 0.1)
       rainbow (>= 1.99.1, < 3.0)
       ruby-progressbar (~> 1.4)
+    ruby-prof (0.15.9)
     ruby-progressbar (1.7.5)
     simplecov (0.10.0)
       docile (~> 1.1.0)
@@ -99,14 +103,20 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord
+  activerecord-import
   bunny (>= 2.0.1)
   json
   json-ld
   net-http-persistent
   pg
   pry
+  rack
   rdf-turtle
   rsolr
   rspec
   rubocop
+  ruby-prof
   simplecov
+
+BUNDLED WITH
+   1.10.6

@@ -8,6 +8,8 @@ gem 'rdf-turtle'
 gem 'net-http-persistent'
 gem 'pg'
 gem 'activerecord'
+gem 'activerecord-import'
+gem 'rack'
 
 group :test do
   gem 'rspec', :require => false
@@ -20,4 +22,5 @@ end
 
 group :development do
   gem 'rubocop'
+  gem 'ruby-prof'
 end

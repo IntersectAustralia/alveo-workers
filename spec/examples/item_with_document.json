@@ -1,0 +1,19 @@
+{
+   "@context":"https://alveo-staging1.intersect.org.au/schema/json-ld",
+   "alveo:metadata":{
+      "dc:identifier":"J68",
+      "ausnc:speech_style":"unspecified",
+      "ausnc:interactivity":"unspecified",
+      "ausnc:communication_context":"unspecified",
+      "hcsvlab:display_document":"J68-plain.txt",
+      "hcsvlab:indexable_document":"J68-plain.txt"
+   },
+   "ausnc:document":[
+      {
+         "dc:type":"Text",
+         "dc:identifier":"J68-plain.txt",
+         "dc:title":"J68#Text",
+         "alveo:fulltext":"this is the text of the document"
+      }
+   ]
+}

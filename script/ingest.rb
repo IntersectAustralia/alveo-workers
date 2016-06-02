@@ -3,7 +3,6 @@ $LOAD_PATH.unshift("#{File.dirname(__FILE__)}/../lib")
 require 'ingester'
 require 'yaml'
 
-
 def main(directory)
   collection = File.basename(directory)
   work = Ingester.get_rdf_file_paths(directory)

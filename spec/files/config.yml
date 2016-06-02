@@ -1,6 +1,7 @@
 ---
 :solr: &solr_common
-  :url: http://alveo-qa-solr.intersect.org.au:8080/solr/hcsvlab
+  :url: http://alveo-qa-solr.intersect.org.au:8080/solr/hcsvlab 
+  # :url: http://127.0.0.1:8080/solr/hcsvlab 
 
 :rabbitmq: &rabbitmq_common
   :client_class: Bunny
@@ -8,33 +9,45 @@
   :host: alveo-qa-mq.intersect.org.au
   :vhost: /alveo
   :exchange: 'alveo.workers'
+  :prefetch: 1000
 
 :sesame_worker:
-  :base_url: http://alveo-qa-sesame.intersect.org.au:8080/openrdf-sesame/
+  :base_url: http://43.240.99.103/openrdf-sesame/
+  # :base_url: http://alveo-qa-sesame.intersect.org.au:8080/openrdf-sesame/
+  # :base_url: http://127.0.0.1:8080/openrdf-sesame/
   :client_class: SesameClient
   :work_queue: sesame
   :paths:
     :repositories: repositories
     :system: repositories/SYSTEM/statements
   :rabbitmq:
-        <<: *rabbitmq_common
-        :work_queue: sesame
-        :user: sesame
-        :pass: sesame
+    <<: *rabbitmq_common
+    :work_queue: sesame
+    :user: sesame
+    :pass: sesame
+  :batch:
+    :enabled: true
+    :size: 5000
+    :timeout: 300
 
 :solr_worker:
   :url: http://alveo-qa-solr.intersect.org.au:8080/solr/hcsvlab
+  # :url: http://127.0.0.1:8080/solr/hcsvlab
   :client_class: RSolr
   :rabbitmq:
     <<: *rabbitmq_common
     :work_queue: solr
     :user: solr
     :pass: solr
+  :batch:
+    :enabled: true
+    :size: 10000
+    :timeout: 300
 
 :upload_worker:
   :rabbitmq:
     <<: *rabbitmq_common
-    :work_queue: upload # change work_queue to consumption_queue
+    :work_queue: upload 
     :user: upload
     :pass: upload
   :solr:
@@ -53,7 +66,12 @@
     :adapter: postgresql
     :database: hcsvlab
     :user: hcsvlab
+    # :host: 127.0.0.1
     :host: alveo-qa-pg.intersect.org.au
+  :batch:
+    :enabled: true
+    :size: 5000
+    :timeout: 300
 
 :ingester:
   <<: *rabbitmq_common
@@ -62,3 +80,21 @@
   :pass: ingester
   :upload_queue: upload
   :sesame_queue: sesame
+
+:trove_ingester:
+  <<: *rabbitmq_common
+  :error_log: trove_ingester_errors.log
+  :user: ingester
+  :pass: ingester
+  :upload_queue: upload
+  :processes: 1
+
+:worker_launcher:
+  :upload_worker:
+    :processes: 2
+  :solr_worker:
+    :processes: 2
+  :sesame_worker:
+    :processes: 2
+  :postgres_worker:
+    :processes: 2

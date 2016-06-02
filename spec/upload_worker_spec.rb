@@ -3,38 +3,33 @@ require 'spec_helper'
 describe UploadWorker do
 
   before(:all) do
-    @options = {rabbitmq: {client_class: 'BunnyMock', work_queue: 'upload'},
-               solr_queue: 'solr_queue', solr: {}, postgres_queue: 'postgres'}
+    @options = {
+      rabbitmq: {
+        client_class: 'BunnyMock',
+        work_queue: 'upload'
+      },
+      solr_queue: 'solr_queue',
+      sesame_queue: 'sesane_queue',
+      postgres_queue: 'postgres_queue'
+    }
     @upload_worker = UploadWorker.new(@options)
     @upload_worker.connect
     @exchange = @upload_worker.instance_variable_get(:@exchange)
   end
 
-  describe '#create_item_solr' do
+  describe '#create_item' do
 
-    it 'adds a create item job to the Solr Worker queue' do
-      example = {key: 'vaule'}
-      allow(@upload_worker).to receive(:create_solr_document).and_return(example)
-      expected = '{"action": "add", "document": {"key":"vaule"}}'
-      solr_queue = @exchange.get_queue(@options[:solr_queue])
-      @upload_worker.create_item_solr('')
-      expect(solr_queue.messages.first).to eq(expected)
+    it 'Adds messages to Solr, Sesame, and Postgres queues' do
+      example = {'mock' => 'item', 'generated' => {}}
+      allow(@upload_worker).to receive(:generate_fields).and_return({})
+      expected = example.to_json
+      headers = {action: 'create'}
+      expect(@exchange).to receive(:publish).with(expected, {routing_key: 'postgres_queue', headers: headers, persistent: true})
+      expect(@exchange).to receive(:publish).with(expected, {routing_key: 'solr_queue', headers: headers, persistent: true})
+      expect(@exchange).to receive(:publish).with(expected, {routing_key: 'sesane_queue', headers: headers, persistent: true})
+      @upload_worker.create_item(example)
     end
 
   end
-
-  describe '#create_item_postgres' do
-
-    it 'adds a create item job to the Postgres Worker queue' do
-      example = {key: 'vaule'}
-      allow(@upload_worker).to receive(:create_pg_statement).and_return(example)
-      expected = '{"action": "create", "payload": {"key":"vaule"}}'
-      postgres_queue = @exchange.get_queue(@options[:postgres_queue])
-      @upload_worker.create_item_postgres('')
-      expect(postgres_queue.messages.first).to eq(expected)
-    end
-
-  end
-
 
 end
