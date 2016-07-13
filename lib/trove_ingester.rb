@@ -94,6 +94,7 @@ class TroveIngester
             "dc": "http://purl.org/dc/terms/",
             "alveo": "http://alveo.edu.au/vocabulary/",
             "olac": "http://www.language-archives.org/OLAC/1.1/",
+            "foaf": "http://xmlns.com/foaf/0.1/",
             "ausnc:document": {"@type": "@id"},
             "alveo:display_document": {"@type": "@id"},
             "alveo:indexable_document": {"@type": "@id"}
@@ -108,7 +109,10 @@ class TroveIngester
             "ausnc:publication_status": "published",
             "ausnc:state": "#{trove_fields['state'].first}",
             "ausnc:written_mode": "print",
-            "ausnc:document": ["http://trove.alveo.edu.au/document/#{trove_fields['id']}"],
+            "ausnc:document": [
+              "http://trove.alveo.edu.au/document/#{trove_fields['id']}#Text",
+              "http://trove.alveo.edu.au/document/#{trove_fields['id']}#Original"
+            ],
             "dc:created": "#{trove_fields['date']}",
             "dc:identifier": "#{trove_fields['id']}",
             "dc:source": #{trove_fields['titleName'].to_json},
@@ -121,6 +125,7 @@ class TroveIngester
           },
           "ausnc:document": [{
             "@id":"http://trove.alveo.edu.au/document/#{trove_fields['id']}#Text",
+            "@type":"foaf:Document",
             "dc:extent": #{trove_fields['fulltext'].size},
             "dc:identifier": "#{trove_fields['id']}.txt",
             "dc:title": "#{trove_fields['id']}#Text",
@@ -130,6 +135,7 @@ class TroveIngester
           },
           {
             "@id":"http://trove.alveo.edu.au/document/#{trove_fields['id']}#Original",
+            "@type":"foaf:Document",
             "dc:extent": #{trove_record.size},
             "dc:identifier": "#{trove_fields['id']}",
             "dc:title": "#{trove_fields['id']}#Original",
