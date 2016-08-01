@@ -17,7 +17,7 @@ module PostgresHelper
     # TODO: gets rid of the fulltext, may not be what we want to do
     item_json_ld['alveo:metadata'].delete('alveo:fulltext')
     item_json_ld.delete('generated')
-    item[:json_metadata] = item_json_ld
+    item[:json_metadata] = item_json_ld.to_json
     # TODO: This is a temporary hack, what should happen is that this remains blank
     # until the Item is indexed  by the Solr worker, which should add update messages
     # to the Postgres queue. This could run into issues if it is indexed in Solr before
