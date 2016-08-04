@@ -52,11 +52,15 @@ describe PostgresHelper do
                                  'collection_id' => 3}}
       time = Time.new(1997)
       expect(Time).to receive(:now).and_return(time)
+      json_metadata = example.clone
+      json_metadata.delete('generated')
+      json_metadata = json_metadata.to_json
+
       expected = {uri: 'https://app.alveo.edu.au/catalog/collection/identifier',
                   handle: 'collection:identifier',
                   collection_id: 3,
                   primary_text_path: '/primary/text/path',
-                  json_metadata: example,
+                  json_metadata: json_metadata,
                   indexed_at: time}
       actual = @postgres_helper.extract_item_info(example)
       expect(actual).to eq(expected)

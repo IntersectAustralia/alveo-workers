@@ -104,7 +104,12 @@ class PostgresWorker < Worker
     @batch_mutex.synchronize {
       @item_batch << pg_statement[:item].values
     }
-    @documents_batch << [pg_statement[:documents].first.values]
+    # @documents_batch << [pg_statement[:documents].first.values]
+    document_values = []
+    pg_statement[:documents].each { |document|
+      document_values << document.values
+    }
+    @documents_batch << document_values
     if (@item_batch.size >= @batch_options[:size])
       commit_batch
     end

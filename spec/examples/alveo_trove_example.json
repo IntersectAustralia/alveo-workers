@@ -6,6 +6,7 @@
             "dc": "http://purl.org/dc/terms/",
             "alveo": "http://alveo.edu.au/vocabulary/",
             "olac": "http://www.language-archives.org/OLAC/1.1/",
+            "foaf": "http://xmlns.com/foaf/0.1/",
             "ausnc:document": {"@type": "@id"},
             "alveo:display_document": {"@type": "@id"},
             "alveo:indexable_document": {"@type": "@id"}
@@ -20,7 +21,10 @@
             "ausnc:publication_status": "published",
             "ausnc:state": "Victoria",
             "ausnc:written_mode": "print",
-            "ausnc:document": ["http://trove.alveo.edu.au/document/64154494"],
+            "ausnc:document": [
+              "http://trove.alveo.edu.au/document/64154494#Text",
+              "http://trove.alveo.edu.au/document/64154494#Original"
+            ],
             "dc:created": "1917-02-02",
             "dc:identifier": "64154494",
             "dc:source": "The Broadford Courier (Broadford, Vic. : 1916 - 1920)",
@@ -33,6 +37,7 @@
           },
           "ausnc:document": [{
             "@id":"http://trove.alveo.edu.au/document/64154494#Text",
+            "@type":"foaf:Document",
             "dc:extent": 1523,
             "dc:identifier": "64154494.txt",
             "dc:title": "64154494#Text",
@@ -42,6 +47,7 @@
           },
           {
             "@id":"http://trove.alveo.edu.au/document/64154494#Original",
+            "@type":"foaf:Document",
             "dc:extent": 1899,
             "dc:identifier": "64154494",
             "dc:title": "64154494#Original",
