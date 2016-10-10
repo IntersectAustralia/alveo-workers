@@ -19,7 +19,7 @@ def main(config)
   # options = {adapter: 'postgresql', database: 'hcsvlab', user: 'hcsvlab', host: 'alveo-qa-pg.intersect.org.au'}
   # ActiveRecord::Base.establish_connection(options)
 
-  ingester = TroveIngester.new(config[:ingester])
+  # ingester = TroveIngester.new(config[:ingester])
   # ingester.connect
   # trove_chunk = "/data/production_collections/trove-test/data-1.dat"
   # ingester.process_chunk(trove_chunk)
@@ -35,15 +35,18 @@ def main(config)
 
   # trove_chunk = "/Users/ilya/workspace/corpora/trove/data-1.dat"
 
-  options = {host: 'alveo-qa-mq.intersect.org.au', vhost: '/alveo', exchange: 'alveo.workers', user: 'sesame', pass: 'sesame'}
-  conn = Bunny.new(options)
-  conn.start
-  ch = conn.create_channel
-  x = ch.direct('alveo.workers')
-  q = ch.queue('sesame')
-  q.bind(x, routing_key: 'sesame')
-  require 'pry'
-  binding.pry
+  # options = {host: 'alveo-qa-mq.intersect.org.au', vhost: '/alveo', exchange: 'alveo.workers', user: 'sesame', pass: 'sesame'}
+  # conn = Bunny.new(options)
+  # conn.start
+  # ch = conn.create_channel
+  # x = ch.direct('alveo.workers')
+  # q = ch.queue('sesame')
+  # q.bind(x, routing_key: 'sesame')
+  json_string = File.read('metadata-postprocess-sample.json')
+  jld = JSON.parse(json_string)
+  File.write('austalk_metadata.json', JSON.pretty_generate(jld))
+  # require 'pry'
+  # binding.pry
 
 end
 

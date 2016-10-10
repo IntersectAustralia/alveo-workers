@@ -123,3 +123,5 @@ Temporary Items
 spec/files/*.dat
 *.dat
 *.rdf
+*.json
+
