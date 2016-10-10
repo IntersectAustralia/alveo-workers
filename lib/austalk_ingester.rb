@@ -80,7 +80,7 @@ class AusTalkIngester
         austalk_fields = JSON.parse(austalk_record.encode('utf-8'))
         austalk_fields = add_document_sizes(austalk_fields)
         properties = {routing_key: @upload_queue.name, headers: {action: 'create'}}
-        message = austalk_fields.to_s
+        message = austalk_fields.to_json
         @exchange.publish(message, properties)
         @record_count += 1
         break if !@ingesting
