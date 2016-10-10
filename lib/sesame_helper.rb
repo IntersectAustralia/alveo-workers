@@ -19,7 +19,11 @@ module SesameHelper
     # to reduce network traffic
     item_metadata.delete('alveo:fulltext')
     json_ld['@graph'] = [item_metadata]
-    json_ld['@graph'].concat(item_json_ld['ausnc:document'])
+    ['ausnc:document', 'alveo:speakers'].each { |key|
+      if item_json_ld.has_key? key
+        json_ld['@graph'].concat(item_json_ld[key])
+      end
+    }
     json_ld
   end
 
