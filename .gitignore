@@ -124,4 +124,4 @@ spec/files/*.dat
 *.dat
 *.rdf
 *.json
-
+script/test.rb
