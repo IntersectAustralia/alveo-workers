@@ -1,20 +1,18 @@
 ---
 :solr: &solr_common
-  :url: http://alveo-qa-solr.intersect.org.au:8080/solr/hcsvlab 
-  # :url: http://127.0.0.1:8080/solr/hcsvlab 
+  url: http://10.0.0.7:8080/solr/hcsvlab
 
 :rabbitmq: &rabbitmq_common
   :client_class: Bunny
   :error_queue: error
-  :host: alveo-qa-mq.intersect.org.au
+  :host: 10.0.0.14
+  :port: 5673
   :vhost: /alveo
   :exchange: 'alveo.workers'
   :prefetch: 1000
 
 :sesame_worker:
-  :base_url: http://43.240.99.103/openrdf-sesame/
-  # :base_url: http://alveo-qa-sesame.intersect.org.au:8080/openrdf-sesame/
-  # :base_url: http://127.0.0.1:8080/openrdf-sesame/
+  :base_url: http://10.0.0.11:8080/openrdf-sesame/
   :client_class: SesameClient
   :work_queue: sesame
   :paths:
@@ -31,8 +29,7 @@
     :timeout: 300
 
 :solr_worker:
-  :url: http://alveo-qa-solr.intersect.org.au:8080/solr/hcsvlab
-  # :url: http://127.0.0.1:8080/solr/hcsvlab
+  :url: http://10.0.0.7:8080/solr/hcsvlab
   :client_class: RSolr
   :rabbitmq:
     <<: *rabbitmq_common
@@ -47,7 +44,7 @@
 :upload_worker:
   :rabbitmq:
     <<: *rabbitmq_common
-    :work_queue: upload 
+    :work_queue: upload
     :user: upload
     :pass: upload
   :solr:
@@ -65,44 +62,38 @@
   :activerecord:
     :adapter: postgresql
     :database: hcsvlab
-    :user: hcsvlab
-    # :host: 127.0.0.1
-    :host: alveo-qa-pg.intersect.org.au
+    :username: hcsvlab
+    :password: alveo
+    :host: 10.0.0.13
   :batch:
-    :enabled: true
+    :enabled: false
     :size: 5000
     :timeout: 300
 
-# :ingester:
-#   <<: *rabbitmq_common
-#   :error_log: ingester_errors.log
-#   :user: ingester
-#   :pass: ingester
-#   :upload_queue: upload
-#   :sesame_queue: sesame
-
-:trove_ingester:
+:ingester:
   <<: *rabbitmq_common
-  :error_log: trove_ingester_errors.log
+  :error_log: ingester_errors.log
   :user: ingester
   :pass: ingester
   :upload_queue: upload
-  :processes: 1
+  :sesame_queue: sesame
+  :monitor:
+    - postgres
+    - solr
+    - sesame
+    - upload
+  :monitor_poll: 300
 
-:austalk_ingester:
-  <<: *rabbitmq_common
-  :error_log: austalk_ingester_errors.log
-  :user: ingester
-  :pass: ingester
-  :upload_queue: upload
-  :processes: 1
 
+# Specifies the number of processes to launch for each worker.
+# The total number of processes shouldn't exceed the number of 
+# CPU cores
 :worker_launcher:
   :upload_worker:
-    :processes: 2
+    :processes: 1
   :solr_worker:
-    :processes: 2
+    :processes: 1
   :sesame_worker:
-    :processes: 2
+    :processes: 1
   :postgres_worker:
-    :processes: 2
+    :processes: 1

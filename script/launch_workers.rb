@@ -64,7 +64,7 @@ def parse_options(args)
   parsed_options.daemonize = false
   parsed_options.processes = 1
   parsed_options.worker_classes = [UploadWorker, SolrWorker, SesameWorker, PostgresWorker]
-  parsed_options.config = YAML.load_file("#{File.dirname(__FILE__)}/../spec/files/config.yml")
+  parsed_options.config = YAML.load_file("#{File.dirname(__FILE__)}/../config.yml")
   #TODO: Add option for specifying a config files
   option_parser = OptionParser.new do |options|
     options.banner = "Usage: launch_workers.rb [options]"

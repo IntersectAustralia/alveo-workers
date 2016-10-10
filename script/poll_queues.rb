@@ -40,6 +40,6 @@ end
 
 
 if __FILE__ == $PROGRAM_NAME
-  config = YAML.load_file("#{File.dirname(__FILE__)}/../spec/files/config.yml")
+  config = YAML.load_file("#{File.dirname(__FILE__)}/../config.yml")
   main(config[:ingester])
 end

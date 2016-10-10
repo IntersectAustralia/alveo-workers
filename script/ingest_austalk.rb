@@ -7,11 +7,11 @@ require 'austalk_ingester'
 @ingesting = true
 @resume_point = -1
 # TODO move these fields to a config file
-@resume = 'resume.log'
-@processed = 'processed.log'
+@resume = 'austalk_resume.log'
+@processed = 'austalk_processed.log'
 
 def get_file_paths(directory)
-  file_paths = Dir[File.join(directory, '*.dat')]
+  file_paths = Dir[File.join(directory, '*.json')]
   processed = []
   if File.exists? @processed
     processed = File.read(@processed).split    
@@ -64,7 +64,7 @@ end
 if __FILE__ == $PROGRAM_NAME
   Process.setproctitle('AusTalkIngester')
   Process.daemon(nochdir=true)
-  config = YAML.load_file("#{File.dirname(__FILE__)}/../spec/files/config.yml")
+  config = YAML.load_file("#{File.dirname(__FILE__)}/../config.yml")
   options = config[:ingester]
   main(options, ARGV[0])
 end

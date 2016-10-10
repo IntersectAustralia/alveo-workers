@@ -10,7 +10,7 @@ require 'sesame_client'
 
 def main(collection_name)
   require 'yaml'
-  config = YAML.load_file("#{File.dirname(__FILE__)}/../spec/files/config.yml")
+  config = YAML.load_file("#{File.dirname(__FILE__)}/../config.yml")
   solr = RSolr.connect(url: config[:solr_worker][:url])
   solr.delete_by_query "collection_name_facet:#{collection_name}"
   solr.commit

@@ -5,8 +5,8 @@ require 'json'
 require 'trove_ingester'
 
 @ingesting = true
-@resume = 'resume.log'
-@processed = 'processed.log'
+@resume = 'trove_resume.log'
+@processed = 'trove_processed.log'
 @resume_point = -1
 
 def get_file_paths(directory)
@@ -63,7 +63,7 @@ end
 if __FILE__ == $PROGRAM_NAME
   Process.setproctitle('TroveIngester')
   Process.daemon(nochdir=true)
-  config = YAML.load_file("#{File.dirname(__FILE__)}/../spec/files/config.yml")
+  config = YAML.load_file("#{File.dirname(__FILE__)}/../config.yml")
   options = config[:ingester]
   main(options, ARGV[0])
 end

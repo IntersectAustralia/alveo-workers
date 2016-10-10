@@ -66,6 +66,6 @@ end
 
 if __FILE__ == $PROGRAM_NAME
   # TODO: use an argument parser
-  config = YAML.load_file("#{File.dirname(__FILE__)}/../spec/files/config.yml")
+  config = YAML.load_file("#{File.dirname(__FILE__)}/../config.yml")
   main(config)
 end

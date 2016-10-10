@@ -27,7 +27,7 @@ module MetadataHelper
       collection = @@COLLECTIONS[name]
     else
       # TODO: super dodgy, fix this
-      config = YAML.load_file("#{File.dirname(__FILE__)}/../spec/files/config.yml")
+      config = YAML.load_file("#{File.dirname(__FILE__)}/../config.yml")
       ActiveRecord::Base.establish_connection(config[:postgres_worker][:activerecord])
       ar_collection = Collection.find_by_name(name) 
       collection = {id: ar_collection.id, owner: ar_collection.owner.email}
