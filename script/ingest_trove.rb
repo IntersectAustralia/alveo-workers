@@ -1,32 +1,70 @@
 $LOAD_PATH.unshift("#{File.dirname(__FILE__)}/../lib")
 
-require 'trove_ingester'
 require 'yaml'
+require 'json'
+require 'trove_ingester'
 
-def main(directory)
-  config = YAML.load_file("#{File.dirname(__FILE__)}/../spec/files/config.yml")
-  work = Dir[File.join(directory, '*.dat')]
-  processes = config[:trove_ingester][:processes]
-  job_size = work.size / processes
-  jobs = work.each_slice(job_size).to_a
-  if jobs.size % processes != 0
-    jobs.first.concat(jobs.last)
-    jobs.delete(jobs.last)
+@ingesting = true
+@resume = 'resume.log'
+@processed = 'processed.log'
+@resume_point = -1
+
+def get_file_paths(directory)
+  file_paths = Dir[File.join(directory, '*.dat')]
+  processed = []
+  if File.exists? @processed
+    processed = File.read(@processed).split    
   end
-  jobs.each { |job|
-    fork {
-      ingester = TroveIngester.new(config[:trove_ingester])
-      ingester.connect
-      ingester.set_work(job)
-      ingester.process
-      ingester.close
-    }
+  file_paths.select! { |file|
+    !processed.include? file
   }
- p Process.waitall
+  if File.exists? @resume
+    resume_data = File.read(@resume).split
+    resume_file = resume_data.first
+    file_paths.delete_if { |path|
+      path = resume_file
+    }
+    @resume_point = resume_data.last.to_i
+    file_paths.unshift(resume_file)
+  end
+  file_paths
+end
+
+def main(options, directory)
+  file_paths = get_file_paths(directory)
+  ingester = TroveIngester.new(options)
+  ingesting = true
+  Signal.trap('TERM') {
+    ingesting = false
+    ingester.ingesting = ingesting
+  }
+  ingester.connect
+  file_paths.each { |file_path|
+    ingester.process_chunk(file_path, @resume_point)
+    @resume_point = -1
+    if ingesting
+      File.open(@processed, 'a') { |processed|
+        processed.write("#{file_path}\n")
+      }
+    else
+      File.open(@resume, 'w') { |processed|
+        processed.write("#{file_path}\t#{ingester.record_count}\n")
+      }
+      break
+    end
+    while ingester.monitor_queues_message_count > 0
+      sleep options[:monitor_poll]
+    end
+  }
+  ingester.close
 end
 
 
 if __FILE__ == $PROGRAM_NAME
-  # TODO: use an argument parser
-  main(ARGV[0])
+  Process.setproctitle('TroveIngester')
+  Process.daemon(nochdir=true)
+  config = YAML.load_file("#{File.dirname(__FILE__)}/../spec/files/config.yml")
+  options = config[:ingester]
+  main(options, ARGV[0])
 end
+

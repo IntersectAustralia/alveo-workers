@@ -2,12 +2,13 @@ $LOAD_PATH.unshift("#{File.dirname(__FILE__)}/../lib")
 
 require 'yaml'
 require 'json'
-require 'trove_ingester'
+require 'austalk_ingester'
 
 @ingesting = true
+@resume_point = -1
+# TODO move these fields to a config file
 @resume = 'resume.log'
 @processed = 'processed.log'
-@resume_point = -1
 
 def get_file_paths(directory)
   file_paths = Dir[File.join(directory, '*.dat')]
@@ -32,7 +33,7 @@ end
 
 def main(options, directory)
   file_paths = get_file_paths(directory)
-  ingester = TroveIngester.new(options)
+  ingester = AustalkIngester.new(options)
   ingesting = true
   Signal.trap('TERM') {
     ingesting = false
@@ -61,7 +62,7 @@ end
 
 
 if __FILE__ == $PROGRAM_NAME
-  Process.setproctitle('TroveIngester')
+  Process.setproctitle('AusTalkIngester')
   Process.daemon(nochdir=true)
   config = YAML.load_file("#{File.dirname(__FILE__)}/../spec/files/config.yml")
   options = config[:ingester]
