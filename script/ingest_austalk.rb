@@ -33,7 +33,7 @@ end
 
 def main(options, directory)
   file_paths = get_file_paths(directory)
-  ingester = AustalkIngester.new(options)
+  ingester = AusTalkIngester.new(options)
   ingesting = true
   Signal.trap('TERM') {
     ingesting = false

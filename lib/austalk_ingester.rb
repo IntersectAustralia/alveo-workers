@@ -76,6 +76,7 @@ class AusTalkIngester
           next
         end
         austalk_fields = JSON.parse(trove_record.encode('utf-8'))
+        austalk_fields = add_document_sizes(austalk_fields)
         properties = {routing_key: @upload_queue.name, headers: {action: 'create'}}
         message = austalk_fields.to_s
         @exchange.publish(message, properties)
