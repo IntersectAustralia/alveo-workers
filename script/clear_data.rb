@@ -15,7 +15,7 @@ def main(collection_name)
   solr.delete_by_query "collection_name_facet:#{collection_name}"
   solr.commit
   ActiveRecord::Base.establish_connection(config[:postgres_worker][:activerecord])
-  collection_id = Collection.where(name: collection_name).id
+  collection_id = Collection.where(name: collection_name).first.id
   Item.where(collection_id: collection_id).delete_all
   sesame = SesameClient.new(config[:sesame_worker])
   sesame.clear_repository(collection_name)
