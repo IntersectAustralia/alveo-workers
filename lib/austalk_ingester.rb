@@ -60,6 +60,13 @@ class AusTalkIngester
     }
   end
 
+  def add_document_sizes(austalk_fields)
+    austalk_fields['ausnc:document'].each { |document|
+      document['alveo:size'] = File.size? document['dc:source']
+    }
+    austalk_fields
+  end
+
   def process_chunk(austalk_chunk, resume_point=0)
     @record_count = 0
     File.open(austalk_chunk).each { |austalk_record|
@@ -68,9 +75,9 @@ class AusTalkIngester
           @record_count += 1
           next
         end
-        austalk_fields = JSON.parse(austalk_record.encode('utf-8'))
-        message = map_to_json_ld(austalk_fields, austalk_record)
+        austalk_fields = JSON.parse(trove_record.encode('utf-8'))
         properties = {routing_key: @upload_queue.name, headers: {action: 'create'}}
+        message = austalk_fields.to_s
         @exchange.publish(message, properties)
         @record_count += 1
         break if !@ingesting
