@@ -28,12 +28,14 @@ class UploadWorker < Worker
   end
 
   def create_item(item)
+    if is_item? item
+      item['generated'] = generate_fields(item)
+    end
     message = item.to_json
     headers = {action: 'create'}
     properties = {routing_key: @sesame_queue.name, headers: headers, persistent: true}
     @exchange.publish(message, properties)
     if is_item? item
-      item['generated'] = generate_fields(item)
       properties = {routing_key: @postgres_queue.name, headers: headers, persistent: true}
       @exchange.publish(message, properties)
       properties = {routing_key: @solr_queue.name, headers: headers, persistent: true}
