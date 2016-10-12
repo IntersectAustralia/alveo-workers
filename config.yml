@@ -26,7 +26,7 @@
   :batch:
     :enabled: true
     :size: 5000
-    :timeout: 30
+    :timeout: 180
 
 :solr_worker:
   :url: http://10.0.0.7:8080/solr/hcsvlab
@@ -39,7 +39,7 @@
   :batch:
     :enabled: true
     :size: 10000
-    :timeout: 30
+    :timeout: 180
 
 :upload_worker:
   :rabbitmq:
@@ -66,9 +66,9 @@
     :password: alveo
     :host: 10.0.0.13
   :batch:
-    :enabled: false
+    :enabled: true
     :size: 5000
-    :timeout: 30
+    :timeout: 180
 
 :ingester:
   <<: *rabbitmq_common
@@ -94,6 +94,6 @@
   :solr_worker:
     :processes: 1
   :sesame_worker:
-    :processes: 1
+    :processes: 2
   :postgres_worker:
     :processes: 1
