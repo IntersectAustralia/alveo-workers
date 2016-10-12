@@ -26,7 +26,7 @@
   :batch:
     :enabled: true
     :size: 5000
-    :timeout: 300
+    :timeout: 30
 
 :solr_worker:
   :url: http://10.0.0.7:8080/solr/hcsvlab
@@ -39,7 +39,7 @@
   :batch:
     :enabled: true
     :size: 10000
-    :timeout: 300
+    :timeout: 30
 
 :upload_worker:
   :rabbitmq:
@@ -68,7 +68,7 @@
   :batch:
     :enabled: false
     :size: 5000
-    :timeout: 300
+    :timeout: 30
 
 :ingester:
   <<: *rabbitmq_common

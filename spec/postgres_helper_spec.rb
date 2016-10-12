@@ -12,8 +12,32 @@ describe PostgresHelper do
   describe '#create_pg_statement' do
 
     it 'creates a hash of items and documents for instertion into postgres' do
-      pending('Implement me')
-      fail
+      # it 'builds an item info hash' do
+      example = {'alveo:metadata' => {'@id' => 'https://app.alveo.edu.au/catalog/collection/identifier',
+                                      'alveo:display_document' => '/primary/text/path'},
+                 'generated' => {'handle' => 'collection:identifier',
+                                 'collection_id' => 3},
+                 'ausnc:document' => [{'dc:identifier' => 'primary_text.txt',
+                 'dc:source' => '/path/to/primary_text.txt',
+                 'dc:type' => 'Original'}]}
+      time = Time.new(1997)
+      expect(Time).to receive(:now).and_return(time)
+      json_metadata = example.clone
+      json_metadata.delete('generated')
+      json_metadata = json_metadata.to_json
+
+      expected = {item: {uri: 'https://app.alveo.edu.au/catalog/collection/identifier',
+                        handle: 'collection:identifier',
+                        collection_id: 3,
+                        primary_text_path: '/primary/text/path',
+                        json_metadata: json_metadata,
+                        indexed_at: time},
+                  documents: [{file_name: 'primary_text.txt',
+                              file_path: '/path/to/primary_text.txt',
+                              doc_type: 'Original',
+                              mime_type: 'text/plain'}]}
+      actual = @postgres_helper.create_pg_statement(example)
+      expect(actual).to eq(expected)
     end
 
   end
@@ -21,8 +45,15 @@ describe PostgresHelper do
   describe '#extract_documents_info' do
 
     it 'it builds an array of document info hashes' do
-      pending('Implement me')
-      fail
+      example = {'ausnc:document' => [{'dc:identifier' => 'primary_text.txt',
+                 'dc:source' => '/path/to/primary_text.txt',
+                 'dc:type' => 'Original'}]}
+      expected = [{file_name: 'primary_text.txt',
+                  file_path: '/path/to/primary_text.txt',
+                  doc_type: 'Original',
+                  mime_type: 'text/plain'}]
+      actual = @postgres_helper.extract_documents_info(example)
+      expect(actual).to eq(expected)
     end
 
   end
