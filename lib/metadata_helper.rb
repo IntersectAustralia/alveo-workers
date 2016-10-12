@@ -8,7 +8,10 @@ module MetadataHelper
 
   @@COLLECTIONS = {}
 
-  # TODO: be consistent in referring to 'item' or 'item_metadata'
+
+  def is_item?(jsonld)
+    not jsonld['alveo:metadata'].empty?
+  end
 
   def generate_fields(item)
     generated = {}

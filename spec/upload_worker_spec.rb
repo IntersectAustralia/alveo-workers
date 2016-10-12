@@ -20,7 +20,7 @@ describe UploadWorker do
   describe '#create_item' do
 
     it 'Adds messages to Solr, Sesame, and Postgres queues' do
-      example = {'mock' => 'item', 'generated' => {}}
+      example = {'mock' => 'item', 'generated' => {}, 'alveo:metadata' => {'meta' => 'data'}}
       allow(@upload_worker).to receive(:generate_fields).and_return({})
       expected = example.to_json
       headers = {action: 'create'}
