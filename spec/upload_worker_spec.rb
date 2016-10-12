@@ -32,4 +32,16 @@ describe UploadWorker do
 
   end
 
+  describe '#process_message' do
+
+    it 'creates an item on create action header' do
+      expected = 'item'
+      example_headers = {'action' => 'create'}
+      example_message = {'items' => [expected]}
+      expect(@upload_worker).to receive(:create_item).with(expected)
+      @upload_worker.process_message(example_headers, example_message)
+    end
+
+  end
+
 end
